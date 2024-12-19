@@ -42,13 +42,17 @@ body {
     border-radius: 8px;
 }
 
-/* Responsive Navbar */
 .navbar {
-    background-color: transparent !important;
-    padding: 10px 15px;
-    border-bottom: 2px solid #ddd;
-    margin-left: 170px;
-    margin-right: 180px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-btn, .cart-btn {
+    transition: all 0.3s ease-in-out;
+}
+
+.login-btn:hover, .cart-btn:hover {
+    background-color: #e9ecef;
+    color: #000;
 }
 
 .btn-outline-success{

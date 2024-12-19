@@ -113,32 +113,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
+        <!-- Logo and Brand -->
         <a class="navbar-brand d-flex align-items-center" href="#">
             <img src="./images/Logo.png" alt="Logo" style="width:50px; height:auto;">
-            <b class="ms-2">Fragrance Haven</b>
+            <b class="ms-2 dm-serif-display-regular-italic custom-font-color">FRAGRANCE HAVEN</b>
         </a>
+
+        <!-- Toggler Button for Small Screens -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+
+        <!-- Collapsible Content -->
         <div class="collapse navbar-collapse" id="navbarNav">
-            <div class="d-flex w-100 align-items-center">
-                <!-- Center the Search Bar -->
-                <div class="mx-auto">
+            <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
+                <!-- Search Bar in the Center -->
+                <div class="mx-auto my-2 my-lg-0">
                     <form class="d-flex">
                         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </form>
                 </div>
-                <!-- Display Username -->
-                <span class="navbar-text me-3">
+
+                <!-- Display Username or Guest -->
+                <span class="navbar-text me-3 my-2 my-lg-0">
                     Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
                 </span>
-            </div>
 
-                <!-- Login and Account Links -->
+                <!-- Account Dropdown for Logged-In Users -->
                 <?php if ($is_logged_in): ?>
                     <div class="dropdown me-3">
                         <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -150,28 +155,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
                         </ul>
                     </div>
-                <?php else: ?>
-                    <a href="user_login.php" class="btn btn-outline-secondary">Login</a>
-                    <a href="user_register.php" class="btn btn-outline-primary">Register</a>
                 <?php endif; ?>
             </div>
         </div>
-    </div>
 
-
-       <!-- Login and Cart Buttons on the Right -->
-       <div class="LoginCart">
-    <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
-        <img src="./images/cart-icon.jpg" alt="Cart" style="width:20px; margin-right:6px;">
-        Cart (<span id="cart-count">
-            <?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?>
-        </span>)
-    </a>
-    </div>
+        <!-- Login and Cart Buttons on the Right -->
+        <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
+            <?php if (!$is_logged_in): ?>
+                <a href="user_login.php" class="btn login-btn me-3">Login/Register</a>
+            <?php endif; ?>
+            <a href="cart.php" class="btn cart-btn" id="cart-button">
+            <img src="./images/cart-icon.jpg" alt="Cart" style="width:20px; height:20px; margin-right:6px;">
+            Cart (<span id="cart-count"><?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?></span>)
+            </a>
         </div>
-            </div>
-                </div>
+    </div>
 </nav>
+
      <!-- New Navigation Links Section -->
      <div class="py-1">
         <div class="container">
@@ -446,7 +446,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($featured_product['product_name']); ?>">
     <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($featured_product['price']); ?>">
     <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($featured_product['image']); ?>">
-
     <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
         Add to Cart
     </button>
