@@ -1,0 +1,287 @@
+/* General Reset */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Responsive Container */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* General Card Styles */
+.card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    text-align: center;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.card-body {
+    flex-grow: 1;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.card img,
+.card-img-top {
+    width: 100%;
+    height: auto; /* Adjust automatically */
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Responsive Navbar */
+.navbar {
+    background-color: transparent !important;
+    padding: 10px 15px;
+    border-bottom: 2px solid #ddd;
+    margin-left: 170px;
+    margin-right: 180px;
+}
+
+.btn-outline-success{
+    background-color: #ffffff;
+    border: rgb(6, 8, 8);
+    color:#1a1b1d
+}
+
+.cart-btn:hover{
+    background-color: #42beef;
+}
+
+.btn-outline-success:hover{
+    background-color: #42beef;
+  
+}
+
+.login-btn:hover{
+    background-color: #42beef;
+}
+
+.navbar-brand img {
+    width: 40px;
+    height: auto;
+}
+
+.navbar-toggler {
+    border: none;
+    background-color: transparent;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(1, 1, 1, 0.5)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+.navbar-nav {
+    flex-direction: row;
+}
+
+.nav-link {
+    color: #000 !important;
+    font-size: 16px;
+    margin-left: 30px;
+    padding: 5px 0px;
+}
+
+.nav-link:hover {
+    color: #007bff !important;
+}
+
+/* Login and Cart Section */
+.LoginCart {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Input Bars*/
+.form-control {
+    border: 1px solid #ccc;
+    max-width: 520px; 
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.dm-serif-display-regular {
+    font-family: "DM Serif Display", serif;
+    font-weight: 400;
+    font-style: normal;
+    
+  }
+.dm-serif-display-regular-italic {
+    font-family: "DM Serif Display", serif;
+    font-weight: 400;
+    font-style: italic;
+  }
+  
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .navbar-nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .LoginCart {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .card img {
+        height: 150px;
+    }
+
+    .navbar-nav {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .LoginCart {
+        flex-direction: column;
+        gap: 5px;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    .form-control {
+        width: 100%;
+    }
+
+    .card img {
+        height: 120px;
+    }
+
+    .LoginCart {
+        gap: 8px;
+    }
+}
+
+.custom-font-color {
+    background: linear-gradient(to right, #0b2a3b, #010101); /* Define your gradient colors */
+    -webkit-background-clip: text; /* Clip the gradient to the text */
+    -webkit-text-fill-color: transparent; /* Make the text itself transparent */
+}
+
+
+.order-now-btn {
+    position: absolute;
+    top: 50%; /* Vertically center */
+    right: 12%; /* Place it 10% from the right edge */
+    margin-left: 50px;
+    transform: translateY(-50%); /* Adjust for vertical alignment */
+    padding: 10px 20px;
+    font-size: 1.0rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #6bc2f1; /* Bootstrap primary color */
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.order-now-btn:hover {
+    background-color: #0c0b0b; /* Darker shade for hover effect */
+    text-decoration: none;
+    color: #fff;
+}
+
+/*index photo*/
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 200px;  /* Adjust height on smaller screens */
+    }
+}
+
+/*Admin Nav*/
+.custom-navbar-spacing .nav-item {
+    margin-right: -15px; /* Reduce spacing between items */
+}
+
+.custom-navbar-spacing .nav-link {
+    padding-left: 25px; /* Reduce left padding inside links */
+    padding-right: 5px; /* Reduce right padding inside links */
+}
+
+
+/*file upload*/
+.file-upload {
+    position: relative;
+    width: 100%;
+}
+
+.file-upload input[type="file"] {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.upload-area {
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    text-align: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    height: 200px;
+}
+
+.upload-area p {
+    margin: 0;
+    color: #888;
+}
+
+.upload-area span {
+    color: #007bff;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.upload-area:hover {
+    background-color: #f0f0f0;
+}
+
+.upload-area img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    display: none; /* Hidden initially */
+}
+
+
+/* card detail */
+.thumbnail-gallery {
+    display: flex;
+    flex-direction: column;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+
+.thumbnail-gallery img:hover {
+    transform: scale(1.1);
+    border-color: #007bff;
+}
