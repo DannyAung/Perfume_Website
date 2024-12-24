@@ -17,16 +17,21 @@ if ($conn->connect_error) {
 session_start();
 $user_id = $_SESSION['user_id']; // Replace with your actual session variable
 
-// Fetch orders and their items
+// Check if user is logged in
+$is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
+
+// Fetch orders and their items along with user details
 $sql = "
     SELECT o.order_id, o.created_at, o.total_price, o.status, 
-           oi.order_item_id, oi.product_id, oi.quantity, oi.price, 
-           p.product_name, p.image
+           oi.order_item_id, oi.product_id, oi.quantity, oi.price,
+           p.product_name, p.image, p.size,  -- Added 'size'
+           u.address, u.phone_number
     FROM orders o
     JOIN order_items oi ON o.order_id = oi.order_id
     JOIN products p ON oi.product_id = p.product_id
+    JOIN users u ON o.user_id = u.user_id
     WHERE o.user_id = ?
-    ORDER BY o.created_at ASC, oi.order_item_id ASC
+    ORDER BY o.created_at DESC, oi.order_item_id ASC
 ";
 
 $stmt = $conn->prepare($sql);
@@ -44,6 +49,8 @@ while ($row = $result->fetch_assoc()) {
             'created_at' => $row['created_at'],
             'total_price' => $row['total_price'],
             'status' => $row['status'],
+            'address' => $row['address'],
+            'phone_number' => $row['phone_number'],
             'items' => []
         ];
     }
@@ -51,17 +58,11 @@ while ($row = $result->fetch_assoc()) {
         'product_name' => $row['product_name'],
         'image' => $row['image'],
         'quantity' => $row['quantity'],
-        'price' => $row['price']
+        'price' => $row['price'],
+        'size' => $row['size']  // Added 'size' to items
     ];
 }
-// Check if user is logged in
-$is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
-// Fetch products
-$sql = "SELECT product_name, price, image FROM products"; // Ensure table columns are correct
-$result = mysqli_query($conn, $sql);
-if (!$result) {
-    die("Error in query: " . mysqli_error($conn));
-}
+
 
 ?>
 
@@ -71,10 +72,9 @@ if (!$result) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Orders</title>
-     <!-- Bootstrap CSS -->
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
 <!-- Navbar -->
@@ -135,9 +135,8 @@ if (!$result) {
         </div>
     </div>
 </nav>
-
-     <!-- New Navigation Links Section -->
-     <div class="py-1">
+  <!-- New Navigation Links Section -->
+  <div class="py-1">
         <div class="container">
             <ul class="nav justify-content">
                 <li class="nav-item">
@@ -166,44 +165,47 @@ if (!$result) {
         </div>
     </div>
 
-    <!-- Orders Table -->
-    <div class="container mt-4">
-        <h2>Your Orders</h2>
-        <?php if (!empty($orders)): ?>
-            <?php foreach ($orders as $order_id => $order): ?>
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <strong>Order ID:</strong> <?php echo htmlspecialchars($order_id); ?>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Order Date:</strong> <?php echo htmlspecialchars($order['created_at']); ?></p>
-                        <p><strong>Status:</strong> <?php echo htmlspecialchars($order['status']); ?></p>
-                        <p><strong>Total Price:</strong> <?php echo number_format($order['total_price'], 2); ?> MMK</p>
-                        <ul class="list-group">
-                            <?php foreach ($order['items'] as $item): ?>
-                                <li class="list-group-item">
-                                    <div class="d-flex">
-                                        <img src="products/<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['product_name']); ?>" class="me-3" style="width: 50px;">
-                                        <div>
-                                            <strong><?php echo htmlspecialchars($item['product_name']); ?></strong><br>
-                                            Quantity: <?php echo htmlspecialchars($item['quantity']); ?><br>
-                                            Price: <?php echo number_format($item['price'], 2); ?> MMK
-                                        </div>
-                                    </div>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>You have no orders yet.</p>
-        <?php endif; ?>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Orders Table -->
+<div class="container mt-4">
+    <h2>Your Orders</h2>
+    <?php if (!empty($orders)): ?>
+        <?php foreach ($orders as $order_id => $order): ?>
+            <div class="card mb-3">
+                <div class="card-header">
+                    <strong>Order ID:</strong> <?php echo htmlspecialchars($order_id); ?>
+                </div>
+                <div class="card-body">
+                    <p><strong>Order Date:</strong> <?php echo htmlspecialchars($order['created_at']); ?></p>
+                    <p><strong>Status:</strong> <?php echo htmlspecialchars($order['status']); ?></p>
+                    <p><strong>Total Price:</strong> <?php echo number_format($order['total_price'], 2); ?> $</p>
+                    <p><strong>Address:</strong> <?php echo htmlspecialchars($order['address']); ?></p>
+                    <p><strong>Phone Number:</strong> <?php echo htmlspecialchars($order['phone_number']); ?></p>
+                    <ul class="list-group">
+                        <?php foreach ($order['items'] as $item): ?>
+                            <li class="list-group-item">
+                                <div class="d-flex">
+                                    <img src="products/<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['product_name']); ?>" class="me-3" style="width: 50px;">
+                                    <div>
+                                        <strong><?php echo htmlspecialchars($item['product_name']); ?></strong><br>
+                                        Quantity: <?php echo htmlspecialchars($item['quantity']); ?><br>
+                                        Size: <?php echo htmlspecialchars($item['size']); ?><br> <!-- Display the size -->
+                                        Price: <?php echo number_format($item['price'], 2); ?> $ <br>
+                                    </div>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>You have no orders yet.</p>
+    <?php endif; ?>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
 

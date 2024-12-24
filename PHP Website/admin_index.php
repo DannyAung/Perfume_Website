@@ -84,7 +84,7 @@ if (!$conn) {
                         <h5 class="card-title mb-1">Manage Orders</h5>
                         <p class="card-text mb-0">View and update order status.</p>
                     </div>
-                    <a href="manage_order.php" class="btn btn-primary ms-2">Go</a>
+                    <a href="manage_orders.php" class="btn btn-primary ms-2">Go</a>
                 </div>
             </div>
         </div>

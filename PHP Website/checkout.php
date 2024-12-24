@@ -47,6 +47,7 @@ while ($item = $result->fetch_assoc()) {
     $cart_items[] = $item;
 }
 
+// Retrieve form data
 if (isset($_POST['checkout'])) {
     // Retrieve form data
     $name = $_POST['name'];
@@ -55,52 +56,74 @@ if (isset($_POST['checkout'])) {
     $email = $_POST['email'];
     $payment_method = $_POST['payment_method'];
 
+    // Update user information
+    $update_sql = "UPDATE users SET address = ?, phone_number = ? WHERE user_id = ?";
+    $update_stmt = $conn->prepare($update_sql);
+    $update_stmt->bind_param("ssi", $address, $phone, $user_id);
+    $update_stmt->execute();
+
+
     // Additional payment method details
     if ($payment_method == 'kpay') {
         $kpay_phone = $_POST['kpay_phone'];
         $kpay_otp = $_POST['kpay_otp'];
     } elseif ($payment_method == 'credit_card') {
         $card_number = $_POST['card_number'];
-        $card_expiry = $_POST['card_expiry'];
-        $card_cvv = $_POST['card_cvv'];
-    }
-
-    // Insert order into the orders table
-    $order_sql = "INSERT INTO orders (user_id, total_price, name, address, phone, email, payment_method) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?)";
-    $order_stmt = $conn->prepare($order_sql);
-    $order_stmt->bind_param("idsssss", $user_id, $total_price, $name, $address, $phone, $email, $payment_method);
-
-    if ($order_stmt->execute()) {
-        $order_id = $conn->insert_id; // Get the generated order ID
-
-        // Insert each cart item into the order_items table
-        foreach ($cart_items as $item) {
+        $card_expiry = $_POST['card_expiry'];foreach ($cart_items as $item) {
             $product_id = $item['product_id'];
             $quantity = $item['quantity'];
             $price = $item['price'];
-
-            $order_item_sql = "INSERT INTO order_items (order_id, product_id, product_name, quantity, price) 
-                               VALUES (?, ?, ?, ?, ?)";
+            $size = $_POST['size_' . $item['cart_item_id']]; // Get the selected size for each item
+        
+            $order_item_sql = "INSERT INTO order_items (order_id, product_id, product_name, quantity, price, size) 
+                               VALUES (?, ?, ?, ?, ?, ?)";
             $order_item_stmt = $conn->prepare($order_item_sql);
-            $order_item_stmt->bind_param("iisid", $order_id, $product_id, $item['product_name'], $quantity, $price);
+            $order_item_stmt->bind_param("iisids", $order_id, $product_id, $item['product_name'], $quantity, $price, $size);
             $order_item_stmt->execute();
         }
-
-        // Update cart items with the generated order ID
-        foreach ($cart_items as $item) {
-            $update_sql = "UPDATE cart_items SET ordered_status = 'ordered', order_id = ? WHERE cart_item_id = ?";
-            $update_stmt = $conn->prepare($update_sql);
-            $update_stmt->bind_param("ii", $order_id, $item['cart_item_id']);
-            $update_stmt->execute();
-        }
-
-        // Redirect to order confirmation page
-        header("Location: order_confirmation.php?order_id=" . $order_id);
-        exit();
-    } else {
-        die("Error executing order query: " . $order_stmt->error);
+        
+        
+        
+        
+        $card_cvv = $_POST['card_cvv'];
     }
+
+  // Insert order into the orders table
+  $order_sql = "INSERT INTO orders (user_id, total_price, name, address, phone, email, payment_method) 
+  VALUES (?, ?, ?, ?, ?, ?, ?)";
+$order_stmt = $conn->prepare($order_sql);
+$order_stmt->bind_param("idsssss", $user_id, $total_price, $name, $address, $phone, $email, $payment_method);
+
+if ($order_stmt->execute()) {
+$order_id = $conn->insert_id; // Get the generated order ID
+
+// Insert each cart item into the order_items table
+foreach ($cart_items as $item) {
+$product_id = $item['product_id'];
+$quantity = $item['quantity'];
+$price = $item['price'];
+
+$order_item_sql = "INSERT INTO order_items (order_id, product_id, product_name, quantity, price) 
+               VALUES (?, ?, ?, ?, ?)";
+$order_item_stmt = $conn->prepare($order_item_sql);
+$order_item_stmt->bind_param("iisid", $order_id, $product_id, $item['product_name'], $quantity, $price);
+$order_item_stmt->execute();
+}
+
+// Update cart items with the generated order ID
+foreach ($cart_items as $item) {
+$update_sql = "UPDATE cart_items SET ordered_status = 'ordered', order_id = ? WHERE cart_item_id = ?";
+$update_stmt = $conn->prepare($update_sql);
+$update_stmt->bind_param("ii", $order_id, $item['cart_item_id']);
+$update_stmt->execute();
+}
+
+// Redirect to order confirmation page
+header("Location: order_confirmation.php?order_id=" . $order_id);
+exit();
+} else {
+die("Error executing order query: " . $order_stmt->error);
+}
 }
 ?>
 
