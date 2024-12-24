@@ -4,7 +4,7 @@ $host = 'localhost';
 $username = 'root';
 $password = '';
 $dbname = 'ecom_website';
-$port = 3307; // Add the correct port here
+$port = 3306; // Add the correct port here
 
 $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 

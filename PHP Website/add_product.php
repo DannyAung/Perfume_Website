@@ -1,5 +1,5 @@
 <?php
-require_once 'db.php';
+require_once "db_connection.php";
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -116,6 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="admin_index.php">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_products.php">Products</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_orders.php">Orders</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_users.php">Users</a></li>

@@ -13,7 +13,7 @@ $host = 'localhost';
 $username = 'root';
 $password = '';
 $dbname = 'ecom_website';
-$port = 3307;
+$port = 3306;
 
 $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 
@@ -46,6 +46,7 @@ if (!$conn) {
             </button>
             <div class="collapse navbar-collapse " id="navbarNav">
             <ul class="navbar-nav me-auto custom-navbar-spacing">
+                    <li class="nav-item"><a class="nav-link" href="admin_index.php">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_products.php">Products</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_orders.php">Orders</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_users.php">Users</a></li>
@@ -56,7 +57,8 @@ if (!$conn) {
                 </div>
             </div>
         </div>
-    </nav>
+    </nav><br>
+   
     
    <div class="container my-5">
     <h1 class="text-center mb-4">Welcome, Admin!</h1>
@@ -82,7 +84,7 @@ if (!$conn) {
                         <h5 class="card-title mb-1">Manage Orders</h5>
                         <p class="card-text mb-0">View and update order status.</p>
                     </div>
-                    <a href="manage_orders.php" class="btn btn-primary ms-2">Go</a>
+                    <a href="manage_order.php" class="btn btn-primary ms-2">Go</a>
                 </div>
             </div>
         </div>

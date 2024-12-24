@@ -12,7 +12,7 @@ $host = 'localhost';
 $username = 'root';
 $password = '';
 $dbname = 'ecom_website';
-$port = 3307;
+$port = 3306;
 
 $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 
@@ -47,6 +47,7 @@ $products = mysqli_fetch_all($result, MYSQLI_ASSOC);
             </a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="admin_index.php">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_products.php">Products</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_orders.php">Orders</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_users.php">Users</a></li>

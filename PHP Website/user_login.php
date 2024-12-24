@@ -1,41 +1,33 @@
 <?php
+session_start();  // Start session at the top
+
 require_once "db_connection.php";
 
-if (!isset($_SESSION)) {
-    session_start(); // Start session if not already started
-}
-
-// Function to check if a password is strong
-function ispasswordstrong($password)
-{
-    if (strlen($password) < 8) {
-        return false;
-    }
-    // Add additional checks for strength if needed
-    return true;
-}
-
+// Handle login logic
 if (isset($_POST['login']) && $_SERVER['REQUEST_METHOD'] == "POST") {
-
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
 
     // Check if email and password are provided
     if (!empty($email) && !empty($password)) {
         try {
-            $sql = "SELECT user_name, password FROM users WHERE email = ?";
+            // Query to get user information
+            $sql = "SELECT user_id, user_name, password FROM users WHERE email = ?";
             $stmt = $conn->prepare($sql);
             $stmt->execute([$email]);
             $info = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($info) {
+                // Password verification
                 $password_hash = $info['password'];
-
                 if (password_verify($password, $password_hash)) {
-                    // Login successful
-                    $_SESSION['user_logged_in'] = true;
+                    // Success: Set session variables
+                    $_SESSION['user_id'] = $info['user_id'];  // Ensure user_id is correctly set
                     $_SESSION['user_name'] = $info['user_name'];
-                    header("Location: viewProduct.php");
+                    $_SESSION['user_logged_in'] = true;  // Mark the user as logged in
+
+                    // Redirect to product page
+                    header("Location: user_index.php");
                     exit;
                 } else {
                     $password_err = "Invalid password.";
@@ -51,6 +43,7 @@ if (isset($_POST['login']) && $_SERVER['REQUEST_METHOD'] == "POST") {
     }
 }
 ?>
+
 
 <!doctype html>
 <html lang="en">

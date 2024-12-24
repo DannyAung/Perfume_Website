@@ -1,100 +1,317 @@
 <?php
-// Start session
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+session_start();
+
+// Assuming user is logged in and their user_id is stored in session
+if (!isset($_SESSION['user_id'])) {
+    echo "You must be logged in to add items to your cart.";
+    exit;
 }
+
+$user_id = $_SESSION['user_id']; // User ID from session
 
 // Database connection
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
 $dbname = 'ecom_website';
-$port = 3307;
+$port = 3306;
 
 $conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
-
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
-// DEBUG: Check if session user_id is set and print it (for testing only)
-if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
-    error_log("User ID is not set or empty in session. Session contents: " . print_r($_SESSION, true));
-    $_SESSION['error'] = "Please log in to add items to your cart.";
-    header("Location: user_login.php");
-    exit;
-}
+// Check if user is logged in
+$is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-// Store the user_id from the session
-$user_id = $_SESSION['user_id'];
+// Add to Cart Logic
+if (isset($_POST['add_to_cart'])) {
+    $product_id = $_POST['product_id'];
 
-// Check if the request method is POST and required fields are set
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'], $_POST['quantity'])) {
-    $product_id = (int)$_POST['product_id'];
-    $quantity = (int)$_POST['quantity'];
-
-    // Fetch product details from the database
-    $sql = "SELECT name, price, image FROM products WHERE product_id = ?";
+    // Check if quantity is set and is a valid number
+    $quantity = isset($_POST['quantity']) && is_numeric($_POST['quantity']) && $_POST['quantity'] > 0 ? $_POST['quantity'] : 1; // Default to 1 if invalid
+    
+    // Check if product already exists in the cart for the user
+    $sql = "SELECT * FROM cart_items WHERE user_id = ? AND product_id = ? AND ordered_status = 'not_ordered'";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $product_id);
+    $stmt->bind_param("ii", $user_id, $product_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        $product = $result->fetch_assoc();
-        $product_name = $product['name'];
-        $product_price = $product['price'];
-        $product_image = $product['image'];
+        // Product already exists in the cart, update the quantity
+        $cart_item = $result->fetch_assoc();
+        $new_quantity = $cart_item['quantity'] + $quantity;
 
-        // Check if the product is already in the user's cart
-        $sql = "SELECT quantity FROM cart_items WHERE user_id = ? AND product_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ii", $user_id, $product_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            // Update the quantity if the product exists in the cart
-            $row = $result->fetch_assoc();
-            $new_quantity = $row['quantity'] + $quantity;
-            $sql = "UPDATE cart_items SET quantity = ? WHERE user_id = ? AND product_id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("iii", $new_quantity, $user_id, $product_id);
-            $stmt->execute();
-        } else {
-            // Insert new item into the cart
-            $sql = "INSERT INTO cart_items (user_id, product_id, quantity, added_at) VALUES (?, ?, ?, NOW())";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("iii", $user_id, $product_id, $quantity);
-            $stmt->execute();
-        }
-
-        $_SESSION['success'] = "Product added to cart successfully!";
+        $sql = "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?";
+        $update_stmt = $conn->prepare($sql);
+        $update_stmt->bind_param("ii", $new_quantity, $cart_item['cart_item_id']);
+        $update_stmt->execute();
     } else {
-        $_SESSION['error'] = "Product not found.";
+        // Insert the product into the cart
+        $sql = "INSERT INTO cart_items (user_id, product_id, quantity, ordered_status) VALUES (?, ?, ?, 'not_ordered')";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iii", $user_id, $product_id, $quantity);
+        $stmt->execute();
+        echo "Product added to your cart!";
     }
-} else {
-    $_SESSION['error'] = "Invalid request. Please try again.";
+
+    // Redirect to avoid repeated submission
+    header("Location: user_index.php");
+    exit;
 }
 
-// Redirect back to the previous page
-header("Location: " . $_SERVER['HTTP_REFERER']);
-exit;
+// Increase Quantity Logic
+if (isset($_POST['increase_quantity'])) {
+    $cart_item_id = $_POST['cart_item_id'];
+
+    // Fetch current quantity
+    $sql = "SELECT quantity FROM cart_items WHERE cart_item_id = ? AND user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $cart_item_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $cart_item = $result->fetch_assoc();
+        $new_quantity = $cart_item['quantity'] + 1;
+
+        // Update quantity
+        $sql = "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?";
+        $update_stmt = $conn->prepare($sql);
+        $update_stmt->bind_param("ii", $new_quantity, $cart_item_id);
+        $update_stmt->execute();
+    }
+
+    // Redirect to avoid repeated submission
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+// Decrease Quantity Logic
+if (isset($_POST['decrease_quantity'])) {
+    $cart_item_id = $_POST['cart_item_id'];
+
+    // Fetch current quantity
+    $sql = "SELECT quantity FROM cart_items WHERE cart_item_id = ? AND user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $cart_item_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $cart_item = $result->fetch_assoc();
+        if ($cart_item['quantity'] > 1) {
+            $new_quantity = $cart_item['quantity'] - 1;
+            // Update quantity
+            $sql = "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?";
+            $update_stmt = $conn->prepare($sql);
+            $update_stmt->bind_param("ii", $new_quantity, $cart_item_id);
+            $update_stmt->execute();
+        } else {
+            // Remove item from cart if quantity is 1
+            $sql = "DELETE FROM cart_items WHERE cart_item_id = ?";
+            $delete_stmt = $conn->prepare($sql);
+            $delete_stmt->bind_param("i", $cart_item_id);
+            $delete_stmt->execute();
+        }
+    }
+
+    // Redirect to avoid repeated submission
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+// Remove All Items Logic
+if (isset($_POST['remove_all'])) {
+    $sql = "DELETE FROM cart_items WHERE user_id = ? AND ordered_status = 'not_ordered'";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+
+    // Redirect to avoid repeated submission
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
 ?>
 
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fragrance Haven</title>
+    <title>Your Cart</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Style for the page */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            padding: 30px;
+            background-color: #34495e;
+            color: #ecf0f1;
+            margin: 0;
+        }
+        .cart-container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f2f2f2;
+        }
+        .cart-item img {
+            width: 120px;
+            height: auto;
+            border-radius: 8px;
+        }
+        .product-details {
+            flex-grow: 1;
+            padding-left: 20px;
+        }
+        .product-details h3 {
+            margin: 0;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+        
+        .quantity {
+            display: flex;
+            align-items: center;
+        }
+        .quantity button {
+            background-color: #3498db;
+            color: #ffffff;
+            padding: 8px 12px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .quantity button:hover {
+            background-color: #2980b9;
+        }
+        .quantity input {
+            width: 50px;
+            padding: 5px;
+            text-align: center;
+            font-size: 1em;
+            margin: 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .cart-item button {
+            padding: 8px 16px;
+            background-color:rgb(88, 148, 198);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .cart-item button:hover {
+            background-color:rgb(43, 132, 192);
+        }
+        .total {
+            text-align: right;
+            font-size: 1.5em;
+            margin-top: 20px;
+            color: #2c3e50;
+        }
+        .empty-cart {
+            text-align: center;
+            padding: 30px;
+            color:rgb(129, 127, 244);
+        }
+      /* Styling for the cart item */
+.cart-item {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 20px;
+}
+
+.product-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.product-details {
+    flex-grow: 1;
+}
+
+.price {
+    font-weight: bold;
+    color:rgb(46, 148, 237);
+}
+
+/* Styling for the button container */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Button Styles */
+.btn-danger, .btn-success {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-danger {
+    background-color: #e74c3c; /* Red background for 'Remove All Items' */
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b; /* Darker red on hover */
+}
+
+.btn-success {
+    background-color: #28a745; /* Green background for 'Checkout' */
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+
+.original-price {
+    text-decoration: line-through;
+    color: blue; /* Optional: Use a lighter color to de-emphasize the original price */
+}
+
+.discounted-price {
+    font-weight: bold;
+    color:rgb(222, 31, 24); /* Optional: Use a distinct color (e.g., red) for the discounted price */
+}
+
+
+    </style>
 </head>
 <body>
-<!-- Navbar -->
+
+    <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <!-- Logo and Brand -->
@@ -145,30 +362,119 @@ exit;
             <?php if (!$is_logged_in): ?>
                 <a href="user_login.php" class="btn login-btn me-3">Login/Register</a>
             <?php endif; ?>
-            <a href="cart.php" class="btn cart-btn" id="cart-button">
+            <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
             <img src="./images/cart-icon.jpg" alt="Cart" style="width:20px; height:20px; margin-right:6px;">
-            Cart (<span id="cart-count"><?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?></span>)
+            Cart 
             </a>
+
+
         </div>
     </div>
 </nav>
 
-    <!-- Main Content -->
-    <div class="container">
-        <?php if (isset($_SESSION['success'])): ?>
-            <div class="success-message">
-                <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="error-message">
-                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
-            </div>
-        <?php endif; ?>
-
-        <h1>Product Added to Cart</h1>
-        <p><a href="products.php">Continue Shopping</a> or <a href="add_to_cart.php">View Cart</a></p>
+     <!-- New Navigation Links Section -->
+     <div class="py-1">
+        <div class="container">
+            <ul class="nav justify-content">
+                <li class="nav-item">
+                    <a class="nav-link active" href="user_index.php">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">About</a>
+                </li>
+                <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">
+                    Category
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+                    <li><a class="dropdown-item" href="#">Men</a></li>
+                    <li><a class="dropdown-item" href="#">Women</a></li>
+                    <li><a class="dropdown-item" href="#">Unisex</a></li>
+                </ul>
+            </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Delivery</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+            </ul>
+        </div>
     </div>
+
+    <h1>Your Cart</h1>
+    <div class="cart-container">
+    <?php
+    $sql = "SELECT ci.cart_item_id, ci.quantity, p.product_name, p.price, p.discounted_price, p.image
+            FROM cart_items ci
+            JOIN products p ON ci.product_id = p.product_id
+            WHERE ci.user_id = ? AND ci.ordered_status = 'not_ordered'";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    
+    if ($result->num_rows > 0) {
+        $total_price = 0;
+        while ($item = $result->fetch_assoc()) {
+            $regular_price = $item['price'];
+            $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : 0;
+            $item_price = $discounted_price > 0 ? $discounted_price : $regular_price;
+            $item_total = $item_price * $item['quantity'];
+            $total_price += $item_total;
+    
+            $product_name = htmlspecialchars($item['product_name']);
+            $product_image = htmlspecialchars($item['image']);
+            $image_path = "products/" . $product_image;
+    
+            // Render cart item
+            echo "<div class='cart-item'>
+                    <img src='" . $image_path . "' alt='" . $product_name . "' class='product-image'>
+                    <div class='product-details'>
+                        <h3>" . $product_name . "</h3>";
+    
+            // Show regular price with a strikethrough if there is a discounted price
+            if ($discounted_price > 0) {
+                echo "<p class='regular-price'><del>$" . number_format($regular_price, 2) . "</del></p>";
+                echo "<p class='discounted-price'>$" . number_format($discounted_price, 2) . "</p>";
+            } else {
+                echo "<p class='price'>$" . number_format($regular_price, 2) . "</p>";
+            }
+    
+            echo "<p>Quantity: " . $item['quantity'] . "</p>
+                    </div>
+                    <form method='post' class='d-inline'>
+                        <input type='hidden' name='cart_item_id' value='" . $item['cart_item_id'] . "'>
+                        <button type='submit' name='decrease_quantity' class='btn btn-secondary'>-</button>
+                        <button type='submit' name='increase_quantity' class='btn btn-primary'>+</button>
+                    </form>
+                </div>";
+        }
+    
+        // Display total price
+        echo "<div class='total'>Total Price: $" . number_format($total_price, 2) . "</div>";
+    
+        // Button Container
+        echo "<div class='button-container'>
+                <form method='post'>
+                    <button type='submit' name='remove_all' class='btn btn-danger'>Remove All Items</button>
+                </form>
+                <form method='post' action='checkout.php'>
+                    <button type='submit' name='check_out' class='btn btn-success'>Process to Check Out</button>
+                </form>
+              </div>";
+    } else {
+        echo "<div class='empty-cart'><p>Your cart is empty.</p></div>";
+        echo "<a href='user_index.php'><p>Continue Shopping?</p></a>";
+    }
+    ?>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+<?php
+$conn->close();
+?>

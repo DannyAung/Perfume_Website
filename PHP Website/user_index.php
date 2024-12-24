@@ -9,7 +9,7 @@ $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
 $dbname = 'ecom_website';
-$port = 3307;
+$port = 3306;
 
 $conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
 
@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             Account
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                            <li><a class="dropdown-item" href="orders.php">Orders</a></li>
+                            <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
                             <li><a class="dropdown-item" href="edit_profile.php">Edit Profile</a></li>
                             <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
                         </ul>
@@ -164,9 +164,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if (!$is_logged_in): ?>
                 <a href="user_login.php" class="btn login-btn me-3">Login/Register</a>
             <?php endif; ?>
-            <a href="cart.php" class="btn cart-btn" id="cart-button">
+            <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
             <img src="./images/cart-icon.jpg" alt="Cart" style="width:20px; height:20px; margin-right:6px;">
-            Cart (<span id="cart-count"><?php echo isset($_SESSION['cart']) ? array_sum(array_column($_SESSION['cart'], 'quantity')) : 0; ?></span>)
+            Cart 
             </a>
         </div>
     </div>
