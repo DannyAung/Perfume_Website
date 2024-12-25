@@ -24,7 +24,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 $sql = "
     SELECT o.order_id, o.created_at, o.total_price, o.status, 
            oi.order_item_id, oi.product_id, oi.quantity, oi.price,
-           p.product_name, p.image, p.size,  -- Added 'size'
+           p.product_name, p.image, p.size, 
            u.address, u.phone_number
     FROM orders o
     JOIN order_items oi ON o.order_id = oi.order_id
@@ -59,11 +59,10 @@ while ($row = $result->fetch_assoc()) {
         'image' => $row['image'],
         'quantity' => $row['quantity'],
         'price' => $row['price'],
-        'size' => $row['size']  // Added 'size' to items
+        'size' => $row['size'],  // Added 'size' to items
+        'product_id' => $row['product_id']
     ];
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -76,6 +75,12 @@ while ($row = $result->fetch_assoc()) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+<style>
+    .cancelled-status {
+        color: red;
+    }
+</style>
+
 <body>
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -115,7 +120,7 @@ while ($row = $result->fetch_assoc()) {
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
                             <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
-                            <li><a class="dropdown-item" href="edit_profile.php">Edit Profile</a></li>
+                            <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
                             <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
                         </ul>
                     </div>
@@ -135,8 +140,9 @@ while ($row = $result->fetch_assoc()) {
         </div>
     </div>
 </nav>
-  <!-- New Navigation Links Section -->
-  <div class="py-1">
+
+     <!-- New Navigation Links Section -->
+     <div class="py-1">
         <div class="container">
             <ul class="nav justify-content">
                 <li class="nav-item">
@@ -165,7 +171,6 @@ while ($row = $result->fetch_assoc()) {
         </div>
     </div>
 
-
 <!-- Orders Table -->
 <div class="container mt-4">
     <h2>Your Orders</h2>
@@ -177,10 +182,15 @@ while ($row = $result->fetch_assoc()) {
                 </div>
                 <div class="card-body">
                     <p><strong>Order Date:</strong> <?php echo htmlspecialchars($order['created_at']); ?></p>
-                    <p><strong>Status:</strong> <?php echo htmlspecialchars($order['status']); ?></p>
+                    <p><strong>Status:</strong> 
+                    <span class="<?php echo $order['status'] == 'cancelled' ? 'cancelled-status' : ''; ?>">
+                        <?php echo htmlspecialchars($order['status']); ?>
+                    </span>
+                    </p>
                     <p><strong>Total Price:</strong> <?php echo number_format($order['total_price'], 2); ?> $</p>
                     <p><strong>Address:</strong> <?php echo htmlspecialchars($order['address']); ?></p>
                     <p><strong>Phone Number:</strong> <?php echo htmlspecialchars($order['phone_number']); ?></p>
+
                     <ul class="list-group">
                         <?php foreach ($order['items'] as $item): ?>
                             <li class="list-group-item">
@@ -190,9 +200,45 @@ while ($row = $result->fetch_assoc()) {
                                         <strong><?php echo htmlspecialchars($item['product_name']); ?></strong><br>
                                         Quantity: <?php echo htmlspecialchars($item['quantity']); ?><br>
                                         Size: <?php echo htmlspecialchars($item['size']); ?><br> <!-- Display the size -->
-                                        Price: <?php echo number_format($item['price'], 2); ?> $ <br>
                                     </div>
                                 </div>
+
+                                <!-- Add review form for completed orders -->
+                                <?php if ($order['status'] == 'completed'): ?>
+                                    <!-- Check if the user has already reviewed this product -->
+                                    <?php
+                                    // Check if the user has reviewed the product before
+                                    $check_review_query = "SELECT review_id FROM reviews WHERE user_id = ? AND product_id = ?";
+                                    $stmt_check = $conn->prepare($check_review_query);
+                                    $stmt_check->bind_param("ii", $user_id, $item['product_id']);
+                                    $stmt_check->execute();
+                                    $result_check = $stmt_check->get_result();
+                                    ?>
+
+                                    <form action="submit_review.php" method="POST" class="mt-3">
+                                        <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+                                        <input type="hidden" name="product_id" value="<?php echo $item['product_id']; ?>">
+                                        <div class="mb-2">
+                                            <textarea name="review_text" class="form-control" placeholder="Write your review..." required></textarea>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label for="rating">Rating:</label>
+                                            <select name="rating" class="form-select" required>
+                                                <option value="">Select Rating</option>
+                                                <option value="1">1 - Poor</option>
+                                                <option value="2">2 - Fair</option>
+                                                <option value="3">3 - Good</option>
+                                                <option value="4">4 - Very Good</option>
+                                                <option value="5">5 - Excellent</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                                    </form>
+
+                                    <?php if ($result_check->num_rows > 0): ?>
+                                        <p>You have already reviewed this product. You can review next time.</p>
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             </li>
                         <?php endforeach; ?>
                     </ul>

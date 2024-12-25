@@ -25,10 +25,11 @@ if (!$conn) {
 } 
 
 // Retrieve cart items
-$sql = "SELECT ci.cart_item_id, ci.quantity, p.product_id, p.product_name, p.price, p.discounted_price, p.image
+$sql = "SELECT ci.cart_item_id, ci.quantity, p.product_id, p.product_name, p.price, p.discounted_price, p.image, p.size
         FROM cart_items ci
         JOIN products p ON ci.product_id = p.product_id
         WHERE ci.user_id = ? AND ci.ordered_status = 'not_ordered'";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -42,12 +43,11 @@ while ($item = $result->fetch_assoc()) {
     $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : 0;
     $item_price = $discounted_price > 0 ? $discounted_price : $regular_price;
     $item_total = $item_price * $item['quantity'];
-    $total_price += $item_total;
-    
+    $total_price += $item_total;   
     $cart_items[] = $item;
 }
 
-// Retrieve form data
+// Retrieve form data and process checkout
 if (isset($_POST['checkout'])) {
     // Retrieve form data
     $name = $_POST['name'];
@@ -62,68 +62,49 @@ if (isset($_POST['checkout'])) {
     $update_stmt->bind_param("ssi", $address, $phone, $user_id);
     $update_stmt->execute();
 
+    // Insert order into the orders table
+    $order_sql = "INSERT INTO orders (user_id, total_price, name, address, phone, email, payment_method) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $order_stmt = $conn->prepare($order_sql);
+    $order_stmt->bind_param("idsssss", $user_id, $total_price, $name, $address, $phone, $email, $payment_method);
 
-    // Additional payment method details
-    if ($payment_method == 'kpay') {
-        $kpay_phone = $_POST['kpay_phone'];
-        $kpay_otp = $_POST['kpay_otp'];
-    } elseif ($payment_method == 'credit_card') {
-        $card_number = $_POST['card_number'];
-        $card_expiry = $_POST['card_expiry'];foreach ($cart_items as $item) {
+    if ($order_stmt->execute()) {
+        $order_id = $conn->insert_id; // Get the generated order ID
+
+        // Insert each cart item into the order_items table and update stock
+        foreach ($cart_items as $item) {
             $product_id = $item['product_id'];
             $quantity = $item['quantity'];
             $price = $item['price'];
-            $size = $_POST['size_' . $item['cart_item_id']]; // Get the selected size for each item
-        
+
+            // Insert order item into order_items table
             $order_item_sql = "INSERT INTO order_items (order_id, product_id, product_name, quantity, price, size) 
                                VALUES (?, ?, ?, ?, ?, ?)";
             $order_item_stmt = $conn->prepare($order_item_sql);
-            $order_item_stmt->bind_param("iisids", $order_id, $product_id, $item['product_name'], $quantity, $price, $size);
+            $order_item_stmt->bind_param("iisids", $order_id, $product_id, $item['product_name'], $quantity, $price, $item['size']);
             $order_item_stmt->execute();
+
+            // Reduce the product's stock quantity
+            $update_stock_sql = "UPDATE products SET stock_quantity = stock_quantity - ? WHERE product_id = ?";
+            $update_stock_stmt = $conn->prepare($update_stock_sql);
+            $update_stock_stmt->bind_param("ii", $quantity, $product_id);
+            $update_stock_stmt->execute();
         }
-        
-        
-        
-        
-        $card_cvv = $_POST['card_cvv'];
+
+        // Update cart items with the generated order ID
+        foreach ($cart_items as $item) {
+            $update_sql = "UPDATE cart_items SET ordered_status = 'ordered', order_id = ? WHERE cart_item_id = ?";
+            $update_stmt = $conn->prepare($update_sql);
+            $update_stmt->bind_param("ii", $order_id, $item['cart_item_id']);
+            $update_stmt->execute();
+        }
+
+        // Redirect to order confirmation page
+        header("Location: order_confirmation.php?order_id=" . $order_id);
+        exit();
+    } else {
+        die("Error executing order query: " . $order_stmt->error);
     }
-
-  // Insert order into the orders table
-  $order_sql = "INSERT INTO orders (user_id, total_price, name, address, phone, email, payment_method) 
-  VALUES (?, ?, ?, ?, ?, ?, ?)";
-$order_stmt = $conn->prepare($order_sql);
-$order_stmt->bind_param("idsssss", $user_id, $total_price, $name, $address, $phone, $email, $payment_method);
-
-if ($order_stmt->execute()) {
-$order_id = $conn->insert_id; // Get the generated order ID
-
-// Insert each cart item into the order_items table
-foreach ($cart_items as $item) {
-$product_id = $item['product_id'];
-$quantity = $item['quantity'];
-$price = $item['price'];
-
-$order_item_sql = "INSERT INTO order_items (order_id, product_id, product_name, quantity, price) 
-               VALUES (?, ?, ?, ?, ?)";
-$order_item_stmt = $conn->prepare($order_item_sql);
-$order_item_stmt->bind_param("iisid", $order_id, $product_id, $item['product_name'], $quantity, $price);
-$order_item_stmt->execute();
-}
-
-// Update cart items with the generated order ID
-foreach ($cart_items as $item) {
-$update_sql = "UPDATE cart_items SET ordered_status = 'ordered', order_id = ? WHERE cart_item_id = ?";
-$update_stmt = $conn->prepare($update_sql);
-$update_stmt->bind_param("ii", $order_id, $item['cart_item_id']);
-$update_stmt->execute();
-}
-
-// Redirect to order confirmation page
-header("Location: order_confirmation.php?order_id=" . $order_id);
-exit();
-} else {
-die("Error executing order query: " . $order_stmt->error);
-}
 }
 ?>
 
@@ -189,7 +170,6 @@ die("Error executing order query: " . $order_stmt->error);
 
     <div class="checkout-container">
         <h1>Checkout</h1>
-
         <!-- Cart Items Summary -->
         <div class="cart-item-summary">
             <h3>Cart Summary</h3>
@@ -210,9 +190,9 @@ die("Error executing order query: " . $order_stmt->error);
                     } else {
                         echo "<p><strong>$" . number_format($regular_price, 2) . "</strong></p>";
                     }
-                    echo "<p>Quantity: " . $item['quantity'] . "</p>
-                          </div>
-                          </div>";
+                    echo "<p>Quantity: " . $item['quantity'] . " <span class='text-muted'>Size: " . htmlspecialchars($item['size']) . "</span></p>
+                        </div>
+                        </div>";
                 }
             }
             ?>
@@ -252,55 +232,33 @@ die("Error executing order query: " . $order_stmt->error);
                     <option value="cash_on_delivery">Cash on Delivery</option>
                 </select>
             </div>
- 
-            
-           <div id="kpay_fields" style="display: none;">
-    <div class="mb-3">
-        <label for="kpay_phone" class="form-label">Phone Number</label>
-        <input 
-            type="text" 
-            class="form-control" 
-            id="kpay_phone" 
-            name="kpay_phone" 
-            placeholder="Enter your K Pay phone number"
-            maxlength="11"
-        >
-    </div>
-    <div class="mb-3">
-        <label for="kpay_otp" class="form-label">OTP</label>
-        <input 
-            type="text" 
-            class="form-control" 
-            id="kpay_otp" 
-            name="kpay_otp" 
-            placeholder="Enter OTP"
-        >
-    </div>
-    <!-- Send OTP Button -->
-    <div class="mb-3" id="send_otp_container" style="display: none;">
-        <button type="button" class="btn btn-primary" id="send_otp_btn">Send OTP</button>
-    </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const phoneInput = document.getElementById('kpay_phone');
-        const sendOtpContainer = document.getElementById('send_otp_container');
+            <!-- K Pay Fields -->
+            <div id="kpay_fields" style="display: none;">
+                <div class="mb-3">
+                    <label for="kpay_phone" class="form-label">Phone Number</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="kpay_phone" 
+                        name="kpay_phone" 
+                        placeholder="Enter your K Pay phone number"
+                        maxlength="11"
+                    >
+                </div>
+                <div class="mb-3">
+                    <label for="kpay_otp" class="form-label">OTP</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="kpay_otp" 
+                        name="kpay_otp" 
+                        placeholder="Enter OTP"
+                    >
+                </div>
+            </div>
 
-        phoneInput.addEventListener('input', function () {
-            const phoneNumber = phoneInput.value.trim();
-
-            // Show the Send OTP button if phone number has 11 digits
-            if (phoneNumber.length === 11) {
-                sendOtpContainer.style.display = 'block';
-            } else {
-                sendOtpContainer.style.display = 'none';
-            }
-        });
-    });
-</script>
-
-
+            <!-- Credit Card Fields -->
             <div id="credit_card_fields" style="display: none;">
                 <div class="mb-3">
                     <label for="card_number" class="form-label">Card Number</label>
@@ -316,11 +274,12 @@ die("Error executing order query: " . $order_stmt->error);
                 </div>
             </div>
 
+            <!-- Cash on Delivery -->
             <div id="cash_on_delivery_fields" style="display: none;">
                 <div class="mb-3">
-                    <p>No additional details requires. Please confirm your order.</p>
+                    <p>No additional details required. Please confirm your order.</p>
                 </div>
-            </div> 
+            </div>
 
             <button type="submit" name="checkout" class="btn btn-success btn-lg w-100">Confirm and Checkout</button>
         </form>

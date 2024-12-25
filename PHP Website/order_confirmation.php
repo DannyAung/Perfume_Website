@@ -38,12 +38,21 @@ if ($order_result->num_rows === 0) {
 }
 
 $order = $order_result->fetch_assoc();
-
-// Fetch cart items associated with this order
-$cart_items_sql = "SELECT ci.quantity, p.product_name, p.price, p.discounted_price 
+// Fetch cart items associated with this order, including size
+$cart_items_sql = "SELECT ci.quantity, p.product_name, p.price, p.discounted_price, p.size 
                    FROM cart_items ci 
                    JOIN products p ON ci.product_id = p.product_id 
                    WHERE ci.order_id = ?";
+$cart_items_stmt = $conn->prepare($cart_items_sql);
+$cart_items_stmt->bind_param("i", $order_id);
+$cart_items_stmt->execute();
+$cart_items_result = $cart_items_stmt->get_result();
+
+$cart_items = [];
+while ($item = $cart_items_result->fetch_assoc()) {
+    $cart_items[] = $item;
+}
+
 $cart_items_stmt = $conn->prepare($cart_items_sql);
 $cart_items_stmt->bind_param("i", $order_id);
 $cart_items_stmt->execute();
@@ -154,35 +163,38 @@ $conn->close();
             </table>
         </div>
 
-        <!-- Cart Items -->
-        <div class="order-details">
-            <h3>Cart Items</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Product Name</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($cart_items as $item): 
-                        $regular_price = $item['price'];
-                        $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : $regular_price;
-                        $item_price = $discounted_price;
-                        $item_subtotal = $item_price * $item['quantity'];
-                    ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($item['product_name']); ?></td>
-                        <td>$<?php echo number_format($item_price, 2); ?></td>
-                        <td><?php echo $item['quantity']; ?></td>
-                        <td>$<?php echo number_format($item_subtotal, 2); ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+     <!-- Cart Items -->
+<div class="order-details">
+    <h3>Cart Items</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Size</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($cart_items as $item): 
+                $regular_price = $item['price'];
+                $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : $regular_price;
+                $item_price = $discounted_price;
+                $item_subtotal = $item_price * $item['quantity'];
+            ?>
+            <tr>
+                <td><?php echo htmlspecialchars($item['product_name']); ?></td>
+                <td><?php echo htmlspecialchars($item['size']); ?></td>
+                <td>$<?php echo number_format($item_price, 2); ?></td>
+                <td><?php echo $item['quantity']; ?></td>
+                <td>$<?php echo number_format($item_subtotal, 2); ?></td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+
 
         <!-- Order Summary -->
         <div class="order-summary">

@@ -99,6 +99,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = 'Error uploading image.';
     }
 }
+
+
+
 ?>
 
 
@@ -151,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
                             <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
-                            <li><a class="dropdown-item" href="edit_profile.php">Edit Profile</a></li>
+                            <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
                             <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
                         </ul>
                     </div>
@@ -240,6 +243,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php 
     if ($discounted_result) {
         while ($discounted_product = mysqli_fetch_assoc($discounted_result)) {
+            // Get stock quantity and check if it's sold out
+            $stock_quantity = $discounted_product['stock_quantity'];
+            $is_sold_out = $stock_quantity == 0;
+
             // Image path logic
             $image = isset($discounted_product['image']) && !empty($discounted_product['image']) 
                 ? 'products/' . htmlspecialchars($discounted_product['image']) 
@@ -275,19 +282,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </h6>
                     </div>
 
-                    <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                    <input type="hidden" name="product_id" value="<?php echo $discounted_product['product_id']; ?>">
-                    <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($discounted_product['product_name']); ?>">
-                    <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($discounted_product['discounted_price']); ?>">
-                    <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($discounted_product['image']); ?>">
+                    <!-- Sold Out Message and Prevent Add to Cart -->
+                    <?php if ($is_sold_out): ?>
+                        <p class="text-danger fw-bold">Sold Out</p>
+                        <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
+                    <?php else: ?>
+                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                            <input type="hidden" name="product_id" value="<?php echo $discounted_product['product_id']; ?>">
+                            <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($discounted_product['product_name']); ?>">
+                            <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($discounted_product['discounted_price']); ?>">
+                            <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($discounted_product['image']); ?>">
 
-                    <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
-                        Add to Cart
-                    </button>
-                    <a href="product_details.php?product_id=<?php echo $discounted_product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
-                        View Details
-                    </a>
-                </form>
+                            <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
+                                Add to Cart
+                            </button>
+                            <a href="product_details.php?product_id=<?php echo $discounted_product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
+                                View Details
+                            </a>
+                        </form>
+                    <?php endif; ?>
 
                 </div>
             </div>
@@ -300,72 +313,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ?>
 </div>
 
-    
 <h2 class="text-center mb-4 mt-5">Popular Products</h2>
-    <!-- Popular Products Section -->
-    <div class="row row-cols-1 row-cols-md-4 g-4">
+<div class="row row-cols-1 row-cols-md-4 g-4">
     <?php 
     // Query to fetch popular products based on subcategory
     $popular_query = "SELECT * FROM products WHERE subcategory = 'popular' ORDER BY created_at DESC LIMIT 4";
     $popular_result = mysqli_query($conn, $popular_query);
         
     while ($popular_product = mysqli_fetch_assoc($popular_result)) {
+        // Get stock quantity and check if it's sold out
+        $stock_quantity = $popular_product['stock_quantity'];
+        $is_sold_out = $stock_quantity == 0;
+
         // Image path 
         $image = isset($popular_product['image']) && !empty($popular_product['image']) 
             ? 'products/' . htmlspecialchars($popular_product['image']) 
             : 'images/default-image.jpg';
 
-       
-        if (!file_exists($image)) {
-            $image = 'images/default-image.jpg';  
-        }
-    
         $product_name = htmlspecialchars($popular_product['product_name']);
         $product_price = htmlspecialchars($popular_product['price']);
-        
     ?>
+        <div class="col">
+            <div class="card h-100 text-center shadow d-flex flex-column">
+                <!-- Image container with dynamic height -->
+                <div class="image-container" style="width: auto; margin: 0 auto;">
+                    <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($popular_product['product_name']); ?>" 
+                    style="max-height: 150px; width: 100%; object-fit: contain;">
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title"><?php echo $product_name; ?></h5>
+                    <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
 
-    <div class="col">
-    <div class="card h-100 text-center shadow d-flex flex-column">
-        <!-- Image container with dynamic height -->
-        <div class="image-container" style="width: auto; margin: 0 auto;">
-            <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($popular_product['product_name']); ?>" 
-            style="max-height: 150px; width: 100%; object-fit: contain;">
-        </div>
-        <div class="card-body d-flex flex-column">
-            <h5 class="card-title"><?php echo $product_name; ?></h5>
-            <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-            
-            <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-    <input type="hidden" name="product_id" value="<?php echo $popular_product['product_id']; ?>">
-    <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($popular_product['product_name']); ?>">
-    <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($popular_product['price']); ?>">
-    <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($popular_product['image']); ?>">
+                    <!-- Sold Out Message and Prevent Add to Cart -->
+                    <?php if ($is_sold_out): ?>
+                        <p class="text-danger fw-bold">Sold Out</p>
+                        <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
+                    <?php else: ?>
+                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                            <input type="hidden" name="product_id" value="<?php echo $popular_product['product_id']; ?>">
+                            <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($popular_product['product_name']); ?>">
+                            <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($popular_product['price']); ?>">
+                            <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($popular_product['image']); ?>">
 
-    <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
-        Add to Cart
-    </button>
-    <a href="product_details.php?product_id=<?php echo $popular_product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
-        View Details
-    </a>
-</form>
+                            <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
+                                Add to Cart
+                            </button>
+                            <a href="product_details.php?product_id=<?php echo $popular_product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
+                                View Details
+                            </a>
+                        </form>
+                    <?php endif; ?>
+
+                </div>
             </div>
         </div>
-    </div>
-<?php } ?>
+    <?php } ?>
 </div>
-    
 
-    
-    <!-- Latest Products Section -->
-    <h2 class="text-center mb-4 mt-5">Latest Products</h2>
-     <div class="row row-cols-1 row-cols-md-4 g-4">
+<h2 class="text-center mb-4 mt-5">Latest Products</h2>
+<div class="row row-cols-1 row-cols-md-4 g-4">
     <?php 
-    // Query to fetch popular products based on subcategory
+    // Query to fetch latest products based on subcategory
     $latest_query = "SELECT * FROM products WHERE subcategory = 'latest' ORDER BY created_at DESC LIMIT 4";
     $latest_result = mysqli_query($conn, $latest_query);
         
     while ($latest_product = mysqli_fetch_assoc($latest_result)) {
+        // Get stock quantity and check if it's sold out
+        $stock_quantity = $latest_product['stock_quantity'];
+        $is_sold_out = $stock_quantity == 0;
+
         // Image path logic
         $image = isset($latest_product['image']) && !empty($latest_product['image']) 
             ? 'products/' . htmlspecialchars($latest_product['image']) 
@@ -375,49 +391,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!file_exists($image)) {
             $image = 'images/default-image.jpg';  // Fallback image
         }
-    
+
         $product_name = htmlspecialchars($latest_product['product_name']);
         $product_price = htmlspecialchars($latest_product['price']);
     ?>
         <div class="col">
-    <div class="card h-100 text-center shadow d-flex flex-column">
-        <!-- Image container with dynamic height -->
-        <div class="image-container" style="width: auto; margin: 0 auto;">
-            <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($latest_product['product_name']); ?>" 
-            style="max-height: 150px; width: 100%; object-fit: contain;">
-        </div>
-        <div class="card-body d-flex flex-column">
-            <h5 class="card-title"><?php echo $product_name; ?></h5>
-            <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-            
-            <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-    <input type="hidden" name="product_id" value="<?php echo $latest_product['product_id']; ?>">
-    <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($latest_product['product_name']); ?>">
-    <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($latest_product['price']); ?>">
-    <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($latest_product['image']); ?>">
+            <div class="card h-100 text-center shadow d-flex flex-column">
+                <!-- Image container with dynamic height -->
+                <div class="image-container" style="width: auto; margin: 0 auto;">
+                    <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($latest_product['product_name']); ?>" 
+                    style="max-height: 150px; width: 100%; object-fit: contain;">
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title"><?php echo $product_name; ?></h5>
+                    <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
 
-    <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
-        Add to Cart
-    </button>
-    <a href="product_details.php?product_id=<?php echo $latest_product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
-        View Details
-    </a>
-</form>
+                    <!-- Sold Out Message and Prevent Add to Cart -->
+                    <?php if ($is_sold_out): ?>
+                        <p class="text-danger fw-bold">Sold Out</p>
+                        <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
+                    <?php else: ?>
+                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                            <input type="hidden" name="product_id" value="<?php echo $latest_product['product_id']; ?>">
+                            <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($latest_product['product_name']); ?>">
+                            <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($latest_product['price']); ?>">
+                            <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($latest_product['image']); ?>">
+
+                            <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
+                                Add to Cart
+                            </button>
+                            <a href="product_details.php?product_id=<?php echo $latest_product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
+                                View Details
+                            </a>
+                        </form>
+                    <?php endif; ?>
+
+                </div>
             </div>
         </div>
-    </div>
-<?php } ?>
+    <?php } ?>
 </div>
-    
-    <!-- Featured Products Section -->
-    <h2 class="text-center mb-4 mt-5">Featured Products</h2>
-    <div class="row row-cols-1 row-cols-md-4 g-4">
+
+<h2 class="text-center mb-4 mt-5">Featured Products</h2>
+<div class="row row-cols-1 row-cols-md-4 g-4">
     <?php 
-    // Query to fetch popular products based on subcategory
+    // Query to fetch featured products based on subcategory
     $featured_query = "SELECT * FROM products WHERE subcategory = 'featured' ORDER BY created_at DESC LIMIT 4";
     $featured_result = mysqli_query($conn, $featured_query);
         
     while ($featured_product = mysqli_fetch_assoc($featured_result)) {
+        // Get stock quantity and check if it's sold out
+        $stock_quantity = $featured_product['stock_quantity'];
+        $is_sold_out = $stock_quantity == 0;
+
         // Image path logic
         $image = isset($featured_product['image']) && !empty($featured_product['image']) 
             ? 'products/' . htmlspecialchars($featured_product['image']) 
@@ -427,36 +453,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!file_exists($image)) {
             $image = 'images/default-image.jpg';  // Fallback image
         }
-    
+
         $product_name = htmlspecialchars($featured_product['product_name']);
         $product_price = htmlspecialchars($featured_product['price']);
     ?>
         <div class="col">
-    <div class="card h-100 text-center shadow d-flex flex-column">
-        <!-- Image container with dynamic height -->
-        <div class="image-container" style="width: auto; margin: 0 auto;">
-            <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($featured_product['product_name']); ?>" 
-            style="max-height: 150px; width: 100%; object-fit: contain;">
-        </div>
-        <div class="card-body d-flex flex-column">
-            <h5 class="card-title"><?php echo $product_name; ?></h5>
-            <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-            <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-    <input type="hidden" name="product_id" value="<?php echo $featured_product['product_id']; ?>">
-    <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($featured_product['product_name']); ?>">
-    <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($featured_product['price']); ?>">
-    <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($featured_product['image']); ?>">
-    <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
-        Add to Cart
-    </button>
-    <a href="product_details.php?product_id=<?php echo $featured_product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
-        View Details
-    </a>
-</form>
+            <div class="card h-100 text-center shadow d-flex flex-column">
+                <!-- Image container with dynamic height -->
+                <div class="image-container" style="width: auto; margin: 0 auto;">
+                    <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($featured_product['product_name']); ?>" 
+                    style="max-height: 150px; width: 100%; object-fit: contain;">
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title"><?php echo $product_name; ?></h5>
+                    <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
+
+                    <!-- Sold Out Message and Prevent Add to Cart -->
+                    <?php if ($is_sold_out): ?>
+                        <p class="text-danger fw-bold">Sold Out</p>
+                        <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
+                    <?php else: ?>
+                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                            <input type="hidden" name="product_id" value="<?php echo $featured_product['product_id']; ?>">
+                            <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($featured_product['product_name']); ?>">
+                            <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($featured_product['price']); ?>">
+                            <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($featured_product['image']); ?>">
+
+                            <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
+                                Add to Cart
+                            </button>
+                            <a href="product_details.php?product_id=<?php echo $featured_product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
+                                View Details
+                            </a>
+                        </form>
+                    <?php endif; ?>
+
+                </div>
             </div>
         </div>
-    </div>
-<?php } ?>
+    <?php } ?>
 </div>
 
 

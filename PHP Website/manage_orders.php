@@ -40,7 +40,7 @@ if (isset($_POST['update_status'])) {
 
     if ($update_stmt->execute()) {
         // After the update, reload the page to reflect the new status
-        header("Location: manage_order.php");
+        header("Location: manage_orders.php");
         exit;
     } else {
         echo "Error updating order status: " . $update_stmt->error;
@@ -161,19 +161,21 @@ if (isset($_POST['update_status'])) {
                     }
                     echo "      </ul>
                             </td>
-                            <td>
-                                <form method='post' action='manage_order.php' class='d-inline'>
-                                    <input type='hidden' name='order_id' value='" . $order['order_id'] . "'>
-                                    <select name='status' class='form-control status-dropdown'>
-                                        <option value='pending' " . ($order['status'] == 'pending' ? 'selected' : '') . ">Pending</option>
-                                        <option value='shipped' " . ($order['status'] == 'shipped' ? 'selected' : '') . ">Shipped</option>
-                                        <option value='delivered' " . ($order['status'] == 'delivered' ? 'selected' : '') . ">Delivered</option>
-                                        <option value='completed' " . ($order['status'] == 'completed' ? 'selected' : '') . ">Completed</option>
-                                        <option value='canceled' " . ($order['status'] == 'canceled' ? 'selected' : '') . ">Canceled</option>
-                                    </select>
-                                    <button type='submit' name='update_status' class='btn btn-primary btn-sm mt-2'>Update</button>
-                                </form>
-                            </td>
+            <td>
+                <form method='post' action='manage_orders.php' class='d-inline'>
+                    <input type='hidden' name='order_id' value='" . $order['order_id'] . "'>
+                    <select name='status' class='form-control status-dropdown'>
+                        <option value='pending' " . ($order['status'] == 'pending' ? 'selected' : '') . ">Pending</option>
+                        <option value='completed' " . ($order['status'] == 'completed' ? 'selected' : '') . ">Completed</option>
+                        <option value='shipped' " . ($order['status'] == 'shipped' ? 'selected' : '') . ">Shipped</option>
+                        <option value='cancelled' " . ($order['status'] == 'cancelled' ? 'selected' : '') . ">Cancelled</option>
+                        <option value='delivered' " . ($order['status'] == 'delivered' ? 'selected' : '') . ">Delivered</option>
+                       
+                    </select>
+                    <button type='submit' name='update_status' class='btn btn-primary btn-sm mt-2'>Update</button>
+                </form>
+            </td>
+
                         </tr>";
                 }
                 

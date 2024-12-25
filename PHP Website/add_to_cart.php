@@ -348,7 +348,7 @@ if (isset($_POST['remove_all'])) {
                             Account
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                            <li><a class="dropdown-item" href="orders.php">Orders</a></li>
+                            <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
                             <li><a class="dropdown-item" href="edit_profile.php">Edit Profile</a></li>
                             <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
                         </ul>
@@ -405,69 +405,73 @@ if (isset($_POST['remove_all'])) {
     <h1>Your Cart</h1>
     <div class="cart-container">
     <?php
-    $sql = "SELECT ci.cart_item_id, ci.quantity, p.product_name, p.price, p.discounted_price, p.image
-            FROM cart_items ci
-            JOIN products p ON ci.product_id = p.product_id
-            WHERE ci.user_id = ? AND ci.ordered_status = 'not_ordered'";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+        $sql = "SELECT ci.cart_item_id, ci.quantity, p.product_name, p.price, p.discounted_price, p.image, p.size
+        FROM cart_items ci
+        JOIN products p ON ci.product_id = p.product_id
+        WHERE ci.user_id = ? AND ci.ordered_status = 'not_ordered'";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    
-    if ($result->num_rows > 0) {
+        if ($result->num_rows > 0) {
         $total_price = 0;
         while ($item = $result->fetch_assoc()) {
-            $regular_price = $item['price'];
-            $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : 0;
-            $item_price = $discounted_price > 0 ? $discounted_price : $regular_price;
-            $item_total = $item_price * $item['quantity'];
-            $total_price += $item_total;
-    
-            $product_name = htmlspecialchars($item['product_name']);
-            $product_image = htmlspecialchars($item['image']);
-            $image_path = "products/" . $product_image;
-    
-            // Render cart item
-            echo "<div class='cart-item'>
-                    <img src='" . $image_path . "' alt='" . $product_name . "' class='product-image'>
-                    <div class='product-details'>
-                        <h3>" . $product_name . "</h3>";
-    
-            // Show regular price with a strikethrough if there is a discounted price
-            if ($discounted_price > 0) {
-                echo "<p class='regular-price'><del>$" . number_format($regular_price, 2) . "</del></p>";
-                echo "<p class='discounted-price'>$" . number_format($discounted_price, 2) . "</p>";
-            } else {
-                echo "<p class='price'>$" . number_format($regular_price, 2) . "</p>";
-            }
-    
-            echo "<p>Quantity: " . $item['quantity'] . "</p>
-                    </div>
-                    <form method='post' class='d-inline'>
-                        <input type='hidden' name='cart_item_id' value='" . $item['cart_item_id'] . "'>
-                        <button type='submit' name='decrease_quantity' class='btn btn-secondary'>-</button>
-                        <button type='submit' name='increase_quantity' class='btn btn-primary'>+</button>
-                    </form>
-                </div>";
+        $regular_price = $item['price'];
+        $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : 0;
+        $item_price = $discounted_price > 0 ? $discounted_price : $regular_price;
+        $item_total = $item_price * $item['quantity'];
+        $total_price += $item_total;
+
+        $product_name = htmlspecialchars($item['product_name']);
+        $product_image = htmlspecialchars($item['image']);
+        $product_size = htmlspecialchars($item['size']); // Fetch the size
+        $image_path = "products/" . $product_image;
+
+        // Render cart item
+        echo "<div class='cart-item'>
+                <img src='" . $image_path . "' alt='" . $product_name . "' class='product-image'>
+                <div class='product-details'>
+                    <h3>" . $product_name . "</h3>";
+
+        // Display size
+        echo "<p>Size: " . $product_size . "</p>";
+
+        // Show regular price with a strikethrough if there is a discounted price
+        if ($discounted_price > 0) {
+            echo "<p class='regular-price'><del>$" . number_format($regular_price, 2) . "</del></p>";
+            echo "<p class='discounted-price'>$" . number_format($discounted_price, 2) . "</p>";
+        } else {
+            echo "<p class='price'>$" . number_format($regular_price, 2) . "</p>";
         }
-    
+
+        echo "<p>Quantity: " . $item['quantity'] . "</p>
+                </div>
+                <form method='post' class='d-inline'>
+                    <input type='hidden' name='cart_item_id' value='" . $item['cart_item_id'] . "'>
+                    <button type='submit' name='decrease_quantity' class='btn btn-secondary'>-</button>
+                    <button type='submit' name='increase_quantity' class='btn btn-primary'>+</button>
+                </form>
+            </div>";
+        }
+
         // Display total price
         echo "<div class='total'>Total Price: $" . number_format($total_price, 2) . "</div>";
-    
+
         // Button Container
         echo "<div class='button-container'>
-                <form method='post'>
-                    <button type='submit' name='remove_all' class='btn btn-danger'>Remove All Items</button>
-                </form>
-                <form method='post' action='checkout.php'>
-                    <button type='submit' name='check_out' class='btn btn-success'>Process to Check Out</button>
-                </form>
-              </div>";
-    } else {
+            <form method='post'>
+                <button type='submit' name='remove_all' class='btn btn-danger'>Remove All Items</button>
+            </form>
+            <form method='post' action='checkout.php'>
+                <button type='submit' name='check_out' class='btn btn-success'>Process to Check Out</button>
+            </form>
+        </div>";
+        } else {
         echo "<div class='empty-cart'><p>Your cart is empty.</p></div>";
         echo "<a href='user_index.php'><p>Continue Shopping?</p></a>";
-    }
+        }
+
     ?>
 
 </div>
