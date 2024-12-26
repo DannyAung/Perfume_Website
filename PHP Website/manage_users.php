@@ -25,6 +25,50 @@ if (!$conn) {
 $sql = "SELECT * FROM users";
 $result = mysqli_query($conn, $sql);
 $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+if (isset($_POST['delete_user'])) {
+    $user_id = intval($_POST['user_id']);
+
+    // Delete related records from the reviews table
+    $delete_reviews_query = "DELETE FROM reviews WHERE user_id = ?";
+    $stmt = $conn->prepare($delete_reviews_query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->close();
+
+    // Delete related records from the order_items table
+    $delete_order_items_query = "DELETE FROM order_items WHERE order_id IN (SELECT order_id FROM orders WHERE user_id = ?)";
+    $stmt = $conn->prepare($delete_order_items_query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->close();
+
+    // Delete related records from the orders table
+    $delete_orders_query = "DELETE FROM orders WHERE user_id = ?";
+    $stmt = $conn->prepare($delete_orders_query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->close();
+
+    // Delete related records from the cart_items table
+    $delete_cart_items_sql = "DELETE FROM cart_items WHERE user_id = ?";
+    $stmt = $conn->prepare($delete_cart_items_sql);
+    $stmt->bind_param("i", $user_id);  
+    $stmt->execute();
+    $stmt->close();
+
+    // Delete user
+    $delete_user_sql = "DELETE FROM users WHERE user_id = ?";
+    $stmt = $conn->prepare($delete_user_sql);
+    $stmt->bind_param("i", $user_id);
+    if ($stmt->execute()) {
+        $message = "User deleted successfully.";
+    } else {
+        $message = "Failed to delete the user: " . $conn->error;
+    }
+    $stmt->close();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -82,7 +126,10 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
                         <td><?= nl2br(htmlspecialchars($user['address'])); ?></td>
                         <td>
                             <a href="view_user_details.php?id=<?= $user['user_id']; ?>" class="btn btn-info btn-sm">View Details</a>
-                            <a href="delete_user.php?id=<?= $user['user_id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
+                            <form action="manage_users.php" method="POST" style="display:inline;">
+                                <input type="hidden" name="user_id" value="<?= $user['user_id']; ?>">
+                                <button type="submit" name="delete_user" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
+                            </form>
                         </td>
                     </tr>
                 <?php endforeach; ?>

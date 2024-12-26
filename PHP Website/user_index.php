@@ -238,7 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container my-5">
 <h1 class="text-center mb-4"><b>Our Products</b></h1>
 
-<h2 class="text-center mb-4 mt-5">Discounted Products</h2>
+<h2 class="mb-4 mt-5">Discounted Products</h2>
 <div class="row row-cols-1 row-cols-md-4 g-4">
     <?php 
     if ($discounted_result) {
@@ -313,19 +313,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ?>
 </div>
 
-<h2 class="text-center mb-4 mt-5">Popular Products</h2>
-<div class="row row-cols-1 row-cols-md-4 g-4">
+
+
+<h2 class="text-center mb-4 mt-5"></h2>
+<div class=" mb-4">
+    <button id="popularBtn" class="btn btn-dark" onclick="showPopular()">Best Sellers</button>
+    <button id="latestBtn" class="btn btn-outline-dark" onclick="showLatest()">New Arrivals</button>
+</div>
+
+<div id="popularProducts" class="row row-cols-1 row-cols-md-4 g-4">
     <?php 
-    // Query to fetch popular products based on subcategory
     $popular_query = "SELECT * FROM products WHERE subcategory = 'popular' ORDER BY created_at DESC LIMIT 4";
     $popular_result = mysqli_query($conn, $popular_query);
         
     while ($popular_product = mysqli_fetch_assoc($popular_result)) {
-        // Get stock quantity and check if it's sold out
         $stock_quantity = $popular_product['stock_quantity'];
         $is_sold_out = $stock_quantity == 0;
 
-        // Image path 
         $image = isset($popular_product['image']) && !empty($popular_product['image']) 
             ? 'products/' . htmlspecialchars($popular_product['image']) 
             : 'images/default-image.jpg';
@@ -335,7 +339,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ?>
         <div class="col">
             <div class="card h-100 text-center shadow d-flex flex-column">
-                <!-- Image container with dynamic height -->
                 <div class="image-container" style="width: auto; margin: 0 auto;">
                     <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($popular_product['product_name']); ?>" 
                     style="max-height: 150px; width: 100%; object-fit: contain;">
@@ -343,18 +346,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title"><?php echo $product_name; ?></h5>
                     <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-
-                    <!-- Sold Out Message and Prevent Add to Cart -->
                     <?php if ($is_sold_out): ?>
                         <p class="text-danger fw-bold">Sold Out</p>
                         <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
                     <?php else: ?>
                         <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
                             <input type="hidden" name="product_id" value="<?php echo $popular_product['product_id']; ?>">
-                            <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($popular_product['product_name']); ?>">
-                            <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($popular_product['price']); ?>">
-                            <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($popular_product['image']); ?>">
-
                             <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
                                 Add to Cart
                             </button>
@@ -363,41 +360,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </a>
                         </form>
                     <?php endif; ?>
-
                 </div>
             </div>
         </div>
     <?php } ?>
 </div>
 
-<h2 class="text-center mb-4 mt-5">Latest Products</h2>
-<div class="row row-cols-1 row-cols-md-4 g-4">
+<div id="latestProducts" class="row row-cols-1 row-cols-md-4 g-4" style="display: none;">
     <?php 
-    // Query to fetch latest products based on subcategory
     $latest_query = "SELECT * FROM products WHERE subcategory = 'latest' ORDER BY created_at DESC LIMIT 4";
     $latest_result = mysqli_query($conn, $latest_query);
         
     while ($latest_product = mysqli_fetch_assoc($latest_result)) {
-        // Get stock quantity and check if it's sold out
         $stock_quantity = $latest_product['stock_quantity'];
         $is_sold_out = $stock_quantity == 0;
 
-        // Image path logic
         $image = isset($latest_product['image']) && !empty($latest_product['image']) 
             ? 'products/' . htmlspecialchars($latest_product['image']) 
             : 'images/default-image.jpg';
-
-        // Check if image exists, otherwise fallback
-        if (!file_exists($image)) {
-            $image = 'images/default-image.jpg';  // Fallback image
-        }
 
         $product_name = htmlspecialchars($latest_product['product_name']);
         $product_price = htmlspecialchars($latest_product['price']);
     ?>
         <div class="col">
             <div class="card h-100 text-center shadow d-flex flex-column">
-                <!-- Image container with dynamic height -->
                 <div class="image-container" style="width: auto; margin: 0 auto;">
                     <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($latest_product['product_name']); ?>" 
                     style="max-height: 150px; width: 100%; object-fit: contain;">
@@ -405,18 +391,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title"><?php echo $product_name; ?></h5>
                     <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-
-                    <!-- Sold Out Message and Prevent Add to Cart -->
                     <?php if ($is_sold_out): ?>
                         <p class="text-danger fw-bold">Sold Out</p>
                         <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
                     <?php else: ?>
                         <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
                             <input type="hidden" name="product_id" value="<?php echo $latest_product['product_id']; ?>">
-                            <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($latest_product['product_name']); ?>">
-                            <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($latest_product['price']); ?>">
-                            <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($latest_product['image']); ?>">
-
                             <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
                                 Add to Cart
                             </button>
@@ -425,14 +405,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </a>
                         </form>
                     <?php endif; ?>
-
                 </div>
             </div>
         </div>
     <?php } ?>
 </div>
 
-<h2 class="text-center mb-4 mt-5">Featured Products</h2>
+<script>
+    function showPopular() {
+        document.getElementById("popularProducts").style.display = "flex";
+        document.getElementById("latestProducts").style.display = "none";
+        document.getElementById("popularBtn").classList.add("btn-dark");
+        document.getElementById("popularBtn").classList.remove("btn-outline-dark");
+        document.getElementById("latestBtn").classList.remove("btn-dark");
+        document.getElementById("latestBtn").classList.add("btn-outline-dark");
+    }
+
+    function showLatest() {
+        document.getElementById("popularProducts").style.display = "none";
+        document.getElementById("latestProducts").style.display = "flex";
+        document.getElementById("latestBtn").classList.add("btn-dark");
+        document.getElementById("latestBtn").classList.remove("btn-outline-dark");
+        document.getElementById("popularBtn").classList.remove("btn-dark");
+        document.getElementById("popularBtn").classList.add("btn-outline-dark");
+    }
+</script>
+
+
+<h2 class="mb-4 mt-5">Featured Products</h2>
 <div class="row row-cols-1 row-cols-md-4 g-4">
     <?php 
     // Query to fetch featured products based on subcategory

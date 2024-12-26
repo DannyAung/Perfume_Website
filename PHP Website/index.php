@@ -123,7 +123,7 @@ if (!$result) {
         <!-- Login and Cart Buttons on the Right -->
         <div class="LoginCart">
     <a href="user_login.php" class="btn login-btn">Login/Register</a>
-    <a href="cart.php" class="btn cart-btn" id="cart-button">
+    <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
         <img src="./images/cart-icon.jpg" alt="Cart" style="width:20px; margin-right:6px;">
         Cart 
     </a>
@@ -138,7 +138,7 @@ if (!$result) {
         <div class="container">
             <ul class="nav justify-content">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Home</a>
+                    <a class="nav-link active" href="index.php">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">About</a>
@@ -242,7 +242,7 @@ if (!$result) {
                         <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
                             Add to Cart
                         </button>
-                        <a href="product_details.php?product_id=<?php echo $discounted_product['product_id']; ?>" 
+                        <a href="product_details_not_login.php?product_id=<?php echo $discounted_product['product_id']; ?>" 
                         class="btn btn-primary btn-sm flex-grow-1">
                             View Details
                         </a>

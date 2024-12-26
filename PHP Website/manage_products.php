@@ -26,6 +26,40 @@ $sql = "SELECT * FROM products";
 $result = mysqli_query($conn, $sql);
 $products = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
+
+// Handle product deletion
+if (isset($_POST['delete_product'])) {
+    $product_id = intval($_POST['product_id']);
+
+    // Delete related records from cart_items table
+    $delete_cart_items_query = "DELETE FROM cart_items WHERE product_id = ?";
+    $stmt = $conn->prepare($delete_cart_items_query);
+    $stmt->bind_param("i", $product_id);
+    $stmt->execute();
+    $stmt->close();
+
+    // Delete related records from order_items table
+    $delete_order_items_query = "DELETE FROM order_items WHERE product_id = ?";
+    $stmt = $conn->prepare($delete_order_items_query);
+    $stmt->bind_param("i", $product_id);
+    $stmt->execute();
+    $stmt->close();
+
+    // Now delete the product from the products table
+    $delete_product_query = "DELETE FROM products WHERE product_id = ?";
+    $stmt = $conn->prepare($delete_product_query);
+    $stmt->bind_param("i", $product_id);
+
+    if ($stmt->execute()) {
+        $message = "Product deleted successfully.";
+    } else {
+        $message = "Failed to delete the product: " . $conn->error;
+    }
+
+    $stmt->close();
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -109,9 +143,13 @@ $products = mysqli_fetch_all($result, MYSQLI_ASSOC);
                             <?php endif; ?>
                         </td>
                         <td>
-                            <a href="edit_products.php?id=<?= $product['product_id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                            <a href="delete_product.php?id=<?= $product['product_id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
-                        </td>
+                <a href="edit_products.php?id=<?= $product['product_id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                <form action="manage_products.php" method="POST" style="display:inline;">
+                    <input type="hidden" name="product_id" value="<?= $product['product_id']; ?>">
+                    <button type="submit" name="delete_product" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?');">Delete</button>
+                </form>
+            </td>
+
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>

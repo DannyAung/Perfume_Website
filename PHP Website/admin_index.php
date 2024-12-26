@@ -89,6 +89,11 @@ if (!$conn) {
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="manage_reviews.php">
+                        <i class="bi bi-person"></i> Manage Reviews
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="view_reports.php">
                         <i class="bi bi-bar-chart"></i> Reports
                     </a>
@@ -136,6 +141,18 @@ if (!$conn) {
                                 <p class="card-text mb-0">View or manage users.</p>
                             </div>
                             <a href="manage_users.php" class="btn btn-primary ms-2">Go</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card text-center shadow-sm">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <h5 class="card-title mb-1">Manage Reviews</h5>
+                                <p class="card-text mb-0">View or manage reviews.</p>
+                            </div>
+                            <a href="manage_reviews.php" class="btn btn-primary ms-2">Go</a>
                         </div>
                     </div>
                 </div>

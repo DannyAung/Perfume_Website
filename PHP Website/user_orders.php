@@ -30,7 +30,7 @@ $sql = "
     JOIN order_items oi ON o.order_id = oi.order_id
     JOIN products p ON oi.product_id = p.product_id
     JOIN users u ON o.user_id = u.user_id
-    WHERE o.user_id = ?
+    WHERE o.user_id = ? 
     ORDER BY o.created_at DESC, oi.order_item_id ASC
 ";
 
@@ -141,8 +141,8 @@ while ($row = $result->fetch_assoc()) {
     </div>
 </nav>
 
-     <!-- New Navigation Links Section -->
-     <div class="py-1">
+   <!-- New Navigation Links Section -->
+   <div class="py-1">
         <div class="container">
             <ul class="nav justify-content">
                 <li class="nav-item">
@@ -170,7 +170,6 @@ while ($row = $result->fetch_assoc()) {
             </ul>
         </div>
     </div>
-
 <!-- Orders Table -->
 <div class="container mt-4">
     <h2>Your Orders</h2>
@@ -199,22 +198,12 @@ while ($row = $result->fetch_assoc()) {
                                     <div>
                                         <strong><?php echo htmlspecialchars($item['product_name']); ?></strong><br>
                                         Quantity: <?php echo htmlspecialchars($item['quantity']); ?><br>
-                                        Size: <?php echo htmlspecialchars($item['size']); ?><br> <!-- Display the size -->
+                                        Size: <?php echo htmlspecialchars($item['size']); ?><br>
                                     </div>
                                 </div>
 
                                 <!-- Add review form for completed orders -->
                                 <?php if ($order['status'] == 'completed'): ?>
-                                    <!-- Check if the user has already reviewed this product -->
-                                    <?php
-                                    // Check if the user has reviewed the product before
-                                    $check_review_query = "SELECT review_id FROM reviews WHERE user_id = ? AND product_id = ?";
-                                    $stmt_check = $conn->prepare($check_review_query);
-                                    $stmt_check->bind_param("ii", $user_id, $item['product_id']);
-                                    $stmt_check->execute();
-                                    $result_check = $stmt_check->get_result();
-                                    ?>
-
                                     <form action="submit_review.php" method="POST" class="mt-3">
                                         <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
                                         <input type="hidden" name="product_id" value="<?php echo $item['product_id']; ?>">
@@ -235,9 +224,6 @@ while ($row = $result->fetch_assoc()) {
                                         <button type="submit" class="btn btn-primary">Submit Review</button>
                                     </form>
 
-                                    <?php if ($result_check->num_rows > 0): ?>
-                                        <p>You have already reviewed this product. You can review next time.</p>
-                                    <?php endif; ?>
                                 <?php endif; ?>
                             </li>
                         <?php endforeach; ?>

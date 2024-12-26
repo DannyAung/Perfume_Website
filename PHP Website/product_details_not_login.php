@@ -1,14 +1,7 @@
 <?php
 session_start();  // Start the session to access session variables
 
-// Check if user is logged in
-$is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-if (!$is_logged_in) {
-    // Redirect to login page or show a message
-    echo "You need to log in to view this page.";
-    exit;  // Stop further execution if user is not logged in
-}
 
 require_once 'db_connection.php';  // Ensure the connection file is correct
 
@@ -91,27 +84,9 @@ if ($product_id) {
                     Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
                 </span>
 
-                <!-- Account Dropdown for Logged-In Users -->
-                <?php if ($is_logged_in): ?>
-                    <div class="dropdown me-3">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            Account
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                            <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
-                            <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
-                            <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
-                        </ul>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-
         <!-- Login and Cart Buttons on the Right -->
         <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
-            <?php if (!$is_logged_in): ?>
                 <a href="user_login.php" class="btn login-btn me-3">Login/Register</a>
-            <?php endif; ?>
             <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
             <img src="./images/cart-icon.jpg" alt="Cart" style="width:20px; height:20px; margin-right:6px;">
             Cart 
@@ -125,7 +100,7 @@ if ($product_id) {
         <div class="container">
             <ul class="nav justify-content">
                 <li class="nav-item">
-                    <a class="nav-link active" href="user_index.php">Home</a>
+                    <a class="nav-link active" href="index.php">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">About</a>
@@ -225,8 +200,8 @@ if ($product_id) {
         </div>
     </div>
 
-    <!-- Display Reviews Section -->
-    <div class="row mt-5">
+ <!-- Display Reviews Section -->
+ <div class="row mt-5">
         <div class="col-12" style="font-family: 'Roboto', sans-serif; font-size: 16px;">
             <h6 style="font-family: 'Poppins', sans-serif; font-size: 18px; color: #333;"><strong>Customer Reviews</strong></h6>
 
@@ -260,23 +235,6 @@ if ($product_id) {
     <?php endif; ?>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const thumbnails = document.querySelectorAll('.thumbnail-img');
-    const mainImage = document.getElementById('main-image');
-
-    thumbnails.forEach((thumbnail, index) => {
-        thumbnail.addEventListener('click', () => {
-            // Update the main image's source
-            mainImage.src = thumbnail.src;
-
-            // Add an active class to the clicked thumbnail
-            thumbnails.forEach(thumb => thumb.style.border = '1px solid #ddd');
-            thumbnail.style.border = '2px solid #007bff';
-        });
-    });
-});
-</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 
