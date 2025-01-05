@@ -4,11 +4,7 @@ session_start();  // Start the session to access session variables
 // Check if user is logged in
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-if (!$is_logged_in) {
-    // Redirect to login page or show a message
-    echo "You need to log in to view this page.";
-    exit;  // Stop further execution if user is not logged in
-}
+
 
 require_once 'db_connection.php';  // Ensure the connection file is correct
 

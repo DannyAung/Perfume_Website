@@ -42,6 +42,17 @@ body {
     border-radius: 8px;
 }
 
+.btn:hover {
+    transform: scale(1.05);
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-outline-dark:hover {
+    background-color: black;
+    color: white;
+    border-color: black;
+}
+
 .navbar {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -101,6 +112,17 @@ body {
 
 .nav-link:hover {
     color: #007bff !important;
+}
+/*  Category button */
+.custom-blue-btn {
+    background-color: #42beef; /* Custom Blue Color */
+    border-color: #42beef; /* Border Color */
+    color: white;
+}
+
+.custom-blue-btn:hover {
+    background-color: #36a3d9; /* Slightly darker shade for hover effect */
+    border-color: #36a3d9; /* Border Color on hover */
 }
 
 /* Login and Cart Section */

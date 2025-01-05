@@ -61,7 +61,7 @@ if (!$result) {
 }
 
 // Fetch discounted products
-$discounted_query = "SELECT * FROM products WHERE subcategory = 'discount' ORDER BY created_at DESC LIMIT 4";
+$discounted_query = "SELECT * FROM products WHERE subcategory = 'discount' ORDER BY created_at";
 $discounted_result = mysqli_query($conn, $discounted_query);
 if (!$discounted_result) {
     die("Error fetching discounted products: " . mysqli_error($conn));
@@ -107,6 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -115,68 +116,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <!-- Logo and Brand -->
-        <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="./images/Logo.png" alt="Logo" style="width:50px; height:auto;">
-            <b class="ms-2 dm-serif-display-regular-italic custom-font-color">FRAGRANCE HAVEN</b>
-        </a>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <!-- Logo and Brand -->
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="./images/Logo.png" alt="Logo" style="width:50px; height:auto;">
+                <b class="ms-2 dm-serif-display-regular-italic custom-font-color">FRAGRANCE HAVEN</b>
+            </a>
 
-        <!-- Toggler Button for Small Screens -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
 
-        <!-- Collapsible Content -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
-                <!-- Search Bar in the Center -->
-                <div class="mx-auto my-2 my-lg-0">
-                    <form class="d-flex">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                        <button class="btn btn-outline-success" type="submit">Search</button>
-                    </form>
-                </div>
+            <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button> -->
 
-                <!-- Display Username or Guest -->
-                <span class="navbar-text me-3 my-2 my-lg-0">
-                    Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
-                </span>
+            <!-- Collapsible Content -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
+                    <!-- Search Bar in the Center -->
+                    <div class="mx-auto my-2 my-lg-0">
+                        <form method="GET" action="search.php" class="mb-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="query" placeholder="Search for a product..." aria-label="Search" required>
+                                <button class="btn btn-primary" type="submit">Search</button>
+                            </div>
+                        </form>
 
-                <!-- Account Dropdown for Logged-In Users -->
-                <?php if ($is_logged_in): ?>
-                    <div class="dropdown me-3">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            Account
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                            <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
-                            <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
-                            <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
-                        </ul>
                     </div>
+
+                    <!-- Display Username or Guest -->
+                    <span class="navbar-text me-3 my-2 my-lg-0">
+                        Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
+                    </span>
+
+                    <!-- Account Dropdown for Logged-In Users -->
+                    <?php if ($is_logged_in): ?>
+                        <div class="dropdown me-3">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Account
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                                <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
+                                <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
+                                <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Login and Cart Buttons on the Right -->
+            <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
+                <?php if (!$is_logged_in): ?>
+                    <a href="user_login.php" class="btn login-btn me-3">Login/Register</a>
                 <?php endif; ?>
+                <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
+                    <img src="./images/cart-icon.jpg" alt="Cart" style="width:20px; height:20px; margin-right:6px;">
+                    Cart
+                </a>
             </div>
         </div>
+    </nav>
 
-        <!-- Login and Cart Buttons on the Right -->
-        <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
-            <?php if (!$is_logged_in): ?>
-                <a href="user_login.php" class="btn login-btn me-3">Login/Register</a>
-            <?php endif; ?>
-            <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
-            <img src="./images/cart-icon.jpg" alt="Cart" style="width:20px; height:20px; margin-right:6px;">
-            Cart 
-            </a>
-        </div>
-    </div>
-</nav>
-
-     <!-- New Navigation Links Section -->
-     <div class="py-1">
+    <!-- New Navigation Links Section -->
+    <div class="py-1">
         <div class="container">
             <ul class="nav justify-content">
                 <li class="nav-item">
@@ -186,15 +191,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a class="nav-link" href="#">About</a>
                 </li>
                 <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">
-                    Category
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
-                    <li><a class="dropdown-item" href="#">Men</a></li>
-                    <li><a class="dropdown-item" href="#">Women</a></li>
-                    <li><a class="dropdown-item" href="#">Unisex</a></li>
-                </ul>
-            </li>
+                    <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">
+                        Category
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+                        <li><a class="dropdown-item" href="men_category.php">Men</a></li>
+                        <li><a class="dropdown-item" href="women_category.php">Women</a></li>
+                        <li><a class="dropdown-item" href="unisex_category.php">Unisex</a></li>
+                    </ul>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Delivery</a>
                 </li>
@@ -205,299 +210,359 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-  <!-- Carousel -->
-<div id="posterCarousel" class="carousel slide my-2" data-bs-ride="carousel">
-    <div class="carousel-inner">
-        
-        <div class="carousel-item active position-relative">
-        <img src="images/poster333.png" class="d-block w-100" alt="Poster 3"> 
-        <a href="add_to_cart.php" class="btn btn-primary order-now-btn position-absolute">Order Now</a>
-    </div>
-    
-        <div class="carousel-item">
-            <img src="images/poster111.png" class="d-block w-100" alt="Poster 1">
+    <!-- Carousel -->
+    <div id="posterCarousel" class="carousel slide my-2" data-bs-ride="carousel">
+        <div class="carousel-inner">
+
+            <div class="carousel-item active position-relative">
+                <img src="images/poster333.png" class="d-block w-100" alt="Poster 3">
+                <a href="add_to_cart.php" class="btn btn-primary order-now-btn position-absolute">Order Now</a>
+            </div>
+
+            <div class="carousel-item">
+                <img src="images/poster111.png" class="d-block w-100" alt="Poster 1">
+            </div>
+
+            <div class="carousel-item">
+                <img src="images/poster222.png" class="d-block w-100" alt="Poster 2">
+            </div>
         </div>
 
-        <div class="carousel-item">
-            <img src="images/poster222.png" class="d-block w-100" alt="Poster 2">
-        </div>
+        <!-- Carousel Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#posterCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#posterCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
+    <!-- Include Font Awesome for Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
-    <!-- Carousel Controls -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#posterCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#posterCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
-</div>
+    <!-- Product Grid -->
+    <div class="container my-5">
+        <h1 class="text-center mb-4" style="font-family: 'Playfair Display', serif;"><b>Our Products</b></h1>
+        <h2 class="mb-4 mt-5" style="font-family: 'Roboto', sans-serif; font-weight: 500;">Discounted Products</h2>
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            <?php
+            if ($discounted_result) {
+                while ($discounted_product = mysqli_fetch_assoc($discounted_result)) {
+                    $stock_quantity = $discounted_product['stock_quantity'];
+                    $is_sold_out = $stock_quantity == 0;
 
-<!-- Product Grid -->
-<div class="container my-5">
-<h1 class="text-center mb-4"><b>Our Products</b></h1>
+                    $image = isset($discounted_product['image']) && !empty($discounted_product['image'])
+                        ? 'products/' . htmlspecialchars($discounted_product['image'])
+                        : 'images/default-image.jpg';
 
-<h2 class="mb-4 mt-5">Discounted Products</h2>
-<div class="row row-cols-1 row-cols-md-4 g-4">
-    <?php 
-    if ($discounted_result) {
-        while ($discounted_product = mysqli_fetch_assoc($discounted_result)) {
-            // Get stock quantity and check if it's sold out
-            $stock_quantity = $discounted_product['stock_quantity'];
-            $is_sold_out = $stock_quantity == 0;
+                    $product_name = htmlspecialchars($discounted_product['product_name']);
+                    $product_price = htmlspecialchars($discounted_product['price']);
+                    $product_discounted_price = htmlspecialchars($discounted_product['discounted_price']);
+            ?>
+                    <div class="col">
+                        <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
+                            <div class="image-container position-relative overflow-hidden">
+                                <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
+                                    alt="<?php echo $product_name; ?>"
+                                    style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
+                                <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
+                                    <?php if (!$is_sold_out): ?>
+                                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                                            <input type="hidden" name="product_id" value="<?php echo $discounted_product['product_id']; ?>">
+                                            <input type="hidden" name="product_name" value="<?php echo $product_name; ?>">
+                                            <input type="hidden" name="product_price" value="<?php echo $product_discounted_price; ?>">
+                                            <input type="hidden" name="product_image" value="<?php echo $image; ?>">
 
-            // Image path logic
-            $image = isset($discounted_product['image']) && !empty($discounted_product['image']) 
-                ? 'products/' . htmlspecialchars($discounted_product['image']) 
-                : 'images/default-image.jpg';
-
-            // Get product details
-            $product_name = htmlspecialchars($discounted_product['product_name']);
-            $product_price = htmlspecialchars($discounted_product['price']);
-            $product_discounted_price = htmlspecialchars($discounted_product['discounted_price']);
-    ?>
-        <div class="col">
-            <div class="card h-100 text-center shadow-sm border-0 rounded">
-                <!-- Image container with dynamic height and hover effect -->
-                <div class="image-container" style="overflow: hidden; position: relative; margin: 0 auto;">
-                    <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3" 
-                    alt="<?php echo $product_name; ?>" 
-                    style="height: 150px; object-fit: contain; transition: transform 0.3s;">
-                </div>
-                <div class="card-body d-flex flex-column justify-content-between">
-                    <!-- Product Name -->
-                    <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
-
-                    <!-- Pricing Section -->
-                    <div class="pricing mb-3">
-                        <h6 class="normal-price text-muted">
-                            <h7>Normal Price</h7><br>
-                            <del>$<?php echo number_format($product_price, 2); ?></del>
-                        </h6>
-
-                        <h7>Sale Price</h7><br>
-                        <h6 class="discount-price text-danger fw-bold">
-                            $<?php echo number_format($product_discounted_price, 2); ?>
-                        </h6>
+                                            <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
+                                                <i class="fa fa-cart-plus"></i>
+                                            </button>
+                                            <a href="product_details.php?product_id=<?php echo $discounted_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                                <i class="fa fa-info-circle"></i>
+                                            </a>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
+                                <div class="pricing mb-3">
+                                    <h6 class="normal-price text-muted">
+                                        <del>$<?php echo number_format($product_price, 2); ?></del>
+                                    </h6>
+                                    <h6 class="discount-price text-danger fw-bold">
+                                        $<?php echo number_format($product_discounted_price, 2); ?>
+                                    </h6>
+                                </div>
+                                <?php if ($is_sold_out): ?>
+                                    <p class="text-danger fw-bold">Sold Out</p>
+                                    <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
                     </div>
+            <?php
+                }
+            } else {
+                echo '<p class="text-center text-muted">No discounted products found.</p>';
+            }
+            ?>
+        </div>
 
-                    <!-- Sold Out Message and Prevent Add to Cart -->
-                    <?php if ($is_sold_out): ?>
-                        <p class="text-danger fw-bold">Sold Out</p>
-                        <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
-                    <?php else: ?>
-                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                            <input type="hidden" name="product_id" value="<?php echo $discounted_product['product_id']; ?>">
-                            <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($discounted_product['product_name']); ?>">
-                            <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($discounted_product['discounted_price']); ?>">
-                            <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($discounted_product['image']); ?>">
 
-                            <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
-                                Add to Cart
-                            </button>
-                            <a href="product_details.php?product_id=<?php echo $discounted_product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
-                                View Details
-                            </a>
-                        </form>
-                    <?php endif; ?>
+        <!-- Category Section -->
+        <div class="container my-5">
+            <h2 class="text-center mb-4 mt-5" style="font-family: 'Roboto', sans-serif; font-weight: 500;">Browse by Category</h2>
 
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <!-- Men Category -->
+                <div class="col">
+                    <div class="card text-center shadow-sm border-0 rounded">
+                        <img src="images/men-category.jpg" class="card-img-top" alt="Men Products" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-family: 'Roboto', sans-serif; font-weight: 600;">Men</h5>
+                            <p class="card-text">Explore our latest collection of men's fashion products.</p>
+                            <!-- Custom Blue button -->
+                            <a href="men_products.php" class="btn custom-blue-btn">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Women Category -->
+                <div class="col">
+                    <div class="card text-center shadow-sm border-0 rounded">
+                        <img src="images/women-category.jpg" class="card-img-top" alt="Women Products" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-family: 'Roboto', sans-serif; font-weight: 600;">Women</h5>
+                            <p class="card-text">Discover stylish and elegant products for women.</p>
+                            <!-- Custom Blue button -->
+                            <a href="women_products.php" class="btn custom-blue-btn">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unisex Category -->
+                <div class="col">
+                    <div class="card text-center shadow-sm border-0 rounded">
+                        <img src="images/unisex-category.jpg" class="card-img-top" alt="Unisex Products" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-family: 'Roboto', sans-serif; font-weight: 600;">Unisex</h5>
+                            <p class="card-text">Browse unisex products suitable for everyone.</p>
+                            <!-- Custom Blue button -->
+                            <a href="unisex_products.php" class="btn custom-blue-btn">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    <?php 
-        }
-    } else {
-        echo '<p class="text-center text-muted">No discounted products found.</p>';
-    }
-    ?>
-</div>
 
 
-
-<h2 class="text-center mb-4 mt-5"></h2>
-<div class=" mb-4">
-    <button id="popularBtn" class="btn btn-dark" onclick="showPopular()">Best Sellers</button>
-    <button id="latestBtn" class="btn btn-outline-dark" onclick="showLatest()">New Arrivals</button>
-</div>
-
-<div id="popularProducts" class="row row-cols-1 row-cols-md-4 g-4">
-    <?php 
-    $popular_query = "SELECT * FROM products WHERE subcategory = 'popular' ORDER BY created_at DESC LIMIT 4";
-    $popular_result = mysqli_query($conn, $popular_query);
-        
-    while ($popular_product = mysqli_fetch_assoc($popular_result)) {
-        $stock_quantity = $popular_product['stock_quantity'];
-        $is_sold_out = $stock_quantity == 0;
-
-        $image = isset($popular_product['image']) && !empty($popular_product['image']) 
-            ? 'products/' . htmlspecialchars($popular_product['image']) 
-            : 'images/default-image.jpg';
-
-        $product_name = htmlspecialchars($popular_product['product_name']);
-        $product_price = htmlspecialchars($popular_product['price']);
-    ?>
-        <div class="col">
-            <div class="card h-100 text-center shadow d-flex flex-column">
-                <div class="image-container" style="width: auto; margin: 0 auto;">
-                    <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($popular_product['product_name']); ?>" 
-                    style="max-height: 150px; width: 100%; object-fit: contain;">
-                </div>
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title"><?php echo $product_name; ?></h5>
-                    <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-                    <?php if ($is_sold_out): ?>
-                        <p class="text-danger fw-bold">Sold Out</p>
-                        <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
-                    <?php else: ?>
-                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                            <input type="hidden" name="product_id" value="<?php echo $popular_product['product_id']; ?>">
-                            <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
-                                Add to Cart
-                            </button>
-                            <a href="product_details.php?product_id=<?php echo $popular_product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
-                                View Details
-                            </a>
-                        </form>
-                    <?php endif; ?>
-                </div>
-            </div>
+        <h2 class="text-center mb-4 mt-5"></h2>
+        <div class="d-flex justify-content-center mb-4 gap-3">
+            <button id="popularBtn" class="btn btn-dark px-4 py-2 rounded-pill" onclick="showPopular()">
+                <i class="fa fa-star me-2"></i> Popular
+            </button>
+            <button id="latestBtn" class="btn btn-outline-dark px-4 py-2 rounded-pill" onclick="showLatest()">
+                <i class="fa fa-clock me-2"></i> New Arrival
+            </button>
         </div>
-    <?php } ?>
-</div>
 
-<div id="latestProducts" class="row row-cols-1 row-cols-md-4 g-4" style="display: none;">
-    <?php 
-    $latest_query = "SELECT * FROM products WHERE subcategory = 'latest' ORDER BY created_at DESC LIMIT 4";
-    $latest_result = mysqli_query($conn, $latest_query);
-        
-    while ($latest_product = mysqli_fetch_assoc($latest_result)) {
-        $stock_quantity = $latest_product['stock_quantity'];
-        $is_sold_out = $stock_quantity == 0;
 
-        $image = isset($latest_product['image']) && !empty($latest_product['image']) 
-            ? 'products/' . htmlspecialchars($latest_product['image']) 
-            : 'images/default-image.jpg';
+        <!-- Popular and Latest Products Sections -->
+        <div id="popularProducts" class="row row-cols-1 row-cols-md-4 g-4">
+            <?php
+            $popular_query = "SELECT * FROM products WHERE subcategory = 'popular' ORDER BY created_at";
+            $popular_result = mysqli_query($conn, $popular_query);
 
-        $product_name = htmlspecialchars($latest_product['product_name']);
-        $product_price = htmlspecialchars($latest_product['price']);
-    ?>
-        <div class="col">
-            <div class="card h-100 text-center shadow d-flex flex-column">
-                <div class="image-container" style="width: auto; margin: 0 auto;">
-                    <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($latest_product['product_name']); ?>" 
-                    style="max-height: 150px; width: 100%; object-fit: contain;">
+            while ($popular_product = mysqli_fetch_assoc($popular_result)) {
+                $stock_quantity = $popular_product['stock_quantity'];
+                $is_sold_out = $stock_quantity == 0;
+
+                $image = isset($popular_product['image']) && !empty($popular_product['image'])
+                    ? 'products/' . htmlspecialchars($popular_product['image'])
+                    : 'images/default-image.jpg';
+
+                $product_name = htmlspecialchars($popular_product['product_name']);
+                $product_price = htmlspecialchars($popular_product['price']);
+            ?>
+                <div class="col">
+                    <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
+                        <div class="image-container position-relative overflow-hidden">
+                            <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
+                                alt="<?php echo $product_name; ?>"
+                                style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
+                            <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
+                                <?php if (!$is_sold_out): ?>
+                                    <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                                        <input type="hidden" name="product_id" value="<?php echo $popular_product['product_id']; ?>">
+                                        <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
+                                            <i class="fa fa-cart-plus"></i>
+                                        </button>
+                                        <a href="product_details.php?product_id=<?php echo $popular_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                            <i class="fa fa-info-circle"></i>
+                                        </a>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
+                            <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
+                            <?php if ($is_sold_out): ?>
+                                <p class="text-danger fw-bold">Sold Out</p>
+                                <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title"><?php echo $product_name; ?></h5>
-                    <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-                    <?php if ($is_sold_out): ?>
-                        <p class="text-danger fw-bold">Sold Out</p>
-                        <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
-                    <?php else: ?>
-                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                            <input type="hidden" name="product_id" value="<?php echo $latest_product['product_id']; ?>">
-                            <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
-                                Add to Cart
-                            </button>
-                            <a href="product_details.php?product_id=<?php echo $latest_product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
-                                View Details
-                            </a>
-                        </form>
-                    <?php endif; ?>
-                </div>
-            </div>
+            <?php } ?>
         </div>
-    <?php } ?>
-</div>
 
-<script>
-    function showPopular() {
-        document.getElementById("popularProducts").style.display = "flex";
-        document.getElementById("latestProducts").style.display = "none";
-        document.getElementById("popularBtn").classList.add("btn-dark");
-        document.getElementById("popularBtn").classList.remove("btn-outline-dark");
-        document.getElementById("latestBtn").classList.remove("btn-dark");
-        document.getElementById("latestBtn").classList.add("btn-outline-dark");
-    }
+        <div id="latestProducts" class="row row-cols-1 row-cols-md-4 g-4" style="display: none;">
+            <?php
+            $latest_query = "SELECT * FROM products WHERE subcategory = 'latest' ORDER BY created_at ";
+            $latest_result = mysqli_query($conn, $latest_query);
 
-    function showLatest() {
-        document.getElementById("popularProducts").style.display = "none";
-        document.getElementById("latestProducts").style.display = "flex";
-        document.getElementById("latestBtn").classList.add("btn-dark");
-        document.getElementById("latestBtn").classList.remove("btn-outline-dark");
-        document.getElementById("popularBtn").classList.remove("btn-dark");
-        document.getElementById("popularBtn").classList.add("btn-outline-dark");
-    }
-</script>
+            while ($latest_product = mysqli_fetch_assoc($latest_result)) {
+                $stock_quantity = $latest_product['stock_quantity'];
+                $is_sold_out = $stock_quantity == 0;
 
+                $image = isset($latest_product['image']) && !empty($latest_product['image'])
+                    ? 'products/' . htmlspecialchars($latest_product['image'])
+                    : 'images/default-image.jpg';
 
-<h2 class="mb-4 mt-5">Featured Products</h2>
-<div class="row row-cols-1 row-cols-md-4 g-4">
-    <?php 
-    // Query to fetch featured products based on subcategory
-    $featured_query = "SELECT * FROM products WHERE subcategory = 'featured' ORDER BY created_at DESC LIMIT 4";
-    $featured_result = mysqli_query($conn, $featured_query);
-        
-    while ($featured_product = mysqli_fetch_assoc($featured_result)) {
-        // Get stock quantity and check if it's sold out
-        $stock_quantity = $featured_product['stock_quantity'];
-        $is_sold_out = $stock_quantity == 0;
-
-        // Image path logic
-        $image = isset($featured_product['image']) && !empty($featured_product['image']) 
-            ? 'products/' . htmlspecialchars($featured_product['image']) 
-            : 'images/default-image.jpg';
-
-        // Check if image exists, otherwise fallback
-        if (!file_exists($image)) {
-            $image = 'images/default-image.jpg';  // Fallback image
-        }
-
-        $product_name = htmlspecialchars($featured_product['product_name']);
-        $product_price = htmlspecialchars($featured_product['price']);
-    ?>
-        <div class="col">
-            <div class="card h-100 text-center shadow d-flex flex-column">
-                <!-- Image container with dynamic height -->
-                <div class="image-container" style="width: auto; margin: 0 auto;">
-                    <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($featured_product['product_name']); ?>" 
-                    style="max-height: 150px; width: 100%; object-fit: contain;">
+                $product_name = htmlspecialchars($latest_product['product_name']);
+                $product_price = htmlspecialchars($latest_product['price']);
+            ?>
+                <div class="col">
+                    <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
+                        <div class="image-container position-relative overflow-hidden">
+                            <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
+                                alt="<?php echo $product_name; ?>"
+                                style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
+                            <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
+                                <?php if (!$is_sold_out): ?>
+                                    <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                                        <input type="hidden" name="product_id" value="<?php echo $latest_product['product_id']; ?>">
+                                        <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
+                                            <i class="fa fa-cart-plus"></i>
+                                        </button>
+                                        <a href="product_details.php?product_id=<?php echo $latest_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                            <i class="fa fa-info-circle"></i>
+                                        </a>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
+                            <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
+                            <?php if ($is_sold_out): ?>
+                                <p class="text-danger fw-bold">Sold Out</p>
+                                <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title"><?php echo $product_name; ?></h5>
-                    <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-
-                    <!-- Sold Out Message and Prevent Add to Cart -->
-                    <?php if ($is_sold_out): ?>
-                        <p class="text-danger fw-bold">Sold Out</p>
-                        <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
-                    <?php else: ?>
-                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                            <input type="hidden" name="product_id" value="<?php echo $featured_product['product_id']; ?>">
-                            <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($featured_product['product_name']); ?>">
-                            <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($featured_product['price']); ?>">
-                            <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($featured_product['image']); ?>">
-
-                            <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
-                                Add to Cart
-                            </button>
-                            <a href="product_details.php?product_id=<?php echo $featured_product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
-                                View Details
-                            </a>
-                        </form>
-                    <?php endif; ?>
-
-                </div>
-            </div>
+            <?php } ?>
         </div>
-    <?php } ?>
-</div>
+        <script>
+            function showPopular() {
+                document.getElementById("popularProducts").style.display = "flex";
+                document.getElementById("latestProducts").style.display = "none";
+                document.getElementById("popularBtn").classList.add("btn-dark");
+                document.getElementById("popularBtn").classList.remove("btn-outline-dark");
+                document.getElementById("latestBtn").classList.remove("btn-dark");
+                document.getElementById("latestBtn").classList.add("btn-outline-dark");
+            }
+
+            function showLatest() {
+                document.getElementById("popularProducts").style.display = "none";
+                document.getElementById("latestProducts").style.display = "flex";
+                document.getElementById("latestBtn").classList.add("btn-dark");
+                document.getElementById("latestBtn").classList.remove("btn-outline-dark");
+                document.getElementById("popularBtn").classList.remove("btn-dark");
+                document.getElementById("popularBtn").classList.add("btn-outline-dark");
+            }
+        </script>
 
 
-<!-- Include Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <h2 class="mb-4 mt-5" style="font-family: 'Roboto', sans-serif; font-weight: 500;">Featured Products</h2>
+        <div class="row row-cols-1 row-cols-md-4 g-4">
+            <?php
+            $featured_query = "SELECT * FROM products WHERE subcategory = 'featured' ORDER BY created_at ";
+            $featured_result = mysqli_query($conn, $featured_query);
+
+            while ($featured_product = mysqli_fetch_assoc($featured_result)) {
+                $stock_quantity = $featured_product['stock_quantity'];
+                $is_sold_out = $stock_quantity == 0;
+
+                $image = isset($featured_product['image']) && !empty($featured_product['image'])
+                    ? 'products/' . htmlspecialchars($featured_product['image'])
+                    : 'images/default-image.jpg';
+
+                $product_name = htmlspecialchars($featured_product['product_name']);
+                $product_price = htmlspecialchars($featured_product['price']);
+            ?>
+                <div class="col">
+                    <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
+                        <div class="image-container position-relative overflow-hidden">
+                            <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
+                                alt="<?php echo $product_name; ?>"
+                                style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
+                            <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
+                                <?php if (!$is_sold_out): ?>
+                                    <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                                        <input type="hidden" name="product_id" value="<?php echo $featured_product['product_id']; ?>">
+                                        <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
+                                            <i class="fa fa-cart-plus"></i>
+                                        </button>
+                                        <a href="product_details.php?product_id=<?php echo $featured_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                            <i class="fa fa-info-circle"></i>
+                                        </a>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
+                            <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
+                            <?php if ($is_sold_out): ?>
+                                <p class="text-danger fw-bold">Sold Out</p>
+                                <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
+    </div>
+
+    <script>
+        const productCards = document.querySelectorAll('.product-card .image-container');
+        productCards.forEach(card => {
+            card.addEventListener('mouseover', () => {
+                card.querySelector('.hover-overlay').style.opacity = '1';
+                card.querySelector('img').style.transform = 'scale(1.1)';
+            });
+
+            card.addEventListener('mouseout', () => {
+                card.querySelector('.hover-overlay').style.opacity = '0';
+                card.querySelector('img').style.transform = 'scale(1)';
+            });
+        });
+    </script>
+    <!-- Latest Font Awesome version -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Include Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>
 
 

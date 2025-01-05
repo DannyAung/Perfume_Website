@@ -3,7 +3,7 @@ session_start();
 
 // Assuming user is logged in and their user_id is stored in session
 if (!isset($_SESSION['user_id'])) {
-    echo "You must be logged in to add items to your cart.";
+    echo "You must be register or logged in to add items to your cart.";
     exit;
 }
 
