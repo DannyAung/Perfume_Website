@@ -16,17 +16,16 @@ $conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-
+// Check if user is logged in
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Men's Products</title>
+    <title>Fragrance Haven</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -42,20 +41,23 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                 <b class="ms-2 dm-serif-display-regular-italic custom-font-color">FRAGRANCE HAVEN</b>
             </a>
 
-            <!-- Toggler Button for Small Screens -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+
+            <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
-            </button>
+            </button> -->
 
             <!-- Collapsible Content -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
                     <!-- Search Bar in the Center -->
                     <div class="mx-auto my-2 my-lg-0">
-                        <form class="d-flex">
-                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        <form method="GET" action="search.php" class="mb-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="query" placeholder="Search for a product..." aria-label="Search" required>
+                                <button class="btn btn-primary" type="submit">Search</button>
+                            </div>
                         </form>
+
                     </div>
 
                     <!-- Display Username or Guest -->
@@ -92,8 +94,8 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
         </div>
     </nav>
 
-  <!-- New Navigation Links Section -->
-  <div class="py-1">
+    <!-- New Navigation Links Section -->
+    <div class="py-1">
         <div class="container">
             <ul class="nav justify-content">
                 <li class="nav-item">
@@ -122,74 +124,194 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
         </div>
     </div>
 
+    <div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar for Filters -->
+        <div class="col-md-3">
+            <div class="border p-3">
+                <h5 class="mb-3">Filter Products</h5>
 
-    <h2 class="mb-4 mt-5">Men's Collection</h2>
-    <div class="row row-cols-1 row-cols-md-4 g-4">
-        <?php
-        // Query to fetch only "Men" category products
-        $query = "SELECT * FROM products WHERE category = 'men' ORDER BY created_at DESC";
-        $result = mysqli_query($conn, $query);
-
-        while ($product = mysqli_fetch_assoc($result)) {
-            // Get stock quantity and check if it's sold out
-            $stock_quantity = $product['stock_quantity'];
-            $is_sold_out = $stock_quantity == 0;
-
-            // Image path logic
-            $image = isset($product['image']) && !empty($product['image'])
-                ? 'products/' . htmlspecialchars($product['image'])
-                : 'images/default-image.jpg';
-
-            // Check if image exists, otherwise fallback
-            if (!file_exists($image)) {
-                $image = 'images/default-image.jpg';  // Fallback image
-            }
-
-            $product_name = htmlspecialchars($product['product_name']);
-            $product_price = htmlspecialchars($product['price']);
-        ?>
-            <div class="col">
-                <div class="card h-100 text-center shadow d-flex flex-column">
-                    <div class="image-container" style="width: auto; margin: 0 auto;">
-                        <img src="<?php echo $image; ?>" class="card-img-top" alt="<?php echo $product_name; ?>"
-                            style="max-height: 150px; width: 100%; object-fit: contain;">
+                <!-- Price Range Filter -->
+                <form method="GET" action="men_category.php">
+                    <div class="mb-3">
+                        <label for="priceRange" class="form-label">Price Range</label>
+                        <div class="d-flex gap-2">
+                            <input type="number" class="form-control" name="min_price" placeholder="Min" min="0" value="<?php echo isset($_GET['min_price']) ? htmlspecialchars($_GET['min_price']) : ''; ?>">
+                            <input type="number" class="form-control" name="max_price" placeholder="Max" min="0" value="<?php echo isset($_GET['max_price']) ? htmlspecialchars($_GET['max_price']) : ''; ?>">
+                        </div>
                     </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title"><?php echo $product_name; ?></h5>
-                        <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
 
-                        <!-- Sold Out Message and Prevent Add to Cart -->
-                        <?php if ($is_sold_out): ?>
-                            <p class="text-danger fw-bold">Sold Out</p>
-                            <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
-                        <?php else: ?>
-                            <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                                <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
-                                <input type="hidden" name="product_name" value="<?php echo $product_name; ?>">
-                                <input type="hidden" name="product_price" value="<?php echo $product_price; ?>">
-                                <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($product['image']); ?>">
-
-                                <button type="submit" name="add_to_cart" class="btn btn-outline-primary btn-sm flex-grow-1">
-                                    Add to Cart
-                                </button>
-                                <a href="product_details.php?product_id=<?php echo $product['product_id']; ?>" class="btn btn-primary btn-sm flex-grow-1">
-                                    View Details
-                                </a>
-                            </form>
-                        <?php endif; ?>
-
+                    <!-- Discount Filter -->
+                    <div class="mb-3">
+                        <label class="form-label">Discount</label>
+                        <select class="form-select" name="discount">
+                            <option value="" selected>Any</option>
+                            <option value="5" <?php echo (isset($_GET['discount']) && $_GET['discount'] == '5') ? 'selected' : ''; ?>>5% or more</option>
+                            <option value="10" <?php echo (isset($_GET['discount']) && $_GET['discount'] == '10') ? 'selected' : ''; ?>>10% or more</option>
+                            <option value="20" <?php echo (isset($_GET['discount']) && $_GET['discount'] == '20') ? 'selected' : ''; ?>>20% or more</option>
+                            <option value="30" <?php echo (isset($_GET['discount']) && $_GET['discount'] == '30') ? 'selected' : ''; ?>>30% or more</option>
+                        </select>
                     </div>
+
+                    <!-- Category Filter -->
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" name="category">
+                           
+                            <option value="Men" <?php echo (isset($_GET['category']) && $_GET['category'] == 'Men') ? 'selected' : ''; ?>>Men</option>
+                            <option value="Women" <?php echo (isset($_GET['category']) && $_GET['category'] == 'Women') ? 'selected' : ''; ?>>Women</option>
+                            <option value="Unisex" <?php echo (isset($_GET['category']) && $_GET['category'] == 'Unisex') ? 'selected' : ''; ?>>Unisex</option>
+                            <option value="All" <?php echo isset($_GET['category']) && $_GET['category'] == 'All' ? 'selected' : ''; ?>>All Categories</option>
+
+                        </select>
+                    </div>
+
+                    <!-- Availability Filter -->
+                    <div class="mb-3">
+                        <label class="form-label">Availability</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="in_stock" id="inStock" value="1" <?php echo isset($_GET['in_stock']) ? 'checked' : ''; ?>>
+                            <label class="form-check-label" for="inStock">In Stock</label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Filter Button -->
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main Products Section -->
+        <div class="col-md-9">
+            <div class="container py-5">
+                <h2 class="text-center">Men's Fragrance Collection</h2>
+                <div class="row row-cols-1 row-cols-md-4 g-4">
+                    <?php
+                     $category = isset($_GET['category']) ? $_GET['category'] : 'Men'; // Default to 'Men' if no category is selected
+                     $men_query = "SELECT * FROM products WHERE 1=1";
+                    // Apply Category Filter
+                    if ($category !== 'All') {
+                        $men_query .= " AND category = '$category'";
+                    } else {
+                        $category;
+                    }
+
+                    // Apply Price Filter
+                    if (isset($_GET['min_price']) && isset($_GET['max_price']) && is_numeric($_GET['min_price']) && is_numeric($_GET['max_price'])) {
+                        $min_price = intval($_GET['min_price']);
+                        $max_price = intval($_GET['max_price']);
+                        $men_query .= " AND price BETWEEN $min_price AND $max_price";
+                    }
+
+                    // Apply Discount Filter
+                    if (isset($_GET['discount']) && is_numeric($_GET['discount'])) {
+                        $discount = intval($_GET['discount']);
+                        $men_query .= " AND discount_percentage >= $discount";
+                    }
+
+                    // Apply In-Stock Filter
+                    if (isset($_GET['in_stock'])) {
+                        $men_query .= " AND stock_quantity > 0";
+                    }
+
+                    $men_query .= " ORDER BY created_at";
+                    $men_result = mysqli_query($conn, $men_query);
+
+                    // Display Filtered Products
+                    while ($men_product = mysqli_fetch_assoc($men_result)) {
+                        $stock_quantity = $men_product['stock_quantity'];
+                        $is_sold_out = $stock_quantity == 0;
+
+                        $image = isset($men_product['image']) && !empty($men_product['image'])
+                            ? 'products/' . htmlspecialchars($men_product['image'])
+                            : 'images/default-image.jpg';
+
+                        $product_name = htmlspecialchars($men_product['product_name']);
+                        $product_price = htmlspecialchars($men_product['price']);
+                        $discount_percentage = isset($men_product['discount_percentage']) ? $men_product['discount_percentage'] : 0;
+
+                        // Calculate the discounted price
+                        if ($discount_percentage > 0) {
+                            $discounted_price = $product_price - ($product_price * ($discount_percentage / 100));
+                        } else {
+                            $discounted_price = $product_price;
+                        }
+                    ?>
+                        <div class="col">
+                            <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
+                                <div class="image-container position-relative overflow-hidden">
+                                    <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
+                                        alt="<?php echo $product_name; ?>"
+                                        style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
+                                    <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
+                                        <?php if (!$is_sold_out): ?>
+                                            <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                                                <input type="hidden" name="product_id" value="<?php echo $men_product['product_id']; ?>">
+                                                <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
+                                                    <i class="fa fa-cart-plus"></i>
+                                                </button>
+
+                                                <a href="product_details.php?product_id=<?php echo $men_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                                    <i class="fa fa-info-circle"></i>
+                                                </a>
+                                            </form>
+                                        <?php else: ?>
+                                            <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
+                                    <p class="card-text text-muted">
+                                        <?php if ($discount_percentage > 0): ?>
+                                            <span class="text-decoration-line-through">$<?php echo number_format($product_price, 2); ?></span>
+                                            <span class="text-danger ms-2">Now $<?php echo number_format($discounted_price, 2); ?></span>
+                                        <?php else: ?>
+                                            $<?php echo number_format($product_price, 2); ?>
+                                        <?php endif; ?>
+                                    </p>
+                                    <?php if ($is_sold_out): ?>
+                                        <p class="text-danger fw-bold">Sold Out</p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
                 </div>
             </div>
-        <?php } ?>
+        </div>
     </div>
+</div>
 
-    <!-- Include Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const productCards = document.querySelectorAll('.product-card .image-container');
+        productCards.forEach(card => {
+            card.addEventListener('mouseover', () => {
+                card.querySelector('.hover-overlay').style.opacity = '1';
+                card.querySelector('img').style.transform = 'scale(1.1)';
+            });
+
+            card.addEventListener('mouseout', () => {
+                card.querySelector('.hover-overlay').style.opacity = '0';
+                card.querySelector('img').style.transform = 'scale(1)';
+            });
+        });
+    </script>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        
+        <!-- Latest Font Awesome version -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+        <!-- Include Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+        <!-- Include Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Include Font Awesome for Icons -->
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
-
 </html>
-
 <?php
 // Close the database connection
 mysqli_close($conn);

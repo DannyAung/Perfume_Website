@@ -1,12 +1,12 @@
 <?php
 session_start();  // Start the session to access session variables
 
-// Check if user is logged in
-$is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
-
-
+// Check if u
 
 require_once 'db_connection.php';  // Ensure the connection file is correct
+
+
+$is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
 // Get the product_id from the URL
 $product_id = isset($_GET['product_id']) ? $_GET['product_id'] : null;
@@ -204,13 +204,13 @@ if ($product_id) {
                 <p class="lead fw-bold" style="font-family: 'Poppins', sans-serif; font-size: 24px; color: #333;">$<?php echo number_format($product['price'], 2); ?></p>
             <?php endif; ?>
             <p style="font-family: 'Roboto', sans-serif; font-size: 16px;"><strong>Stock:</strong> <?php echo intval($product['stock_quantity']); ?> available</p>
-
-            <!-- Add to Cart Button -->
+            <!-- Add to Cart Form -->
             <form method="POST" action="add_to_cart.php">
-                <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
-                <button type="submit" class="btn btn-primary w-100" style="font-family: 'Poppins', sans-serif; font-size: 16px; padding: 10px 20px;">Add to Cart</button>
-            </form>
-        </div>
+                                    <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
+                                    <input type="number" name="quantity" value="1" min="1" class="form-control mb-3" style="width: 100px;">
+                                    <button type="submit" name="add_to_cart" class="btn btn-primary">Add to Cart</button>
+                                </form>
+                    </div>
     </div>
 
     <!-- Product Description-->

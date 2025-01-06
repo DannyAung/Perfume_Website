@@ -1,15 +1,15 @@
 <?php
 session_start();
 
-// Assuming user is logged in and their user_id is stored in session
+
 if (!isset($_SESSION['user_id'])) {
     echo "You must be register or logged in to add items to your cart.";
     exit;
 }
 
-$user_id = $_SESSION['user_id']; // User ID from session
+$user_id = $_SESSION['user_id']; 
 
-// Database connection
+
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -21,17 +21,16 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Check if user is logged in
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-// Add to Cart Logic
+
 if (isset($_POST['add_to_cart'])) {
     $product_id = $_POST['product_id'];
 
-    // Check if quantity is set and is a valid number
+    
     $quantity = isset($_POST['quantity']) && is_numeric($_POST['quantity']) && $_POST['quantity'] > 0 ? $_POST['quantity'] : 1; // Default to 1 if invalid
     
-    // Check if product already exists in the cart for the user
+
     $sql = "SELECT * FROM cart_items WHERE user_id = ? AND product_id = ? AND ordered_status = 'not_ordered'";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $user_id, $product_id);
@@ -39,7 +38,6 @@ if (isset($_POST['add_to_cart'])) {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // Product already exists in the cart, update the quantity
         $cart_item = $result->fetch_assoc();
         $new_quantity = $cart_item['quantity'] + $quantity;
 
@@ -56,10 +54,13 @@ if (isset($_POST['add_to_cart'])) {
         echo "Product added to your cart!";
     }
 
-    // Redirect to avoid repeated submission
-    header("Location: user_index.php");
-    exit;
-}
+     // Get the referer (page the user was on)
+     $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'user_index.php';
+     // Redirect back to the page the user came from (either user_index.php, product_detail.php, etc.)
+     header("Location: " . $referer);
+     exit;
+ }
+
 
 // Increase Quantity Logic
 if (isset($_POST['increase_quantity'])) {
