@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$user_id = $_SESSION['user_id']; 
+$user_id = $_SESSION['user_id'];
 
 $host = 'localhost';
 $username_db = 'root';
@@ -22,7 +22,7 @@ $port = 3306;
 $conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
-} 
+}
 
 // Retrieve cart items
 $sql = "SELECT ci.cart_item_id, ci.quantity, p.product_id, p.product_name, p.price, p.discounted_price, p.image, p.size
@@ -43,7 +43,7 @@ while ($item = $result->fetch_assoc()) {
     $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : 0;
     $item_price = $discounted_price > 0 ? $discounted_price : $regular_price;
     $item_total = $item_price * $item['quantity'];
-    $total_price += $item_total;   
+    $total_price += $item_total;
     $cart_items[] = $item;
 }
 
@@ -110,6 +110,7 @@ if (isset($_POST['checkout'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -120,6 +121,7 @@ if (isset($_POST['checkout'])) {
             font-family: 'Arial', sans-serif;
             background-color: #f4f7fc;
         }
+
         .checkout-container {
             width: 80%;
             margin: 50px auto;
@@ -128,18 +130,22 @@ if (isset($_POST['checkout'])) {
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             text-align: center;
             padding-bottom: 20px;
         }
+
         .cart-item-summary {
             margin-bottom: 20px;
         }
+
         .total-price {
             text-align: right;
             font-size: 1.5em;
             margin-top: 20px;
         }
+
         .checkout-form input {
             margin-bottom: 10px;
         }
@@ -149,12 +155,12 @@ if (isset($_POST['checkout'])) {
         // JavaScript to show/hide payment method fields based on selection
         function togglePaymentFields() {
             var paymentMethod = document.getElementById("payment_method").value;
-            
+
             // Hide all payment method fields initially
             document.getElementById("kpay_fields").style.display = "none";
             document.getElementById("credit_card_fields").style.display = "none";
             document.getElementById("cash_on_delivery_fields").style.display = "none";
-            
+
             // Show the relevant fields based on the selected payment method
             if (paymentMethod == "kpay") {
                 document.getElementById("kpay_fields").style.display = "block";
@@ -166,6 +172,7 @@ if (isset($_POST['checkout'])) {
         }
     </script>
 </head>
+
 <body>
 
     <div class="checkout-container">
@@ -237,24 +244,22 @@ if (isset($_POST['checkout'])) {
             <div id="kpay_fields" style="display: none;">
                 <div class="mb-3">
                     <label for="kpay_phone" class="form-label">Phone Number</label>
-                    <input 
-                        type="text" 
-                        class="form-control" 
-                        id="kpay_phone" 
-                        name="kpay_phone" 
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="kpay_phone"
+                        name="kpay_phone"
                         placeholder="Enter your K Pay phone number"
-                        maxlength="11"
-                    >
+                        maxlength="11">
                 </div>
                 <div class="mb-3">
                     <label for="kpay_otp" class="form-label">OTP</label>
-                    <input 
-                        type="text" 
-                        class="form-control" 
-                        id="kpay_otp" 
-                        name="kpay_otp" 
-                        placeholder="Enter OTP"
-                    >
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="kpay_otp"
+                        name="kpay_otp"
+                        placeholder="Enter OTP">
                 </div>
             </div>
 
@@ -285,8 +290,9 @@ if (isset($_POST['checkout'])) {
         </form>
     </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
 
 <?php

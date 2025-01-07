@@ -1,10 +1,8 @@
 <?php
-// Start session
 if (!isset($_SESSION)) {
-    session_start(); // Start session if not already started
+    session_start(); 
 }
 
-// Database connection
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -53,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
 
 // Check if user is logged in
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
+
 // Fetch products
 $sql = "SELECT product_name, price, image FROM products"; // Ensure table columns are correct
 $result = mysqli_query($conn, $sql);
@@ -99,11 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = 'Error uploading image.';
     }
 }
-
-
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -115,37 +110,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Latest Font Awesome version -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <!-- Include Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Include Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include Font Awesome for Icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
         <div class="container-fluid">
             <!-- Logo and Brand -->
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="./images/Logo.png" alt="Logo" style="width:50px; height:auto;">
+            <a class="navbar-brand d-flex align-items-center" href="user_index.php">
+                <img src="./images/perfume_logo.png" alt="Logo" style="width:50px; height:auto;">
                 <b class="ms-2 dm-serif-display-regular-italic custom-font-color">FRAGRANCE HAVEN</b>
             </a>
-
-
-            <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button> -->
 
             <!-- Collapsible Content -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
-                    <!-- Search Bar in the Center -->
-                    <div class="mx-auto my-2 my-lg-0">
-                        <form method="GET" action="search.php" class="mb-4">
+
+                    <!-- Modern Search Bar in the Center -->
+                    <div class="search-bar-container mx-auto my-2 my-lg-0">
+                        <form method="GET" action="search.php" class="search-form mb-2">
                             <div class="input-group">
-                                <input type="text" class="form-control" name="query" placeholder="Search for a product..." aria-label="Search" required>
-                                <button class="btn btn-primary" type="submit">Search</button>
+                                <input type="text" class="form-control border-end-0 search-input" name="query" placeholder="Search for a product..." aria-label="Search" required>
+                                <button class="btn btn-primary search-btn border-start-0 rounded-end px-4 py-2 shadow-lg" type="submit">
+                                    <i class="bi bi-search"></i> <!-- FontAwesome or Bootstrap Icons -->
+                                </button>
                             </div>
                         </form>
-
                     </div>
-
                     <!-- Display Username or Guest -->
                     <span class="navbar-text me-3 my-2 my-lg-0">
                         Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
@@ -191,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a class="nav-link" href="#">About</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: black;">
+                    <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" aria-expanded="false" style="color: black;">
                         Category
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
@@ -201,7 +202,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Delivery</a>
+                    <a class="nav-link" href="#" id="deliveryLink">Delivery</a>
+                    <div class="delivery-tooltip" id="deliveryTooltip">
+                        <p><b>Delivery: Within 2 or 3 days for YGN</b></p>
+                        <p><b>Delivery: Within 2 or 5 days for Other Locations</b></p>
+                    </div>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Contact</a>
@@ -311,50 +316,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Category Section -->
         <div class="container my-5">
-            <h2 class="text-center mb-4 mt-5" style="font-family: 'Roboto', sans-serif; font-weight: 500;">Browse by Category</h2>
+            <h2 class="text-center mb-5 mt-5" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #2c3e50;">Browse by Category</h2>
 
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <!-- Men Category -->
                 <div class="col">
-                    <div class="card text-center shadow-sm border-0 rounded">
-                        <img src="images/men-category.jpg" class="card-img-top" alt="Men Products" style="height: 200px; object-fit: cover;">
-                        <div class="card-body">
-                            <h5 class="card-title" style="font-family: 'Roboto', sans-serif; font-weight: 600;">Men</h5>
-                            <p class="card-text">Explore our latest collection of men's fashion products.</p>
-                            <!-- Custom Blue button -->
-                            <a href="men_category.php" class="btn custom-blue-btn">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
+                    <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
+                        <div class="position-relative">
+                            <img src="images/men-category.jpg" class="card-img-top" alt="Men Products" style="height: 250px; object-fit: cover;">
+                            <div class="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <a href="men_category.php" class="btn btn-light btn-lg rounded-pill">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-3" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #34495e;">Men</h5>
+                            <p class="card-text text-muted">Explore our latest collection of men's fashion products.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Women Category -->
                 <div class="col">
-                    <div class="card text-center shadow-sm border-0 rounded">
-                        <img src="images/women-category.jpg" class="card-img-top" alt="Women Products" style="height: 200px; object-fit: cover;">
-                        <div class="card-body">
-                            <h5 class="card-title" style="font-family: 'Roboto', sans-serif; font-weight: 600;">Women</h5>
-                            <p class="card-text">Discover stylish and elegant products for women.</p>
-                            <!-- Custom Blue button -->
-                            <a href="women_category.php" class="btn custom-blue-btn">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
+                    <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
+                        <div class="position-relative">
+                            <img src="images/women-category.jpg" class="card-img-top" alt="Women Products" style="height: 250px; object-fit: cover;">
+                            <div class="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <a href="women_category.php" class="btn btn-light btn-lg rounded-pill">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-3" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #34495e;">Women</h5>
+                            <p class="card-text text-muted">Discover stylish and elegant products for women.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Unisex Category -->
                 <div class="col">
-                    <div class="card text-center shadow-sm border-0 rounded">
-                        <img src="images/unisex-category.jpg" class="card-img-top" alt="Unisex Products" style="height: 200px; object-fit: cover;">
-                        <div class="card-body">
-                            <h5 class="card-title" style="font-family: 'Roboto', sans-serif; font-weight: 600;">Unisex</h5>
-                            <p class="card-text">Browse unisex products suitable for everyone.</p>
-                            <!-- Custom Blue button -->
-                            <a href="unisex_category.php" class="btn custom-blue-btn">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
+                    <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
+                        <div class="position-relative">
+                            <img src="images/unisex-category.jpg" class="card-img-top" alt="Unisex Products" style="height: 250px; object-fit: cover;">
+                            <div class="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <a href="unisex_category.php" class="btn btn-light btn-lg rounded-pill">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-3" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #34495e;">Unisex</h5>
+                            <p class="card-text text-muted">Browse unisex products suitable for everyone.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
 
         <h2 class="text-center mb-4 mt-5"></h2>
         <div class="d-flex justify-content-center mb-4 gap-3">
@@ -367,173 +380,173 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
 
-       <!-- Carousel for Popular Products -->
-<div id="popularProductsCarousel" class="carousel slide" data-bs-ride="false">
-    <div class="carousel-inner">
-        <?php
-        $popular_query = "SELECT * FROM products WHERE subcategory = 'popular' ORDER BY created_at";
-        $popular_result = mysqli_query($conn, $popular_query);
-        
-        $counter = 0;
-        while ($popular_product = mysqli_fetch_assoc($popular_result)) {
-            $stock_quantity = $popular_product['stock_quantity'];
-            $is_sold_out = $stock_quantity == 0;
+        <!-- Carousel for Popular Products -->
+        <div id="popularProductsCarousel" class="carousel slide" data-bs-ride="false">
+            <div class="carousel-inner">
+                <?php
+                $popular_query = "SELECT * FROM products WHERE subcategory = 'popular' ORDER BY created_at";
+                $popular_result = mysqli_query($conn, $popular_query);
 
-            $image = isset($popular_product['image']) && !empty($popular_product['image'])
-                ? 'products/' . htmlspecialchars($popular_product['image'])
-                : 'images/default-image.jpg';
+                $counter = 0;
+                while ($popular_product = mysqli_fetch_assoc($popular_result)) {
+                    $stock_quantity = $popular_product['stock_quantity'];
+                    $is_sold_out = $stock_quantity == 0;
 
-            $product_name = htmlspecialchars($popular_product['product_name']);
-            $product_price = htmlspecialchars($popular_product['price']);
+                    $image = isset($popular_product['image']) && !empty($popular_product['image'])
+                        ? 'products/' . htmlspecialchars($popular_product['image'])
+                        : 'images/default-image.jpg';
 
-            if ($counter % 4 == 0) {
-                echo $counter == 0 ? '<div class="carousel-item active">' : '<div class="carousel-item">';
-                echo '<div class="row row-cols-1 row-cols-md-4 g-4">';
-            }
-        ?>
-            <div class="col">
-                <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
-                    <div class="image-container position-relative overflow-hidden">
-                        <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
-                            alt="<?php echo $product_name; ?>"
-                            style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
-                        <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
-                            <?php if (!$is_sold_out): ?>
-                                <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                                    <input type="hidden" name="product_id" value="<?php echo $popular_product['product_id']; ?>">
-                                    <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
-                                        <i class="fa fa-cart-plus"></i>
-                                    </button>
-                                    <a href="product_details.php?product_id=<?php echo $popular_product['product_id']; ?>" class="btn btn-light btn-sm">
-                                        <i class="fa fa-info-circle"></i>
-                                    </a>
-                                </form>
-                            <?php endif; ?>
+                    $product_name = htmlspecialchars($popular_product['product_name']);
+                    $product_price = htmlspecialchars($popular_product['price']);
+
+                    if ($counter % 4 == 0) {
+                        echo $counter == 0 ? '<div class="carousel-item active">' : '<div class="carousel-item">';
+                        echo '<div class="row row-cols-1 row-cols-md-4 g-4">';
+                    }
+                ?>
+                    <div class="col">
+                        <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
+                            <div class="image-container position-relative overflow-hidden">
+                                <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
+                                    alt="<?php echo $product_name; ?>"
+                                    style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
+                                <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
+                                    <?php if (!$is_sold_out): ?>
+                                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                                            <input type="hidden" name="product_id" value="<?php echo $popular_product['product_id']; ?>">
+                                            <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
+                                                <i class="fa fa-cart-plus"></i>
+                                            </button>
+                                            <a href="product_details.php?product_id=<?php echo $popular_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                                <i class="fa fa-info-circle"></i>
+                                            </a>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
+                                <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
+                                <?php if ($is_sold_out): ?>
+                                    <p class="text-danger fw-bold">Sold Out</p>
+
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
-                        <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-                        <?php if ($is_sold_out): ?>
-                            <p class="text-danger fw-bold">Sold Out</p>
-                           
-                        <?php endif; ?>
-                    </div>
-                </div>
+                <?php
+                    $counter++;
+                    if ($counter % 4 == 0 || $counter == mysqli_num_rows($popular_result)) {
+                        echo '</div></div>';
+                    }
+                }
+                ?>
             </div>
-        <?php
-            $counter++;
-            if ($counter % 4 == 0 || $counter == mysqli_num_rows($popular_result)) {
-                echo '</div></div>';
-            }
-        }
-        ?>
-    </div>
 
-    <!-- Carousel Controls for Popular Products -->
-    <button class="carousel-control-prev1" type="button" data-bs-target="#popularProductsCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next1" type="button" data-bs-target="#popularProductsCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
-</div>
+            <!-- Carousel Controls for Popular Products -->
+            <button class="carousel-control-prev1" type="button" data-bs-target="#popularProductsCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next1" type="button" data-bs-target="#popularProductsCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
 
-<!-- Carousel for Latest Products -->
-<div id="latestProductsCarousel" class="carousel slide" data-bs-ride="false" style="display: none;">
-    <div class="carousel-inner">
-        <?php
-        $latest_query = "SELECT * FROM products WHERE subcategory = 'latest' ORDER BY created_at";
-        $latest_result = mysqli_query($conn, $latest_query);
+        <!-- Carousel for Latest Products -->
+        <div id="latestProductsCarousel" class="carousel slide" data-bs-ride="false" style="display: none;">
+            <div class="carousel-inner">
+                <?php
+                $latest_query = "SELECT * FROM products WHERE subcategory = 'latest' ORDER BY created_at";
+                $latest_result = mysqli_query($conn, $latest_query);
 
-        $counter = 0;
-        while ($latest_product = mysqli_fetch_assoc($latest_result)) {
-            $stock_quantity = $latest_product['stock_quantity'];
-            $is_sold_out = $stock_quantity == 0;
+                $counter = 0;
+                while ($latest_product = mysqli_fetch_assoc($latest_result)) {
+                    $stock_quantity = $latest_product['stock_quantity'];
+                    $is_sold_out = $stock_quantity == 0;
 
-            $image = isset($latest_product['image']) && !empty($latest_product['image'])
-                ? 'products/' . htmlspecialchars($latest_product['image'])
-                : 'images/default-image.jpg';
+                    $image = isset($latest_product['image']) && !empty($latest_product['image'])
+                        ? 'products/' . htmlspecialchars($latest_product['image'])
+                        : 'images/default-image.jpg';
 
-            $product_name = htmlspecialchars($latest_product['product_name']);
-            $product_price = htmlspecialchars($latest_product['price']);
+                    $product_name = htmlspecialchars($latest_product['product_name']);
+                    $product_price = htmlspecialchars($latest_product['price']);
 
-            if ($counter % 4 == 0) {
-                echo $counter == 0 ? '<div class="carousel-item active">' : '<div class="carousel-item">';
-                echo '<div class="row row-cols-1 row-cols-md-4 g-4">';
-            }
-        ?>
-            <div class="col">
-                <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
-                    <div class="image-container position-relative overflow-hidden">
-                        <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
-                            alt="<?php echo $product_name; ?>"
-                            style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
-                        <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
-                            <?php if (!$is_sold_out): ?>
-                                <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                                    <input type="hidden" name="product_id" value="<?php echo $latest_product['product_id']; ?>">
-                                    <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
-                                        <i class="fa fa-cart-plus"></i>
-                                    </button>
-                                    <a href="product_details.php?product_id=<?php echo $latest_product['product_id']; ?>" class="btn btn-light btn-sm">
-                                        <i class="fa fa-info-circle"></i>
-                                    </a>
-                                </form>
-                            <?php endif; ?>
+                    if ($counter % 4 == 0) {
+                        echo $counter == 0 ? '<div class="carousel-item active">' : '<div class="carousel-item">';
+                        echo '<div class="row row-cols-1 row-cols-md-4 g-4">';
+                    }
+                ?>
+                    <div class="col">
+                        <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
+                            <div class="image-container position-relative overflow-hidden">
+                                <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
+                                    alt="<?php echo $product_name; ?>"
+                                    style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
+                                <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
+                                    <?php if (!$is_sold_out): ?>
+                                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                                            <input type="hidden" name="product_id" value="<?php echo $latest_product['product_id']; ?>">
+                                            <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
+                                                <i class="fa fa-cart-plus"></i>
+                                            </button>
+                                            <a href="product_details.php?product_id=<?php echo $latest_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                                <i class="fa fa-info-circle"></i>
+                                            </a>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
+                                <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
+                                <?php if ($is_sold_out): ?>
+                                    <p class="text-danger fw-bold">Sold Out</p>
+                                    <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
-                        <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-                        <?php if ($is_sold_out): ?>
-                            <p class="text-danger fw-bold">Sold Out</p>
-                            <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
-                        <?php endif; ?>
-                    </div>
-                </div>
+                <?php
+                    $counter++;
+                    if ($counter % 4 == 0 || $counter == mysqli_num_rows($latest_result)) {
+                        echo '</div></div>';
+                    }
+                }
+                ?>
             </div>
-        <?php
-            $counter++;
-            if ($counter % 4 == 0 || $counter == mysqli_num_rows($latest_result)) {
-                echo '</div></div>';
+
+            <!-- Carousel Controls for Latest Products -->
+            <button class="carousel-control-prev1" type="button" data-bs-target="#latestProductsCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next1" type="button" data-bs-target="#latestProductsCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+
+        <script>
+            function showPopular() {
+                document.getElementById("popularProductsCarousel").style.display = "block";
+                document.getElementById("latestProductsCarousel").style.display = "none";
+                document.getElementById("popularBtn").classList.add("btn-dark");
+                document.getElementById("popularBtn").classList.remove("btn-outline-dark");
+                document.getElementById("latestBtn").classList.remove("btn-dark");
+                document.getElementById("latestBtn").classList.add("btn-outline-dark");
             }
-        }
-        ?>
-    </div>
 
-    <!-- Carousel Controls for Latest Products -->
-    <button class="carousel-control-prev1" type="button" data-bs-target="#latestProductsCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next1" type="button" data-bs-target="#latestProductsCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
-</div>
-
-<script>
-    function showPopular() {
-        document.getElementById("popularProductsCarousel").style.display = "block";
-        document.getElementById("latestProductsCarousel").style.display = "none";
-        document.getElementById("popularBtn").classList.add("btn-dark");
-        document.getElementById("popularBtn").classList.remove("btn-outline-dark");
-        document.getElementById("latestBtn").classList.remove("btn-dark");
-        document.getElementById("latestBtn").classList.add("btn-outline-dark");
-    }
-
-    function showLatest() {
-        document.getElementById("popularProductsCarousel").style.display = "none";
-        document.getElementById("latestProductsCarousel").style.display = "block";
-        document.getElementById("latestBtn").classList.add("btn-dark");
-        document.getElementById("latestBtn").classList.remove("btn-outline-dark");
-        document.getElementById("popularBtn").classList.remove("btn-dark");
-        document.getElementById("popularBtn").classList.add("btn-outline-dark");
-    }
-</script>
+            function showLatest() {
+                document.getElementById("popularProductsCarousel").style.display = "none";
+                document.getElementById("latestProductsCarousel").style.display = "block";
+                document.getElementById("latestBtn").classList.add("btn-dark");
+                document.getElementById("latestBtn").classList.remove("btn-outline-dark");
+                document.getElementById("popularBtn").classList.remove("btn-dark");
+                document.getElementById("popularBtn").classList.add("btn-outline-dark");
+            }
+        </script>
 
 
         <h2 class="mb-4 mt-5" style="font-family: 'Roboto', sans-serif; font-weight: 500;">Featured Products</h2>
@@ -610,45 +623,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <span class="visually-hidden">Next</span>
             </button>
         </div>
-
-        <style>
-    .carousel-control-prev1,
-    .carousel-control-next1 {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 5;
-        background-color: transparent; /* Set background to transparent */
-        width: 40px;
-        height: 40px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 1px solid white; /* Optional: Add black border around buttons */
-    }
-
-    /* Left arrow positioning */
-    .carousel-control-prev1 {
-        left: -60px;
-        /* Adjust as needed */
-    }
-
-    /* Right arrow positioning */
-    .carousel-control-next1 {
-        right: -60px;
-        /* Adjust as needed */
-    }
-
-    /* Customize the arrow icons inside the buttons */
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-       
-        filter:invert(1);
-    }
-</style>
-
-
-
         <script>
             const productCards = document.querySelectorAll('.product-card .image-container');
             productCards.forEach(card => {
@@ -664,25 +638,116 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         </script>
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<!-- Related Resources Section -->
+<section class="related-resources py-5">
+    <div class="container">
+        <h3 class="text-center mb-2 display-5 font-weight-bold">Related Resources</h3>
+        <div class="row">
         
-        <!-- Latest Font Awesome version -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="images/resource1.jpg" class="card-img-top" alt="How to Spray Perfume in a Day">
+                    <div class="card-body text-center">
+                        <h5 class="card-title font-weight-bold">How to Spray Perfume In a Day</h5>
+                        <p class="card-text text-muted">Learn the best ways to apply perfume throughout the day for lasting fragrance.</p>
+                        <a href="how_to_spray_perfume.php" class="btn btn-gradient-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+           
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="images/resource2.jpg" class="card-img-top" alt="Choosing the Right Perfume">
+                    <div class="card-body text-center">
+                        <h5 class="card-title font-weight-bold">Choosing the Right Perfume</h5>
+                        <p class="card-text text-muted">A guide to help you pick the perfect fragrance for your personality and lifestyle.</p>
+                        <a href="choosing_right_perfume.php" class="btn btn-gradient-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+           
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="images/resource3.jpg" class="card-img-top" alt="Perfume Tips for Special Occasions">
+                    <div class="card-body text-center">
+                        <h5 class="card-title font-weight-bold">Perfume Tips for Special Occasions</h5>
+                        <p class="card-text text-muted">Tips on selecting the perfect scent for weddings, parties, and more.</p>
+                        <a href="perfume_tips_occasion.php" class="btn btn-gradient-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+           
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="images/resource4.jpg" class="card-img-top" alt="Perfume Storage Guide">
+                    <div class="card-body text-center">
+                        <h5 class="card-title font-weight-bold">Perfume Storage Guide</h5>
+                        <p class="card-text text-muted">How to store your perfumes properly to maintain their fragrance and quality.</p>
+                        <a href="perfume_storage.php" class="btn btn-gradient-primary">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-        <!-- Include Google Fonts -->
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    </div>
 
-        <!-- Include Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+              
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">About Us</h5>
+                    <p class="text-muted">Fragrance Haven is your ultimate destination for high-quality perfumes that elevate your senses. Explore our wide range of fragrances designed to suit every occasion and personality.</p>
+                </div>
 
-        <!-- Include Font Awesome for Icons -->
-        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+              
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="user_index.php" class="text-white text-decoration-none">Home</a></li>
+                        <li><a href="women_category.php" class="text-white text-decoration-none">Women’s Collection</a></li>
+                        <li><a href="men_category.php" class="text-white text-decoration-none">Men’s Collection</a></li>
+                        <a href="unisex_category.php" class="text-white text-decoration-none">Unisex Collection</a></li>
+                        <li><a href="about_us.php" class="text-white text-decoration-none">About Us</a></li>
+                        <li><a href="contact_us.php" class="text-white text-decoration-none">Contact Us</a></li>
+                    </ul>
+                </div>
+
+               
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">Contact Info</h5>
+                    <p class="text-muted"><i class="fas fa-map-marker-alt me-2"></i> 123 Fragrance St, City, Country</p>
+                    <p class="text-muted"><i class="fas fa-phone-alt me-2"></i> +123 456 7890</p>
+                    <p class="text-muted"><i class="fas fa-envelope me-2"></i> support@fragrancehaven.com</p>
+                </div>
+            </div>
+
+           
+            <div class="row mt-4 border-top pt-3">
+                <div class="col-md-6">
+                    <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="https://www.instagram.com/" class="text-white me-3 text-decoration-none"><i class="fab fa-instagram fa-lg"></i></a>
+                    <a href="https://www.facebook.com/" class="text-white me-3 text-decoration-none"><i class="fab fa-facebook fa-lg"></i></a>
+                    <a href="https://twitter.com/" class="text-white text-decoration-none"><i class="fab fa-twitter fa-lg"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+
 </body>
 
 </html>
 
-
 <?php
-// Close the database connection
+
 mysqli_close($conn);
 ?>

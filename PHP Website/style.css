@@ -26,103 +26,245 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
 }
-.card-body {
-    flex-grow: 1;
+
+.btn-gradient-primary {
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
 }
+
+.btn-gradient-primary:hover {
+    background: linear-gradient(45deg, #2575fc, #6a11cb);
+    transform: translateY(-2px);
+}
+
+/*Related Resource Card*/
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
-.card img,
 .card-img-top {
-    width: 100%;
-    height: auto; /* Adjust automatically */
+    height: 200px;
     object-fit: cover;
-    border-radius: 8px;
 }
 
-.btn:hover {
-    transform: scale(1.05);
-    transition: all 0.3s ease-in-out;
+.card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column; /* Stack the card title, text, and button vertically */
+    justify-content: space-between; /* Make space between elements */
 }
 
-.btn-outline-dark:hover {
-    background-color: black;
-    color: white;
-    border-color: black;
+.card-footer {
+    display: flex;
+    justify-content: flex-start; /* Align the button to the left */
 }
 
-.navbar {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.card-footer .btn {
+    margin-top: auto; /* Ensures the button stays at the bottom of the card */
 }
 
-.login-btn, .cart-btn {
-    transition: all 0.3s ease-in-out;
+.card-title {
+    font-size: 1rem;
+    margin-bottom: 1rem;
 }
 
-.login-btn:hover, .cart-btn:hover {
-    background-color: #e9ecef;
-    color: #000;
+.card-text {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
 }
 
-.btn-outline-success{
-    background-color: #ffffff;
-    border: rgb(6, 8, 8);
-    color:#1a1b1d
+.related-resources .card-img-top {
+    width: 100%; /* Ensures the image takes the full width of the card */
+    height: 200px; /* Sets a fixed height for all images */
+    object-fit: cover; /* Ensures images maintain aspect ratio and cover the area without stretching */
 }
 
-.cart-btn:hover{
-    background-color: #42beef;
+.related-resources {
+    background-color: #f8f9fa;
 }
 
-.btn-outline-success:hover{
-    background-color: #42beef;
-  
-}
-
-.login-btn:hover{
-    background-color: #42beef;
-}
-
-.navbar-brand img {
-    width: 40px;
-    height: auto;
-}
-
-.navbar-toggler {
+.related-resources .card {
     border: none;
-    background-color: transparent;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.navbar-toggler-icon {
-    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(1, 1, 1, 0.5)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+.related-resources .card-title {
+    font-size: 1.1rem;
 }
 
-.navbar-nav {
-    flex-direction: row;
+.related-resources .card-text {
+    font-size: 0.9rem;
+}
+
+/* Custom Navbar Styles */
+.navbar {
+    background-color: #f8f9fa;
+    /* Light background color */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow for depth */
+}
+
+.navbar .navbar-brand {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #3f3e3e;
+}
+
+.navbar .navbar-brand:hover {
+    color: #0056b3;
+    /* Darker color on hover */
+}
+
+/* Search input customization */
+.search-input {
+    border-radius: 30px 0 0 30px;
+    /* More rounded input corners */
+    transition: all 0.3s ease;
+}
+
+/* Hover effect for search button */
+.search-btn:hover {
+    background-color: #0056b3;
+    /* Darker blue on hover */
+    color: #fff;
+}
+
+/* Account button customization */
+.dropdown-toggle {
+    font-size: 1rem;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 8px 15px;
+    border-radius: 25px;
+}
+
+.dropdown-toggle:hover {
+    background-color: #c5c7c7;
+}
+
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    /* Make it appear directly below the parent */
+    z-index: 1000;
+    /* Ensure the dropdown is above other content */
 }
 
 .nav-link {
-    color: #000 !important;
-    font-size: 16px;
-    margin-left: 30px;
-    padding: 5px 0px;
+    color: black !important;
+    /* Use !important to ensure overriding of default styles */
 }
 
+/* Optional: Hover effect to change color when hovering */
 .nav-link:hover {
-    color: #007bff !important;
+    color: #333;
+    /* Slightly darker color on hover */
 }
+
+/* Optional: Active nav item color */
+.nav-link.active {
+    color: #0056b3 !important;
+    /* You can change this to any color you want */
+}
+
+/*category dropdown*/
+.nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+    /* Display the dropdown on hover */
+}
+
+
+.dropdown-item {
+    color: #000;
+    padding: 10px 20px;
+    text-decoration: none;
+}
+
+
+.dropdown-item:hover {
+    background-color: #f1f1f1;
+}
+
+/*delivery dropdown*/
+.delivery-tooltip {
+    display: none;
+    /* Hide by default */
+    position: absolute;
+    /* Position it relative to the parent */
+    background-color: #ffffff;
+    /* Dark background for the tooltip */
+    color: rgb(12, 11, 11);
+    /* White text for contrast */
+    padding: 8px;
+    border-radius: 10px;
+    /* Rounded corners */
+    z-index: 1000;
+    /* Ensure it stays on top of other content */
+    width: max-content;
+    margin-top: 5px;
+}
+
+
+.nav-item:hover .delivery-tooltip {
+    display: block;
+}
+
+#deliveryLink {
+    position: relative;
+    /* Make the link the reference for the tooltip */
+}
+
+
+.delivery-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 12%;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #333;
+    /* Arrow color matches the tooltip background */
+}
+
+/* Cart button customization */
+.cart-btn {
+    font-size: 1rem;
+    padding: 8px 15px;
+    border-radius: 25px;
+    color: rgb(4, 2, 2);
+}
+
+.cart-btn:hover {
+    background-color: #42beef;
+}
+
 /*  Category button */
 .custom-blue-btn {
-    background-color: #42beef; /* Custom Blue Color */
-    border-color: #42beef; /* Border Color */
+    background-color: #42beef;
+    /* Custom Blue Color */
+    border-color: #42beef;
+    /* Border Color */
     color: white;
 }
 
 .custom-blue-btn:hover {
-    background-color: #36a3d9; /* Slightly darker shade for hover effect */
-    border-color: #36a3d9; /* Border Color on hover */
+    background-color: #36a3d9;
+    /* Slightly darker shade for hover effect */
+    border-color: #36a3d9;
+    /* Border Color on hover */
 }
 
 /* Login and Cart Section */
@@ -133,29 +275,96 @@ body {
     gap: 10px;
 }
 
-/* Input Bars*/
-.form-control {
-    border: 1px solid #ccc;
-    max-width: 520px; 
+
+/* Container for the search bar */
+.search-bar-container {
+    width: 100%;
+    max-width: 600px;
+    /* Maximum width for the form */
 }
 
-.form-control:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+/* Style for the form */
+.search-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+}
+
+/* Style for the input field */
+.search-input {
+    border-radius: 25px 0 0 25px;
+    /* Rounded left corners */
+    padding: 12px 20px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    /* Smooth transition on focus */
+}
+
+/* Style for the button */
+.search-btn {
+    border-radius: 0 25px 25px 0;
+    /* Rounded right corners */
+    background-color: #007bff;
+    /* Button color */
+    color: white;
+    font-size: 18px;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+    /* Smooth transition on hover */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hover effect for the button */
+.search-btn:hover {
+    background-color: #0056b3;
+    /* Darker blue on hover */
+    transform: translateX(5px);
+    /* Slight right movement on hover */
+}
+
+/* Search input focus effect */
+.search-input:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
+    /* Blue focus shadow */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .search-bar-container {
+        padding: 0 15px;
+        /* Add some padding on smaller screens */
+    }
+
+    .search-input {
+        width: 100%;
+        /* Make input take up the full width */
+    }
+
+    .search-btn {
+        width: 50px;
+        /* Adjust button width on smaller screens */
+        font-size: 20px;
+        padding: 12px;
+    }
 }
 
 .dm-serif-display-regular {
     font-family: "DM Serif Display", serif;
     font-weight: 400;
     font-style: normal;
-    
-  }
+
+}
+
 .dm-serif-display-regular-italic {
     font-family: "DM Serif Display", serif;
     font-weight: 400;
     font-style: italic;
-  }
-  
+}
+
 
 /* Responsive Adjustments */
 @media (max-width: 992px) {
@@ -201,51 +410,140 @@ body {
     }
 }
 
-.custom-font-color {
-    background: linear-gradient(to right, #0b2a3b, #010101); /* Define your gradient colors */
-    -webkit-background-clip: text; /* Clip the gradient to the text */
-    -webkit-text-fill-color: transparent; /* Make the text itself transparent */
-}
-
-
 .order-now-btn {
     position: absolute;
-    top: 50%; /* Vertically center */
-    right: 12%; /* Place it 10% from the right edge */
+    top: 50%;
+    right: 12%;
     margin-left: 50px;
-    transform: translateY(-50%); /* Adjust for vertical alignment */
+    transform: translateY(-50%);
     padding: 10px 20px;
-    font-size: 1.0rem;
+    font-size: 1rem;
     font-weight: bold;
     color: #fff;
-    background-color: #6bc2f1; /* Bootstrap primary color */
+    background-color: #6bc2f1;
     border: none;
     border-radius: 5px;
     text-decoration: none;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+
+@media (max-width: 900px) {
+    .order-now-btn {
+        right: 5%;
+        padding: 8px 16px;
+        font-size: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .order-now-btn {
+        right: 2%;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Hover effect */
 .order-now-btn:hover {
-    background-color: #0c0b0b; /* Darker shade for hover effect */
+    background-color: #0c0b0b;
     text-decoration: none;
     color: #fff;
 }
 
+
 /*index photo*/
 @media (max-width: 768px) {
     .card-img-top {
-        height: 200px;  /* Adjust height on smaller screens */
+        height: 200px;
+        /* Adjust height on smaller screens */
     }
 }
 
+/*Category Grid*/
+.overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.card:hover .overlay {
+    opacity: 1;
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-light {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    color: #34495e;
+    font-weight: 500;
+}
+
+.btn-light:hover {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+}
+
+footer {
+    background-color: #343a40;
+    /* Dark background */
+}
+
+footer h5 {
+    color: #ffffff;
+    /* White heading text */
+}
+
+footer a {
+    color: #ffffff;
+    /* White link text */
+}
+
+footer a:hover {
+    color: #f8f9fa;
+    /* Light gray on hover */
+}
+
+footer .text-muted {
+    color: #adb5bd !important;
+    /* Light gray text */
+}
+
+footer .border-top {
+    border-color: #495057 !important;
+    /* Darker border color */
+}
+
+footer .fab {
+    transition: color 0.3s ease;
+}
+
+footer .fab:hover {
+    color: #17a2b8;
+    /* Teal color on hover */
+}
+
+
 /*Admin Nav*/
 .custom-navbar-spacing .nav-item {
-    margin-right: -15px; /* Reduce spacing between items */
+    margin-right: -15px;
+    /* Reduce spacing between items */
+
 }
 
 .custom-navbar-spacing .nav-link {
-    padding-left: 25px; /* Reduce left padding inside links */
-    padding-right: 5px; /* Reduce right padding inside links */
+    padding-left: 25px;
+    /* Reduce left padding inside links */
+    padding-right: 5px;
+    /* Reduce right padding inside links */
 }
 
 
@@ -294,7 +592,8 @@ body {
     max-width: 100%;
     height: auto;
     margin-top: 10px;
-    display: none; /* Hidden initially */
+    display: none;
+    /* Hidden initially */
 }
 
 
@@ -310,4 +609,124 @@ body {
 .thumbnail-gallery img:hover {
     transform: scale(1.1);
     border-color: #007bff;
+}
+
+
+/* filter */
+.filter-sidebar {
+    /* background: linear-gradient(135deg, #f7fafd, #edf4fc); */
+    border-radius: 2px;
+    padding: 15px;
+    color: #333;
+}
+
+.filter-sidebar h5 {
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    color: #0056b3;
+    text-transform: uppercase;
+}
+
+.filter-sidebar .form-label {
+    font-weight: 600;
+    color: #004085;
+}
+
+.filter-sidebar .form-control,
+.filter-sidebar .form-select {
+    border: 1px solid #ccddee;
+    border-radius: 4px;
+    box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.filter-sidebar .btn {
+    background-color: #007bff;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.filter-sidebar .btn:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.sticky-sidebar {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+
+.breadcrumb {
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+    padding: 0.75rem 1rem;
+    font-size: 14px;
+    margin-left: -150px;
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    content: "/";
+    padding: 0 5px;
+    color: #6c757d;
+}
+
+.breadcrumb a {
+    text-decoration: none;
+    color: #090b0e;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
+}
+
+.carousel-control-prev1,
+.carousel-control-next1 {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    background-color: transparent;
+    /* Set background to transparent */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid white;
+    /* Optional: Add black border around buttons */
+}
+
+/* Left arrow positioning */
+.carousel-control-prev1 {
+    left: -60px;
+    /* Adjust as needed */
+}
+
+/* Right arrow positioning */
+.carousel-control-next1 {
+    right: -60px;
+    /* Adjust as needed */
+}
+
+/* Customize the arrow icons inside the buttons */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+
+    filter: invert(1);
 }
