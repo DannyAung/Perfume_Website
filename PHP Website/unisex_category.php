@@ -33,63 +33,71 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
-        <div class="container-fluid">
-            <!-- Logo and Brand -->
-            <a class="navbar-brand d-flex align-items-center" href="user_index.php">
-                <img src="./images/perfume_logo.png" alt="Logo" style="width:50px; height:auto;">
-                <b class="ms-2 dm-serif-display-regular-italic custom-font-color">FRAGRANCE HAVEN</b>
-            </a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+    <div class="container-fluid">
+        <!-- Logo and Brand -->
+        <a class="navbar-brand d-flex align-items-center" href="user_index.php">
+            <img src="./images/perfume_logo.png" alt="Logo" style="width:50px; height:auto;">
+            <b class="ms-2" style="font-family: 'Roboto', sans-serif; font-weight: 300; color: #333;">FRAGRANCE HAVEN</b>
+        </a>
 
-            <!-- Collapsible Content -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
+        <!-- Toggler for Small Screens -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-                    <!-- Modern Search Bar in the Center -->
-                    <div class="search-bar-container mx-auto my-2 my-lg-0">
-                        <form method="GET" action="search.php" class="search-form mb-2">
-                            <div class="input-group">
-                                <input type="text" class="form-control border-end-0 search-input" name="query" placeholder="Search for a product..." aria-label="Search" required>
-                                <button class="btn btn-primary search-btn border-start-0 rounded-end px-4 py-2 shadow-lg" type="submit">
-                                    <i class="bi bi-search"></i> <!-- FontAwesome or Bootstrap Icons -->
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <!-- Display Username or Guest -->
-                    <span class="navbar-text me-3 my-2 my-lg-0">
-                        Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
-                    </span>
+        <!-- Collapsible Navbar Content -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
 
-                    <!-- Account Dropdown for Logged-In Users -->
-                    <?php if ($is_logged_in): ?>
-                        <div class="dropdown me-3">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Account
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                                <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
-                                <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
-                                <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
+                <!-- Modern Search Bar in the Center -->
+                <div class="search-bar-container mx-lg-auto my- my-lg-0 w-100 w-lg-auto">
+                    <form method="GET" action="search.php" class="search-form d-flex">
+                        <input type="text" class="form-control border-end-0 search-input" name="query" placeholder="Search for a product..." aria-label="Search" required>
+                        <button class="btn btn-primary search-btn border-start-1 rounded-end-2 px-4  shadow-lg" type="submit">
+                            <i class="bi bi-search"></i> <!-- FontAwesome or Bootstrap Icons -->
+                        </button>
+                    </form>
                 </div>
-            </div>
 
-            <!-- Login and Cart Buttons on the Right -->
-            <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
+                <!-- Display Username or Guest -->
+                <span class="navbar-text mx-lg-3 my-2 my-lg-0 text-center">
+                    Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
+                </span>
+
+                <!-- Account Dropdown for Logged-In Users -->
+                <?php if ($is_logged_in): ?>
+                    <div class="dropdown mx-lg-3 my-2 my-lg-0">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Account
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                            <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
+                            <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
+                            <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+            
+                <!-- Login and Cart Buttons -->
+                <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
                 <?php if (!$is_logged_in): ?>
                     <a href="user_login.php" class="btn login-btn me-3">Login/Register</a>
-                <?php endif; ?>
-                <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
-                    <img src="./images/cart-icon.jpg" alt="Cart" style="width:20px; height:20px; margin-right:6px;">
-                    Cart
+                    <?php endif; ?>
+                    <!-- Favorite Link -->
+                <a class="nav-link d-flex align-items-center justify-content-center mx-lg-3 my-2 my-lg-0" href="favorite.php">
+                    <i class="bi bi-heart fs-5"></i> <!-- Larger Icon -->
                 </a>
+                    <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
+                        <img src="./images/cart-icon.jpg" alt="Cart" style="width:24px; height:24px; margin-right:2px;">
+                    </a>
+                </div>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
+
 
     <div>
         <!-- Breadcrumb Navigation -->
@@ -144,7 +152,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                                     <option value="Unisex" <?php echo (isset($_GET['category']) && $_GET['category'] == 'Unisex') ? 'selected' : ''; ?>>Unisex</option>
                                     <option value="Women" <?php echo (isset($_GET['category']) && $_GET['category'] == 'Women') ? 'selected' : ''; ?>>Women</option>
                                     <option value="Men" <?php echo (isset($_GET['category']) && $_GET['category'] == 'Men') ? 'selected' : ''; ?>>Men</option>
-                                    <option value="All" <?php echo isset($_GET['category']) && $_GET['category'] == 'All' ? 'selected' : ''; ?>>All Categories</option>
+                                    <option value="All" <?php echo isset($_GET['category']) && $_GET['category'] == 'All' ? 'selected' : ''; ?>>All</option>
 
                                 </select>
                             </div>
@@ -212,50 +220,57 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                                 $product_price = htmlspecialchars($unisex_product['price']);
                                 $discount_percentage = isset($unisex_product['discount_percentage']) ? $unisex_product['discount_percentage'] : 0;
 
-                                // Calculate the discounted price
-                                if ($discount_percentage > 0) {
-                                    $discounted_price = $product_price - ($product_price * ($discount_percentage / 100));
-                                } else {
-                                    $discounted_price = $product_price;
-                                }
+                              // Calculate the discounted price
+                              if ($discount_percentage > 0) {
+                                $discounted_price = $product_price - ($product_price * ($discount_percentage / 100));
+                            } else {
+                                $discounted_price = $product_price;
+                            }
                             ?>
                                 <div class="col">
                                     <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
                                         <div class="image-container position-relative overflow-hidden">
-                                            <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
+                                              <!-- Discount Badge -->
+                                              <?php if ($discount_percentage > 0): ?>
+                                                <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end" style="font-size: 0.9rem;">
+                                                    <?php echo $discount_percentage; ?>% OFF
+                                                </div>
+                                            <?php endif; ?>
+                                        <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
                                                 alt="<?php echo $product_name; ?>"
                                                 style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
-                                            <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
-                                                <?php if (!$is_sold_out): ?>
-                                                    <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                                                        <input type="hidden" name="product_id" value="<?php echo $women_product['product_id']; ?>">
-                                                        <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
-                                                            <i class="fa fa-cart-plus"></i>
-                                                        </button>
+                                           <!-- Sold Out Badge -->
+                                <?php if ($is_sold_out): ?>
+                                    <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex justify-content-center align-items-center"
+                                        style="background: rgba(52, 51, 51, 0.7);">
+                                        <div class="sold-out-badge text-center bg-red px-2 py-0 rounded-pill shadow-sm"
+                                            style="color:rgb(253, 253, 255); font-weight: 550; border: 2px">
+                                            Sold Out
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
 
-                                                        <a href="product_details.php?product_id=<?php echo $women_product['product_id']; ?>" class="btn btn-light btn-sm">
-                                                            <i class="fa fa-info-circle"></i>
-                                                        </a>
-                                                    </form>
-                                                <?php else: ?>
-                                                    <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-                                        <div class="card-body d-flex flex-column">
-                                            <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
-                                            <p class="card-text text-muted">
-                                                <?php if ($discount_percentage > 0): ?>
-                                                    <span class="text-decoration-line-through">$<?php echo number_format($product_price, 2); ?></span>
-                                                    <span class="text-danger ms-2">Now $<?php echo number_format($discounted_price, 2); ?></span>
-                                                <?php else: ?>
-                                                    $<?php echo number_format($product_price, 2); ?>
-                                                <?php endif; ?>
-                                            </p>
-                                            <?php if ($is_sold_out): ?>
-                                                <p class="text-danger fw-bold">Sold Out</p>
-                                            <?php endif; ?>
-                                        </div>
+                                <!-- Hover Overlay -->
+                                <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+                                    style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
+                                    <?php if (!$is_sold_out): ?>
+                                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                                            <input type="hidden" name="product_id" value="<?php echo $popular_product['product_id']; ?>">
+                                            <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
+                                                <i class="fa fa-cart-plus"></i>
+                                            </button>
+                                            <a href="product_details.php?product_id=<?php echo $popular_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                                <i class="fa fa-info-circle"></i>
+                                            </a>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
+                                <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
+                            </div>
                                     </div>
                                 </div>
                             <?php } ?>

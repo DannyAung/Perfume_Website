@@ -5,7 +5,11 @@ session_start();  // Start the session to access session variables
 
 require_once 'db_connection.php';  // Ensure the connection file is correct
 
-
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+} else {
+    die("User is not logged in. Please check your session handling.");
+}
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
 // Get the product_id from the URL
@@ -56,85 +60,97 @@ if ($product_id) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
 </head>
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
-        <div class="container-fluid">
-            <!-- Logo and Brand -->
-            <a class="navbar-brand d-flex align-items-center" href="user_index.php">
-                <img src="./images/perfume_logo.png" alt="Logo" style="width:50px; height:auto;">
-                <b class="ms-2 dm-serif-display-regular-italic custom-font-color">FRAGRANCE HAVEN</b>
-            </a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+    <div class="container-fluid">
+        <!-- Logo and Brand -->
+        <a class="navbar-brand d-flex align-items-center" href="user_index.php">
+            <img src="./images/perfume_logo.png" alt="Logo" style="width:50px; height:auto;">
+            <b class="ms-2" style="font-family: 'Roboto', sans-serif; font-weight: 300; color: #333;">FRAGRANCE HAVEN</b>
+        </a>
 
-            <!-- Collapsible Content -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
+        <!-- Toggler for Small Screens -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-                    <!-- Modern Search Bar in the Center -->
-                    <div class="search-bar-container mx-auto my-2 my-lg-0">
-                        <form method="GET" action="search.php" class="search-form mb-2">
-                            <div class="input-group">
-                                <input type="text" class="form-control border-end-0 search-input" name="query" placeholder="Search for a product..." aria-label="Search" required>
-                                <button class="btn btn-primary search-btn border-start-0 rounded-end px-4 py-2 shadow-lg" type="submit">
-                                    <i class="bi bi-search"></i> <!-- FontAwesome or Bootstrap Icons -->
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <!-- Display Username or Guest -->
-                    <span class="navbar-text me-3 my-2 my-lg-0">
-                        Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
-                    </span>
+        <!-- Collapsible Navbar Content -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
 
-                    <!-- Account Dropdown for Logged-In Users -->
-                    <?php if ($is_logged_in): ?>
-                        <div class="dropdown me-3">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Account
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                                <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
-                                <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
-                                <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
+                <!-- Modern Search Bar in the Center -->
+                <div class="search-bar-container mx-lg-auto my- my-lg-0 w-100 w-lg-auto">
+                    <form method="GET" action="search.php" class="search-form d-flex">
+                        <input type="text" class="form-control border-end-0 search-input" name="query" placeholder="Search for a product..." aria-label="Search" required>
+                        <button class="btn btn-primary search-btn border-start-1 rounded-end-2 px-4  shadow-lg" type="submit">
+                            <i class="bi bi-search"></i> <!-- FontAwesome or Bootstrap Icons -->
+                        </button>
+                    </form>
                 </div>
-            </div>
 
-            <!-- Login and Cart Buttons on the Right -->
-            <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
+                <!-- Display Username or Guest -->
+                <span class="navbar-text mx-lg-3 my-2 my-lg-0 text-center">
+                    Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
+                </span>
+
+                <!-- Account Dropdown for Logged-In Users -->
+                <?php if ($is_logged_in): ?>
+                    <div class="dropdown mx-lg-3 my-2 my-lg-0">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Account
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                            <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
+                            <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
+                            <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+            
+                <!-- Login and Cart Buttons -->
+                <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
                 <?php if (!$is_logged_in): ?>
                     <a href="user_login.php" class="btn login-btn me-3">Login/Register</a>
-                <?php endif; ?>
-                <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
-                    <img src="./images/cart-icon.jpg" alt="Cart" style="width:20px; height:20px; margin-right:6px;">
-                    Cart
+                    <?php endif; ?>
+                    <!-- Favorite Link -->
+                <a class="nav-link d-flex align-items-center justify-content-center mx-lg-3 my-2 my-lg-0" href="favorite.php">
+                    <i class="bi bi-heart fs-5"></i> <!-- Larger Icon -->
                 </a>
+                    <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
+                        <img src="./images/cart-icon.jpg" alt="Cart" style="width:24px; height:24px; margin-right:2px;">
+                    </a>
+                </div>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
+
+
+
 
 
     <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb" class="py-3 bg-light">
         <div class="container">
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item" onclick="history.back()">Back</li>
+
                 <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Details</li>
             </ol>
         </div>
 
-        <!-- Product Details Section -->
-        <div class="container my-5">
+     <!-- Product Details Section -->
+     <div class="container my-5">
             <?php if ($product): ?>
                 <div class="row">
                     <!-- Thumbnail Gallery and Main Image -->
                     <div class="col-md-6 d-flex">
-                        <div class="thumbnail-gallery me-3">
+                        <div class="thumbnail-gallery me-3" style="margin-left: 50px;">
                             <?php
                             // Images array
                             $images = [];
@@ -169,7 +185,8 @@ if ($product_id) {
                     </div>
 
                     <!-- Product Details -->
-                    <div class="col-md-6">
+                    <div class="col-md-6" > <!-- Added margin-left to move content to the right -->
+
                         <h1 class="fw-bold" style="font-family: 'Poppins', sans-serif; font-size: 36px; color: #333;"><?php echo htmlspecialchars($product['product_name']); ?></h1>
                         <p class="text-muted" style="font-family: 'Roboto', sans-serif; font-size: 16px;"><strong>Category:</strong> <?php echo htmlspecialchars($product['category']); ?></p>
                         <p class="text-muted" style="font-family: 'Roboto', sans-serif; font-size: 16px;"><strong>Size:</strong> <?php echo htmlspecialchars($product['size']); ?></p>
@@ -185,12 +202,53 @@ if ($product_id) {
                             <p class="lead fw-bold" style="font-family: 'Poppins', sans-serif; font-size: 24px; color: #333;">$<?php echo number_format($product['price'], 2); ?></p>
                         <?php endif; ?>
                         <p style="font-family: 'Roboto', sans-serif; font-size: 16px;"><strong>Stock:</strong> <?php echo intval($product['stock_quantity']); ?> available</p>
+
                         <!-- Add to Cart Form -->
-                        <form method="POST" action="add_to_cart.php">
+                        <form method="POST" action="add_to_cart.php" class="d-flex align-items-center">
                             <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
-                            <input type="number" name="quantity" value="1" min="1" class="form-control mb-3" style="width: 100px;">
-                            <button type="submit" name="add_to_cart" class="btn btn-primary">Add to Cart</button>
+
+
+                            <input type="number" name="quantity" value="1" min="1" class="form-control me-3" style="width: 100px;">
+
+
+                            <button type="submit" name="add_to_cart" class="btn btn-primary me-3">
+                                Add to Cart
+                            </button>
                         </form>
+                        <!-- Add or Remove from Wishlist Form -->
+                        <form method="POST" action="favorite.php" class="d-flex align-items-center mt-2">
+
+                            <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product_id); ?>">
+
+                            <?php
+                            $query = "SELECT 1 FROM wishlist WHERE user_id = :user_id AND product_id = :product_id";
+                            $stmt = $conn->prepare($query);
+                            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                            $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+
+                            if (!$stmt->execute()) {
+                                print_r($stmt->errorInfo());
+                            }
+
+                            $in_wishlist = $stmt->rowCount() > 0;
+                            ?>
+
+                            <!-- Add to Wishlist Button -->
+                            <?php if (!$in_wishlist): ?>
+                                <button type="submit" name="add_to_wishlist" class="btn btn-outline-primary" title="Add to Wishlist">
+                                    <i class="bi bi-heart"></i> 
+                                </button>
+                            <?php endif; ?>
+
+                            <!-- Remove from Wishlist Button -->
+                            <?php if ($in_wishlist): ?>
+                                <button type="submit" name="remove_from_wishlist" class="btn btn-outline-danger" title="Remove from Wishlist">
+                                    <i class="bi bi-heart-fill text-danger"></i>
+                                </button>
+                            <?php endif; ?>
+                        </form>
+
+
                     </div>
                 </div>
 
@@ -237,6 +295,7 @@ if ($product_id) {
             <?php endif; ?>
         </div>
 
+       
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const thumbnails = document.querySelectorAll('.thumbnail-img');

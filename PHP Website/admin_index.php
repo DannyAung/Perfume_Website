@@ -131,6 +131,18 @@ if (!$conn) {
                         </div>
                     </div>
                 </div>
+               
+                 <div class="col-md-3">
+                    <div class="card text-center shadow-sm">
+                        <div class="card-body d-flex align-items-center justify-content-between">
+                            <div>
+                                <h5 class="card-title mb-1">Manage Coupons</h5>
+                                <p class="card-text mb-0">View and update coupons.</p>
+                            </div>
+                            <a href="manage_product_coupon.php" class="btn btn-primary ms-2">Go</a>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Manage Users -->
                 <div class="col-md-3">

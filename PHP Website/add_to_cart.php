@@ -132,6 +132,7 @@ if (isset($_POST['remove_all'])) {
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -146,12 +147,6 @@ if (isset($_POST['remove_all'])) {
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7fc;
-            margin: 0;
-            padding: 0;
-        }
 
         h1 {
             text-align: center;
@@ -162,7 +157,7 @@ if (isset($_POST['remove_all'])) {
         }
 
         .cart-container {
-            width: 80%;
+            width: 100%;
             margin: 20px auto;
             background-color: #ffffff;
             padding: 20px;
@@ -332,105 +327,95 @@ if (isset($_POST['remove_all'])) {
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
-        <div class="container-fluid">
-            <!-- Logo and Brand -->
-            <a class="navbar-brand d-flex align-items-center" href="user_idex.php">
-                <img src="./images/perfume_logo.png" alt="Logo" style="width:50px; height:auto;">
-                <b class="ms-2 dm-serif-display-regular-italic custom-font-color">FRAGRANCE HAVEN</b>
-            </a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+    <div class="container-fluid">
+        <!-- Logo and Brand -->
+        <a class="navbar-brand d-flex align-items-center" href="user_index.php">
+            <img src="./images/perfume_logo.png" alt="Logo" style="width:50px; height:auto;">
+            <b class="ms-2" style="font-family: 'Roboto', sans-serif; font-weight: 300; color: #333;">FRAGRANCE HAVEN</b>
+        </a>
 
-            <!-- Collapsible Content -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
+        <!-- Toggler for Small Screens -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-                    <!-- Modern Search Bar in the Center -->
-                    <div class="search-bar-container mx-auto my-2 my-lg-0">
-                        <form method="GET" action="search.php" class="search-form mb-2">
-                            <div class="input-group">
-                                <input type="text" class="form-control border-end-0 search-input" name="query" placeholder="Search for a product..." aria-label="Search" required>
-                                <button class="btn btn-primary search-btn border-start-0 rounded-end px-4 py-2 shadow-lg" type="submit">
-                                    <i class="bi bi-search"></i> <!-- FontAwesome or Bootstrap Icons -->
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <!-- Display Username or Guest -->
-                    <span class="navbar-text me-3 my-2 my-lg-0">
-                        Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
-                    </span>
+        <!-- Collapsible Navbar Content -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
 
-                    <!-- Account Dropdown for Logged-In Users -->
-                    <?php if ($is_logged_in): ?>
-                        <div class="dropdown me-3">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Account
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                                <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
-                                <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
-                                <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
+                <!-- Modern Search Bar in the Center -->
+                <div class="search-bar-container mx-lg-auto my- my-lg-0 w-100 w-lg-auto">
+                    <form method="GET" action="search.php" class="search-form d-flex">
+                        <input type="text" class="form-control border-end-0 search-input" name="query" placeholder="Search for a product..." aria-label="Search" required>
+                        <button class="btn btn-primary search-btn border-start-1 rounded-end-2 px-4  shadow-lg" type="submit">
+                            <i class="bi bi-search"></i> <!-- FontAwesome or Bootstrap Icons -->
+                        </button>
+                    </form>
                 </div>
-            </div>
 
-            <!-- Login and Cart Buttons on the Right -->
-            <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
+                <!-- Display Username or Guest -->
+                <span class="navbar-text mx-lg-3 my-2 my-lg-0 text-center">
+                    Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
+                </span>
+
+                <!-- Account Dropdown for Logged-In Users -->
+                <?php if ($is_logged_in): ?>
+                    <div class="dropdown mx-lg-3 my-2 my-lg-0">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Account
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                            <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
+                            <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
+                            <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+            
+                <!-- Login and Cart Buttons -->
+                <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
                 <?php if (!$is_logged_in): ?>
                     <a href="user_login.php" class="btn login-btn me-3">Login/Register</a>
-                <?php endif; ?>
-                <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
-                    <img src="./images/cart-icon.jpg" alt="Cart" style="width:20px; height:20px; margin-right:6px;">
-                    Cart
+                    <?php endif; ?>
+                    <!-- Favorite Link -->
+                <a class="nav-link d-flex align-items-center justify-content-center mx-lg-3 my-2 my-lg-0" href="favorite.php">
+                    <i class="bi bi-heart fs-5"></i> <!-- Larger Icon -->
                 </a>
+                    <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
+                        <img src="./images/cart-icon.jpg" alt="Cart" style="width:24px; height:24px; margin-right:2px;">
+                    </a>
+                </div>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!-- New Navigation Links Section -->
-    <div class="py-1">
+
+ <!-- Breadcrumb Navigation -->
+ <nav aria-label="breadcrumb" class="py-3 bg-light">
         <div class="container">
-            <ul class="nav justify-content">
-                <li class="nav-item">
-                    <a class="nav-link active" href="user_index.php">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" aria-expanded="false" style="color: black;">
-                        Category
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
-                        <li><a class="dropdown-item" href="men_category.php">Men</a></li>
-                        <li><a class="dropdown-item" href="women_category.php">Women</a></li>
-                        <li><a class="dropdown-item" href="unisex_category.php">Unisex</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="deliveryLink">Delivery</a>
-                    <div class="delivery-tooltip" id="deliveryTooltip">
-                        <p><b>Delivery: Within 2 or 3 days for YGN</b></p>
-                        <p><b>Delivery: Within 2 or 5 days for Other Locations</b></p>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Contact</a>
-                </li>
-            </ul>
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Add To Cart</li>
+            </ol>
         </div>
+
+   </nav>
+   
+   <div class="cart-page container my-2">
+    <!-- Cart Header -->
+    <div class="cart-header text-center mb-2">
+        <h1>Your Shopping Cart</h1>
     </div>
 
-    <h1>Your Cart</h1>
     <div class="cart-container">
         <?php
         $sql = "SELECT ci.cart_item_id, ci.quantity, p.product_name, p.price, p.discounted_price, p.image, p.size
-        FROM cart_items ci
-        JOIN products p ON ci.product_id = p.product_id
-        WHERE ci.user_id = ? AND ci.ordered_status = 'not_ordered'";
+                FROM cart_items ci
+                JOIN products p ON ci.product_id = p.product_id
+                WHERE ci.user_id = ? AND ci.ordered_status = 'not_ordered'";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -450,53 +435,57 @@ if (isset($_POST['remove_all'])) {
                 $product_size = htmlspecialchars($item['size']); // Fetch the size
                 $image_path = "products/" . $product_image;
 
-                // Render cart item
-                echo "<div class='cart-item'>
-                <img src='" . $image_path . "' alt='" . $product_name . "' class='product-image'>
-                <div class='product-details'>
-                    <h3>" . $product_name . "</h3>";
+                // Render cart item with a modern layout
+                echo "<div class='cart-item d-flex align-items-center p-3 mb-4 bg-light rounded shadow-sm'>
+                    <img src='" . $image_path . "' alt='" . $product_name . "' class='product-image img-thumbnail me-4' style='width: 100px; height: 100px; object-fit: cover;'>
+                    <div class='product-details flex-grow-1'>
+                        <h4>" . $product_name . "</h4>
+                        <p class='text-muted'>Size: " . $product_size . "</p>";
 
-                // Display size
-                echo "<p>Size: " . $product_size . "</p>";
-
-                // Show regular price with a strikethrough if there is a discounted price
+                // Display price with discount if applicable
                 if ($discounted_price > 0) {
-                    echo "<p class='regular-price'><del>$" . number_format($regular_price, 2) . "</del></p>";
-                    echo "<p class='discounted-price'>$" . number_format($discounted_price, 2) . "</p>";
+                    echo "<p class='regular-price text-muted'><del>$" . number_format($regular_price, 2) . "</del></p>";
+                    echo "<p class='discounted-price text-success fw-bold'>$" . number_format($discounted_price, 2) . "</p>";
                 } else {
-                    echo "<p class='price'>$" . number_format($regular_price, 2) . "</p>";
+                    echo "<p class='price fw-bold'>$" . number_format($regular_price, 2) . "</p>";
                 }
 
                 echo "<p>Quantity: " . $item['quantity'] . "</p>
-                </div>
-                <form method='post' class='d-inline'>
-                    <input type='hidden' name='cart_item_id' value='" . $item['cart_item_id'] . "'>
-                    <button type='submit' name='decrease_quantity' class='btn btn-secondary'>-</button>
-                    <button type='submit' name='increase_quantity' class='btn btn-primary'>+</button>
-                </form>
-            </div>";
+                    </div>
+                    <div class='quantity-controls ms-3'>
+                        <form method='post'>
+                            <input type='hidden' name='cart_item_id' value='" . $item['cart_item_id'] . "'>
+                            <button type='submit' name='decrease_quantity' class='btn btn-sm btn-outline-secondary' >&ndash;</button>
+                            <button type='submit' name='increase_quantity' class='btn btn-sm btn-outline-primary'>+</button>
+                        </form>
+                    </div>
+                </div>";
             }
 
-            // Display total price
-            echo "<div class='total'>Total Price: $" . number_format($total_price, 2) . "</div>";
+            // Display total price at the bottom
+            echo "<div class='total-price p-3 bg-white text-center text-black fw-bold rounded'>
+                    Total Price: $" . number_format($total_price, 2) . "
+                  </div>";
 
-            // Button Container
-            echo "<div class='button-container'>
-            <form method='post'>
-                <button type='submit' name='remove_all' class='btn btn-danger'>Remove All Items</button>
-            </form>
-            <form method='post' action='checkout.php'>
-                <button type='submit' name='check_out' class='btn btn-success'>Process to Check Out</button>
-            </form>
-        </div>";
+            // Button Container (remove all, proceed to checkout)
+            echo "<div class='button-container d-flex justify-content-center mt-4'>
+                    <form method='post' class='w-20'>
+                        <button type='submit' name='remove_all' class='btn btn-danger w-100'>Remove All Items</button>
+                    </form>
+                    <form method='post' action='checkout.php' class='w-20'>
+                        <button type='submit' name='check_out' class='btn btn-success w-100'>Proceed to Checkout</button>
+                    </form>
+                  </div>";
         } else {
-            echo "<div class='empty-cart'><p>Your cart is empty.</p></div>";
-            echo "<a href='user_index.php'><p>Continue Shopping?</p></a>";
+            echo "<div class='empty-cart text-center py-5'>
+                    <p class='text-muted'>Your cart is empty.</p>
+                    <a href='user_index.php' class='btn btn-primary mt-3'>Continue Shopping</a>
+                  </div>";
         }
-
         ?>
-
     </div>
+</div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

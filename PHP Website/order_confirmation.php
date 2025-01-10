@@ -1,6 +1,22 @@
 <?php
 session_start();
 
+if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
+    header('Location: admin_login.php');
+    exit;
+}
+
+$host = 'localhost';
+$username_db = 'root';
+$password_db = '';
+$dbname = 'ecom_website';
+$port = 3306;
+
+$conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
 // Enable error reporting
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -13,19 +29,7 @@ if (!isset($_GET['order_id'])) {
 
 $order_id = intval($_GET['order_id']);
 
-// Database connection
-$host = 'localhost';
-$username_db = 'root';
-$password_db = '';
-$dbname = 'ecom_website';
-$port = 3306;
-
-$conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-
-// Fetch order details
+// Fetch order details, including shipping_method, shipping_fee, and coupon details
 $order_sql = "SELECT * FROM orders WHERE order_id = ?";
 $order_stmt = $conn->prepare($order_sql);
 $order_stmt->bind_param("i", $order_id);
@@ -38,6 +42,7 @@ if ($order_result->num_rows === 0) {
 }
 
 $order = $order_result->fetch_assoc();
+
 // Fetch cart items associated with this order, including size
 $cart_items_sql = "SELECT ci.quantity, p.product_name, p.price, p.discounted_price, p.size 
                    FROM cart_items ci 
@@ -53,15 +58,10 @@ while ($item = $cart_items_result->fetch_assoc()) {
     $cart_items[] = $item;
 }
 
-$cart_items_stmt = $conn->prepare($cart_items_sql);
-$cart_items_stmt->bind_param("i", $order_id);
-$cart_items_stmt->execute();
-$cart_items_result = $cart_items_stmt->get_result();
-
-$cart_items = [];
-while ($item = $cart_items_result->fetch_assoc()) {
-    $cart_items[] = $item;
-}
+// Check if a coupon was applied
+$discount_percentage = isset($order['discount_percentage']) ? $order['discount_percentage'] : 0;
+$discount_amount = ($discount_percentage > 0) ? ($order['total_price'] * ($discount_percentage / 100)) : 0;
+$final_price = $order['total_price'] - $discount_amount;
 
 $conn->close();
 ?>
@@ -127,84 +127,101 @@ $conn->close();
         Your order will be processed and delivered within 2-3 business days. Thank you for shopping with us!
     </p>
 
-
-        <!-- Order Details -->
-        <div class="order-details">
-            <h3>Order Information</h3>
-            <table>
-                <tr>
-                    <th>Order ID</th>
-                    <td><?php echo htmlspecialchars($order['order_id']); ?></td>
-                </tr>
-                <tr>
-                    <th>Name</th>
-                    <td><?php echo htmlspecialchars($order['name']); ?></td>
-                </tr>
-                <tr>
-                    <th>Address</th>
-                    <td><?php echo htmlspecialchars($order['address']); ?></td>
-                </tr>
-                <tr>
-                    <th>Phone</th>
-                    <td><?php echo htmlspecialchars($order['phone']); ?></td>
-                </tr>
-                <tr>
-                    <th>Email</th>
-                    <td><?php echo htmlspecialchars($order['email']); ?></td>
-                </tr>
-                <tr>
-                    <th>Payment Method</th>
-                    <td><?php echo htmlspecialchars($order['payment_method']); ?></td>
-                </tr>
-                <tr>
-                    <th>Total Price</th>
-                    <td>$<?php echo number_format($order['total_price'], 2); ?></td>
-                </tr>
-            </table>
-        </div>
-
-     <!-- Cart Items -->
-<div class="order-details">
-    <h3>Cart Items</h3>
-    <table>
-        <thead>
+    <!-- Order Details -->
+    <div class="order-details">
+        <h3>Order Information</h3>
+        <table>
             <tr>
-                <th>Product Name</th>
-                <th>Size</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Subtotal</th>
+                <th>Order ID</th>
+                <td><?php echo htmlspecialchars($order['order_id']); ?></td>
             </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($cart_items as $item): 
-                $regular_price = $item['price'];
-                $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : $regular_price;
-                $item_price = $discounted_price;
-                $item_subtotal = $item_price * $item['quantity'];
-            ?>
             <tr>
-                <td><?php echo htmlspecialchars($item['product_name']); ?></td>
-                <td><?php echo htmlspecialchars($item['size']); ?></td>
-                <td>$<?php echo number_format($item_price, 2); ?></td>
-                <td><?php echo $item['quantity']; ?></td>
-                <td>$<?php echo number_format($item_subtotal, 2); ?></td>
+                <th>Name</th>
+                <td><?php echo htmlspecialchars($order['name']); ?></td>
             </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            <tr>
+                <th>Address</th>
+                <td><?php echo htmlspecialchars($order['address']); ?></td>
+            </tr>
+            <tr>
+                <th>Phone</th>
+                <td><?php echo htmlspecialchars($order['phone']); ?></td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td><?php echo htmlspecialchars($order['email']); ?></td>
+            </tr>
+            <tr>
+                <th>Payment Method</th>
+                <td><?php echo htmlspecialchars($order['payment_method']); ?></td>
+            </tr>
+            <tr>
+                <th>Shipping Method</th>
+                <td><?php echo htmlspecialchars($order['shipping_method']); ?></td>
+            </tr>
+            <tr>
+                <th>Shipping Fee</th>
+                <td>$<?php echo number_format($order['shipping_fee'], 2); ?></td>
+            </tr>
+            <tr>
+                <th>Total Price</th>
+                <td>$<?php echo number_format($order['total_price'], 2); ?></td>
+            </tr>
+            <?php if ($discount_percentage > 0): ?>
+            <tr>
+                <th>Discount Applied</th>
+                <td>- $<?php echo number_format($discount_amount, 2); ?> (<?php echo $discount_percentage; ?>%)</td>
+            </tr>
+            <?php endif; ?>
+            <tr>
+                <th>Final Price</th>
+                <td>$<?php echo number_format($final_price, 2); ?></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Cart Items -->
+    <div class="order-details">
+        <h3>Cart Items</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Size</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($cart_items as $item): 
+                    $regular_price = $item['price'];
+                    $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : $regular_price;
+                    $item_price = $discounted_price;
+                    $item_subtotal = $item_price * $item['quantity'];
+                ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($item['product_name']); ?></td>
+                    <td><?php echo htmlspecialchars($item['size']); ?></td>
+                    <td>$<?php echo number_format($item_price, 2); ?></td>
+                    <td><?php echo $item['quantity']; ?></td>
+                    <td>$<?php echo number_format($item_subtotal, 2); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+        <h4>Final Price: $<?php echo number_format($final_price, 2); ?></h4>
+    </div>
+
+    <div class="btn-container">
+        <a href="user_index.php" class="btn btn-primary btn-lg">Continue Shopping</a>
+    </div>
 </div>
 
-
-        <!-- Order Summary -->
-        <div class="order-summary">
-            <h4>Total Price: $<?php echo number_format($order['total_price'], 2); ?></h4>
-        </div>
-
-        <div class="btn-container">
-    <a href="user_index.php" class="btn btn-primary btn-lg">Continue Shopping</a>
-</div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

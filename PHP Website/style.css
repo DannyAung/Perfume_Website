@@ -1,10 +1,8 @@
-/* General Reset */
 body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
 }
-
 /* Responsive Container */
 .container {
     width: 100%;
@@ -56,30 +54,13 @@ body {
     object-fit: cover;
 }
 
-.card-body {
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column; /* Stack the card title, text, and button vertically */
-    justify-content: space-between; /* Make space between elements */
+.login-btn{
+    margin-top: 2px;
 }
-
-.card-footer {
-    display: flex;
-    justify-content: flex-start; /* Align the button to the left */
-}
-
-.card-footer .btn {
-    margin-top: auto; /* Ensures the button stays at the bottom of the card */
-}
-
-.card-title {
-    font-size: 1rem;
-    margin-bottom: 1rem;
-}
-
-.card-text {
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
+/* Enhanced styling for normal price */
+.normal-price {
+    font-size: 1.2rem;  /* Font size */
+    font-weight: 500;  /* Normal weight */
 }
 
 .related-resources .card-img-top {
@@ -104,13 +85,53 @@ body {
 .related-resources .card-text {
     font-size: 0.9rem;
 }
+/* Container for the image and sold out overlay */
+.position-relative {
+    position: relative;
+}
 
-/* Custom Navbar Styles */
+/* Sold Out Overlay */
+.sold-out-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 0, 0, 0.7); /* Red background with some transparency */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Sold Out Text */
+.sold-out-text {
+    font-size: 1rem;
+    font-weight: bold;
+}
+.sold-out-badge {
+    font-family: 'Roboto', sans-serif; 
+    font-size: 1rem;
+    font-weight: 600;
+    background: #b71313;
+    border: 2px solid #e74c3c;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.sold-out-badge:hover {
+    transform: scale(1.10);
+}
+
+.hover-overlay:hover {
+    opacity: 1;
+}
+
+/* Navbar Styles */
 .navbar {
     background-color: #f8f9fa;
-    /* Light background color */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    /* Subtle shadow for depth */
 }
 
 .navbar .navbar-brand {
@@ -120,71 +141,13 @@ body {
 }
 
 .navbar .navbar-brand:hover {
-    color: #0056b3;
-    /* Darker color on hover */
+    color: #090e12;
 }
 
-/* Search input customization */
-.search-input {
-    border-radius: 30px 0 0 30px;
-    /* More rounded input corners */
-    transition: all 0.3s ease;
-}
-
-/* Hover effect for search button */
-.search-btn:hover {
-    background-color: #0056b3;
-    /* Darker blue on hover */
-    color: #fff;
-}
-
-/* Account button customization */
-.dropdown-toggle {
-    font-size: 1rem;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 8px 15px;
-    border-radius: 25px;
-}
-
-.dropdown-toggle:hover {
-    background-color: #c5c7c7;
-}
-
-
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    left: 0;
-    top: 100%;
-    /* Make it appear directly below the parent */
-    z-index: 1000;
-    /* Ensure the dropdown is above other content */
-}
-
-.nav-link {
-    color: black !important;
-    /* Use !important to ensure overriding of default styles */
-}
-
-/* Optional: Hover effect to change color when hovering */
-.nav-link:hover {
-    color: #333;
-    /* Slightly darker color on hover */
-}
-
-/* Optional: Active nav item color */
-.nav-link.active {
-    color: #0056b3 !important;
-    /* You can change this to any color you want */
-}
-
-/*category dropdown*/
+/* Dropdown Menu Styles */
 .nav-item.dropdown:hover .dropdown-menu {
     display: block;
-    /* Display the dropdown on hover */
 }
-
 
 .dropdown-item {
     color: #000;
@@ -192,80 +155,45 @@ body {
     text-decoration: none;
 }
 
-
 .dropdown-item:hover {
     background-color: #f1f1f1;
 }
 
-/*delivery dropdown*/
+/* Delivery Tooltip */
 .delivery-tooltip {
     display: none;
-    /* Hide by default */
     position: absolute;
-    /* Position it relative to the parent */
     background-color: #ffffff;
-    /* Dark background for the tooltip */
-    color: rgb(12, 11, 11);
-    /* White text for contrast */
+    color: #000;
     padding: 8px;
     border-radius: 10px;
-    /* Rounded corners */
     z-index: 1000;
-    /* Ensure it stays on top of other content */
     width: max-content;
     margin-top: 5px;
 }
 
-
-.nav-item:hover .delivery-tooltip {
+#deliveryLink:hover + .delivery-tooltip {
     display: block;
 }
 
-#deliveryLink {
-    position: relative;
-    /* Make the link the reference for the tooltip */
+/* Search Input */
+.search-input {
+    border-radius: 30px 0 0 30px;
 }
 
-
-.delivery-tooltip::before {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: 12%;
-    transform: translateX(-50%);
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-bottom: 5px solid #333;
-    /* Arrow color matches the tooltip background */
+.search-btn:hover {
+    background-color: #0056b3;
+    color: #fff;
 }
 
-/* Cart button customization */
-.cart-btn {
-    font-size: 1rem;
-    padding: 8px 15px;
-    border-radius: 25px;
-    color: rgb(4, 2, 2);
+/* Active Nav-Link */
+.nav-link.active {
+    color: #0e0d0d !important;
+}
+.nav-link {
+    color: #100f0f !important;
 }
 
-.cart-btn:hover {
-    background-color: #42beef;
-}
-
-/*  Category button */
-.custom-blue-btn {
-    background-color: #42beef;
-    /* Custom Blue Color */
-    border-color: #42beef;
-    /* Border Color */
-    color: white;
-}
-
-.custom-blue-btn:hover {
-    background-color: #36a3d9;
-    /* Slightly darker shade for hover effect */
-    border-color: #36a3d9;
-    /* Border Color on hover */
-}
 
 /* Login and Cart Section */
 .LoginCart {
@@ -280,7 +208,6 @@ body {
 .search-bar-container {
     width: 100%;
     max-width: 600px;
-    /* Maximum width for the form */
 }
 
 /* Style for the form */
@@ -294,24 +221,20 @@ body {
 /* Style for the input field */
 .search-input {
     border-radius: 25px 0 0 25px;
-    /* Rounded left corners */
     padding: 12px 20px;
     font-size: 16px;
     transition: all 0.3s ease;
-    /* Smooth transition on focus */
+   
 }
 
-/* Style for the button */
+
 .search-btn {
     border-radius: 0 25px 25px 0;
-    /* Rounded right corners */
     background-color: #007bff;
-    /* Button color */
     color: white;
     font-size: 18px;
     padding: 12px 20px;
     transition: all 0.3s ease;
-    /* Smooth transition on hover */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -351,6 +274,106 @@ body {
         padding: 12px;
     }
 }
+/* Cart button customization */
+.cart-btn {
+    font-size: 1rem;
+    padding: 8px 15px;
+    border-radius: 25px;
+    color: rgb(4, 2, 2);
+}
+
+
+
+/* Heart Icon Hover Effect */
+.modern-favorite-link:hover i {
+    color: #131111; /* White heart icon on hover */
+    transform: scale(1.1); /* Slight enlargement for interactive feel */
+}
+
+/* Adjust icon size for better visibility */
+.modern-favorite-link i {
+    font-size: 1.2rem; /* Larger heart icon */
+}
+
+/* Adjust spacing on small screens (text is hidden) */
+@media (max-width: 991px) {
+    .modern-favorite-link span {
+        display: none; /* Hide the text on small screens */
+    }
+}
+/* Styling for buttons */
+.btn-outline-primary {
+    border-color: #007bff;
+    color: #007bff;
+}
+
+.btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.bi-heart {
+    font-size: 1.5rem;
+}
+
+.bi-heart-fill {
+    font-size: 1.5rem;
+}
+
+/* Hover effects for buttons */
+.btn-outline-primary:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Adjust spacing between the elements */
+.navbar-text {
+    margin-right: 15px; /* Add space between the username and the next item */
+}
+
+.modern-favorite-link {
+    margin-left: -25px; /* Add space before the favorite icon */
+}
+
+/* Icon styling for consistent size */
+.favorite-icon {
+    font-size: 1.5rem; /* Adjust the size of the icon */
+    margin-right: 10px; /* Add space to the right of the icon */
+}
+
+.modern-favorite-link {
+    margin-bottom: -20px;
+    margin-right: 10px;
+    position: relative;
+    display: block;
+    border-radius: 20px;
+    background-color: transparent; /* Transparent background */
+    text-decoration: none;
+    transition: all 0.1s ease;
+ 
+}
+
+
+.modern-favorite-link:hover .favorite-icon {
+    transform: scale(1.2); /* Icon grows slightly on hover */
+}
+
+/* Optional: Add a pulse animation for the icon */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.modern-favorite-link:hover .favorite-icon {
+    animation: pulse 1s infinite; /* Continuous pulse effect on hover */
+}
+
 
 .dm-serif-display-regular {
     font-family: "DM Serif Display", serif;
@@ -479,6 +502,9 @@ body {
     transform: translateY(-10px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
+
+/* add to cart */
+
 
 .btn-light {
     background-color: rgba(255, 255, 255, 0.9);
@@ -729,4 +755,10 @@ footer .fab:hover {
 .carousel-control-next-icon {
 
     filter: invert(1);
+}
+
+
+.cancelled-status {
+    color: red;
+    font-weight: bold;
 }

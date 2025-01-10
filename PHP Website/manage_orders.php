@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 
@@ -25,7 +26,7 @@ $sql = "
     JOIN users u ON o.user_id = u.user_id
     JOIN order_items oi ON o.order_id = oi.order_id
     JOIN products p ON oi.product_id = p.product_id
-     ORDER BY o.order_id ASC
+    ORDER BY o.order_id ASC
 ";
 
 $result = mysqli_query($conn, $sql);
@@ -34,11 +35,33 @@ if (isset($_POST['update_status'])) {
     $order_id = $_POST['order_id'];
     $new_status = $_POST['status'];
 
+    // Update order status
     $update_sql = "UPDATE orders SET status = ? WHERE order_id = ?";
     $update_stmt = $conn->prepare($update_sql);
     $update_stmt->bind_param("si", $new_status, $order_id);
 
     if ($update_stmt->execute()) {
+        // If order is cancelled, update the product quantities
+        if ($new_status == 'cancelled') {
+            // Get the products in the cancelled order
+            $order_items_sql = "SELECT product_id, quantity FROM order_items WHERE order_id = ?";
+            $order_items_stmt = $conn->prepare($order_items_sql);
+            $order_items_stmt->bind_param("i", $order_id);
+            $order_items_stmt->execute();
+            $order_items_result = $order_items_stmt->get_result();
+
+            // Loop through each product and update the quantity
+            while ($item = $order_items_result->fetch_assoc()) {
+                $product_id = $item['product_id'];
+                $quantity = $item['quantity'];
+
+                // Increase the product quantity in the inventory
+                $update_product_sql = "UPDATE products SET stock_quantity = stock_quantity + ? WHERE product_id = ?";
+                $update_product_stmt = $conn->prepare($update_product_sql);
+                $update_product_stmt->bind_param("ii", $quantity, $product_id);
+                $update_product_stmt->execute();
+            }
+        }
         // After the update, reload the page to reflect the new status
         header("Location: manage_orders.php");
         exit;
@@ -170,16 +193,12 @@ if (isset($_POST['update_status'])) {
                         <option value='shipped' " . ($order['status'] == 'shipped' ? 'selected' : '') . ">Shipped</option>
                         <option value='cancelled' " . ($order['status'] == 'cancelled' ? 'selected' : '') . ">Cancelled</option>
                         <option value='delivered' " . ($order['status'] == 'delivered' ? 'selected' : '') . ">Delivered</option>
-                       
                     </select>
                     <button type='submit' name='update_status' class='btn btn-primary btn-sm mt-2'>Update</button>
                 </form>
             </td>
-
                         </tr>";
                 }
-                
-
             } else {
                 echo "<tr><td colspan='6'>No orders found.</td></tr>";
             }
