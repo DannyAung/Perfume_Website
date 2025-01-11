@@ -49,10 +49,6 @@ while ($item = $result->fetch_assoc()) {
     $cart_items[] = $item;
 }
 
-// Initialize coupon session variables
-$discount_percentage = $_SESSION['discount_percentage'] ?? 0;
-$applied_coupon_code = $_SESSION['applied_coupon_code'] ?? "N/A";
-
 // Handle manual coupon application only when the user submits it
 if (isset($_POST['apply_coupon'])) {
     $manual_coupon_code = trim($_POST['coupon_code']); // Get the submitted coupon code
@@ -61,22 +57,29 @@ if (isset($_POST['apply_coupon'])) {
     if ($total_price < 300) {
         echo "<script>alert('Coupons can only be applied to orders above $300.');</script>";
     } else {
-        // Check if the coupon code exists and is active
-        $coupon_sql = "SELECT discount_percentage FROM coupons WHERE coupon_code = ? AND is_active = 1";
-        $coupon_stmt = $conn->prepare($coupon_sql);
-        $coupon_stmt->bind_param("s", $manual_coupon_code);
-        $coupon_stmt->execute();
-        $coupon_result = $coupon_stmt->get_result();
+        // Only allow "SAVE20" coupon to be applied
+        if ($manual_coupon_code === "SAVE20") {
+            // Check if the "SAVE20" coupon code is active
+            $coupon_sql = "SELECT discount_percentage FROM coupons WHERE coupon_code = ? AND is_active = 1";
+            $coupon_stmt = $conn->prepare($coupon_sql);
+            $coupon_stmt->bind_param("s", $manual_coupon_code);
+            $coupon_stmt->execute();
+            $coupon_result = $coupon_stmt->get_result();
 
-        if ($coupon_result->num_rows > 0) {
-            // Apply the coupon and store it in the session
-            $coupon_data = $coupon_result->fetch_assoc();
-            $discount_percentage = $coupon_data['discount_percentage'];
-            $_SESSION['discount_percentage'] = $discount_percentage;
-            $_SESSION['applied_coupon_code'] = $manual_coupon_code;
-            echo "<script>alert('Coupon applied successfully!');</script>";
+            if ($coupon_result->num_rows > 0) {
+                // Apply the coupon and store it in the session
+                $coupon_data = $coupon_result->fetch_assoc();
+                $discount_percentage = $coupon_data['discount_percentage'];
+                $_SESSION['discount_percentage'] = $discount_percentage;
+                $_SESSION['applied_coupon_code'] = $manual_coupon_code;
+                echo "<script>alert('Coupon applied successfully!');</script>";
+            } else {
+                // Invalid coupon if not found
+                echo "<script>alert('Invalid or expired coupon code!');</script>";
+            }
         } else {
-            echo "<script>alert('Invalid or expired coupon code!');</script>";
+            // If the code is not "SAVE20", it is invalid
+            echo "<script>alert('Invalid coupon code! Only SAVE20 is accepted.');</script>";
         }
     }
 }
@@ -103,7 +106,7 @@ if (isset($_POST['checkout'])) {
     $payment_method = $_POST['payment_method'];
     $shipping_method = $_POST['shipping_method'];
 
-    // Get the coupon code and discount percentage
+    // Get the coupon code and discount percentage (from the session)
     $coupon_code = $_SESSION['applied_coupon_code'] ?? null;
     $discount_percentage = $_SESSION['discount_percentage'] ?? 0;
 
@@ -150,7 +153,7 @@ if (isset($_POST['checkout'])) {
         // Clear coupon session variables after the order is placed
         unset($_SESSION['discount_percentage']);
         unset($_SESSION['applied_coupon_code']);
-    
+
         // Redirect to receipt page
         header("Location: receipt.php?order_id=" . $order_id);
         exit();
@@ -159,8 +162,23 @@ if (isset($_POST['checkout'])) {
     }
 }
 
+// Before using $applied_coupon_code, check if it's set in the session
+$applied_coupon_code = isset($_SESSION['applied_coupon_code']) ? $_SESSION['applied_coupon_code'] : "N/A";
+
+// Check if discount_percentage is set in the session, else default to 0
+$discount_percentage = isset($_SESSION['discount_percentage']) ? $_SESSION['discount_percentage'] : 0;
+
+// Using htmlspecialchars safely to avoid deprecated behavior
+$applied_coupon_code_html = htmlspecialchars($applied_coupon_code, ENT_QUOTES, 'UTF-8');
+unset($_SESSION['discount_percentage']);
+unset($_SESSION['applied_coupon_code']);
+
+// Regenerate session ID to prevent session hijacking and ensure the session data is reset
+session_regenerate_id(true);
+
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -177,12 +195,12 @@ if (isset($_POST['checkout'])) {
         }
 
         .checkout-container {
-            width: 80%;
+            max-width: 800px;
             margin: 50px auto;
             background-color: #fff;
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
@@ -203,12 +221,66 @@ if (isset($_POST['checkout'])) {
         .checkout-form input {
             margin-bottom: 10px;
         }
+
+        .product-image {
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .cart-item:hover {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-container {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .product-image {
+                margin-bottom: 10px;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="py-3 bg-light">
+        <div class="container">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="add_to_cart.php">Your Cart</a></li>
 
-    <div class="checkout-container mt-0">
+                <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+            </ol>
+        </div>
+
+    </nav>
+    <div class="checkout-container">
         <h1>Checkout</h1>
         <!-- Cart Items Summary -->
         <div class="cart-item-summary">
@@ -241,10 +313,10 @@ if (isset($_POST['checkout'])) {
         <!-- Coupon Application -->
         <form method="POST" action="checkout.php">
             <label for="coupon_code">Enter Coupon Code:</label>
-            <input type="text" name="coupon_code" id="coupon_code" value="<?php echo htmlspecialchars($applied_coupon_code !== 'N/A' ? $applied_coupon_code : ''); ?>">
-            <button type="submit" name="apply_coupon">Apply Coupon</button>
+            <input type="text" name="coupon_code" id="coupon_code" class="form-control" value="<?php echo htmlspecialchars($applied_coupon_code !== 'N/A' ? $applied_coupon_code : ''); ?>">
+            <button type="submit" name="apply_coupon" class="btn btn-primary">Apply Coupon</button>
         </form>
-        <p>Submitted Coupon Code: <?php echo htmlspecialchars($applied_coupon_code); ?></p>
+        <p>SAVE 20% with 'SAVE10' if you buy above $300!!</p>
 
         <form method="post" class="checkout-form">
             <h3>Shipping Details</h3>
@@ -300,28 +372,25 @@ if (isset($_POST['checkout'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-</body>
+    <script>
+        const baseTotalPrice = <?php echo $total_price; ?>;
+        const discountPercentage = <?php echo $discount_percentage; ?>;
+        let shippingFee = <?php echo $shipping_fee; ?>;
+        let finalTotalPrice = baseTotalPrice - (baseTotalPrice * (discountPercentage / 100)) + shippingFee;
 
-</html>
-<script>
-    const baseTotalPrice = <?php echo $total_price; ?>;
-    const discountPercentage = <?php echo $discount_percentage; ?>;
-    let shippingFee = <?php echo $shipping_fee; ?>;
-    let finalTotalPrice = baseTotalPrice - (baseTotalPrice * (discountPercentage / 100)) + shippingFee;
+        function updateTotalPrice() {
+            const shippingMethod = document.getElementById('shipping_method').value;
+            shippingFee = shippingMethod === 'express' ? 40 : 20; // Assign correct shipping fee based on selection
+            finalTotalPrice = baseTotalPrice - (baseTotalPrice * (discountPercentage / 100)) + shippingFee;
 
-    function updateTotalPrice() {
-        const shippingMethod = document.getElementById('shipping_method').value;
-        shippingFee = shippingMethod === 'express' ? 40 : 20; // Assign correct shipping fee based on selection
-        finalTotalPrice = baseTotalPrice - (baseTotalPrice * (discountPercentage / 100)) + shippingFee;
+            // Update displayed prices dynamically
+            document.getElementById('total-amount').innerText = "Total Amount: $" + baseTotalPrice.toFixed(2);
+            document.getElementById('coupon-discount').innerText = discountPercentage > 0 ? "Coupon Applied: -$" + (baseTotalPrice * (discountPercentage / 100)).toFixed(2) : '';
+            document.getElementById('shipping-fee').innerText = "Shipping Fee: $" + shippingFee.toFixed(2);
+            document.getElementById('final-total').innerText = "Total Amount: $" + finalTotalPrice.toFixed(2);
+        }
+    </script>
 
-        // Update displayed prices dynamically
-        document.getElementById('total-amount').innerText = "Total Amount: $" + baseTotalPrice.toFixed(2);
-        document.getElementById('coupon-discount').innerText = discountPercentage > 0 ? "Coupon Applied: -$" + (baseTotalPrice * (discountPercentage / 100)).toFixed(2) : '';
-        document.getElementById('shipping-fee').innerText = "Shipping Fee: $" + shippingFee.toFixed(2);
-        document.getElementById('final-total').innerText = "Total Amount: $" + finalTotalPrice.toFixed(2);
-    }
-</script>
-
-<?php
-$conn->close();
-?>
+    <?php
+    $conn->close();
+    ?>

@@ -70,7 +70,6 @@ if (isset($_POST['delete_user'])) {
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,10 +78,68 @@ if (isset($_POST['delete_user'])) {
     <title>Admin Dashboard - Manage Users</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9fafc;
+        }
+       
+        .container {
+            margin-top: 50px;
+
+        }
+        .table {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .table th {
+            background-color:rgb(65, 98, 228);
+            color: white;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+        }
+        .btn-info:hover {
+            background-color: #138496;
+            border-color: #138496;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        .btn-danger:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+        .user-table {
+            margin-top: 30px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background-color: #fff;
+            overflow: hidden;
+        }
+
+        .user-table th {
+            background-color:rgb(46, 94, 146);
+            color: #fff;
+        }
+
+        .user-table td {
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
                 <img src="./images/Logo.png" alt="Logo" style="width:50px;">
@@ -96,16 +153,17 @@ if (isset($_POST['delete_user'])) {
                     <li class="nav-item"><a class="nav-link" href="manage_users.php">Users</a></li>
                     <li class="nav-item"><a class="nav-link" href="view_reports.php">Reports</a></li>
                 </ul>
-                <a href="admin_login.php" class="btn btn-outline-dark">Logout</a>
+                <a href="logout.php" class="btn btn-outline-dark">Logout</a>
             </div>
         </div>
     </nav>
 
+    <!-- Content -->
     <div class="container my-5">
-        <h1 class="text-center mb-4">Manage Users</h1>
+        <h1 class="text-center mb-2">Manage Users</h1>
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead class="table-light">
+            <table class="table table-hover align-middle user-table">
+                <thead>
                     <tr>
                         <th>User ID</th>
                         <th>Name</th>
@@ -116,32 +174,38 @@ if (isset($_POST['delete_user'])) {
                     </tr>
                 </thead>
                 <tbody>
-            <?php if (!empty($users)): ?>
-                <?php foreach ($users as $user): ?>
+                <?php if (!empty($users)): ?>
+                    <?php foreach ($users as $user): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($user['user_id']); ?></td>
+                            <td><?= htmlspecialchars($user['user_name']); ?></td>
+                            <td><?= htmlspecialchars($user['email']); ?></td>
+                            <td><?= htmlspecialchars($user['phone_number']); ?></td>
+                            <td><?= nl2br(htmlspecialchars($user['address'])); ?></td>
+                            <td>
+                                <a href="view_user_details.php?id=<?= $user['user_id']; ?>" class="btn btn-info btn-sm">View Details</a>
+                                <form action="manage_users.php" method="POST" class="d-inline">
+                                    <input type="hidden" name="user_id" value="<?= $user['user_id']; ?>">
+                                    <button type="submit" name="delete_user" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
                     <tr>
-                        <td><?= htmlspecialchars($user['user_id']); ?></td>
-                        <td><?= htmlspecialchars($user['user_name']); ?></td>
-                        <td><?= htmlspecialchars($user['email']); ?></td>
-                        <td><?= htmlspecialchars($user['phone_number']); ?></td>
-                        <td><?= nl2br(htmlspecialchars($user['address'])); ?></td>
-                        <td>
-                            <a href="view_user_details.php?id=<?= $user['user_id']; ?>" class="btn btn-info btn-sm">View Details</a>
-                            <form action="manage_users.php" method="POST" style="display:inline;">
-                                <input type="hidden" name="user_id" value="<?= $user['user_id']; ?>">
-                                <button type="submit" name="delete_user" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">Delete</button>
-                            </form>
-                        </td>
+                        <td colspan="6" class="no-data">No users found.</td>
                     </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr><td colspan="8">No users found.</td></tr>
-            <?php endif; ?>
-            </tbody>
+                <?php endif; ?>
+                </tbody>
             </table>
         </div>
     </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
 <?php
 mysqli_close($conn);
 ?>

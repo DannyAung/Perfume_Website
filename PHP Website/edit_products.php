@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
     $upload_errors = [];
 
-    
+
 
     function handle_image_upload($image_key, $upload_dir, $allowed_types, $existing_image = null)
     {
@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     discount_percentage = :discount_percentage, 
                     discounted_price = :discounted_price
                 WHERE product_id = :product_id";
-        
+
         $stmt = $conn->prepare($sql);
         $stmt->execute([
             ':product_name' => $product_name,
@@ -139,14 +139,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Product</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+   
 </head>
+<style>
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        border: none;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
@@ -167,137 +178,145 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </nav>
 
     <form action="edit_products.php?id=<?= $product_id ?>" method="POST" enctype="multipart/form-data">
-    <div class="container mt-5">
-        <h2 class="text-center mb-4">Edit Product</h2>
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
-        <?php endif; ?>
+        <div class="container mt-5">
+            <h2 class="text-center mb-4">Edit Product</h2>
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger"><?= $_SESSION['error'];
+                                                unset($_SESSION['error']); ?></div>
+            <?php endif; ?>
 
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <label for="product_name" class="form-label">Product Name</label>
-                <input type="text" class="form-control" id="product_name" name="product_name" value="<?= $product['product_name'] ?>" required>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="product_name" class="form-label">Product Name</label>
+                    <input type="text" class="form-control" id="product_name" name="product_name" value="<?= $product['product_name'] ?>" required>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label for="price" class="form-label">Price ($)</label>
+                    <input type="number" step="0.01" class="form-control" id="price" name="price" value="<?= $product['price'] ?>" required>
+                </div>
             </div>
-            <div class="col-md-6 mb-4">
-                <label for="price" class="form-label">Price ($)</label>
-                <input type="number" step="0.01" class="form-control" id="price" name="price" value="<?= $product['price'] ?>" required>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required><?= $product['description'] ?></textarea>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label for="stock_quantity" class="form-label">Stock Quantity</label>
+                    <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" value="<?= $product['stock_quantity'] ?>" required>
+                </div>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" id="description" name="description" rows="3" required><?= $product['description'] ?></textarea>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-control" id="category" name="category" required>
+                        <option value="Men" <?= $product['category'] == 'Men' ? 'selected' : '' ?>>Men</option>
+                        <option value="Women" <?= $product['category'] == 'Women' ? 'selected' : '' ?>>Women</option>
+                        <option value="Unisex" <?= $product['category'] == 'Unisex' ? 'selected' : '' ?>>Unisex</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label for="subcategory" class="form-label">SubCategory</label>
+                    <select class="form-control" id="subcategory" name="subcategory" required>
+                        <option value="Discount" <?= $product['subcategory'] == 'Discount' ? 'selected' : '' ?>>Discount</option>
+                        <option value="Latest" <?= $product['subcategory'] == 'Latest' ? 'selected' : '' ?>>Latest</option>
+                        <option value="Popular" <?= $product['subcategory'] == 'Popular' ? 'selected' : '' ?>>Popular</option>
+                        <option value="Featured" <?= $product['subcategory'] == 'Featured' ? 'selected' : '' ?>>Featured</option>
+                    </select>
+                </div>
             </div>
-            <div class="col-md-6 mb-4">
-                <label for="stock_quantity" class="form-label">Stock Quantity</label>
-                <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" value="<?= $product['stock_quantity'] ?>" required>
+
+            <!-- Discount Section -->
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="discount_available" class="form-label">Discount Available</label>
+                    <select class="form-control" id="discount_available" name="discount_available" required onchange="toggleDiscountField()">
+                        <option value="No" <?= $product['discount_available'] == 'No' ? 'selected' : '' ?>>No</option>
+                        <option value="Yes" <?= $product['discount_available'] == 'Yes' ? 'selected' : '' ?>>Yes</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-4" id="discount_field" style="<?= $product['discount_available'] == 'Yes' ? '' : 'display: none;' ?>">
+                    <label for="discount_percentage" class="form-label">Discount Percentage</label>
+                    <input type="number" class="form-control" id="discount_percentage" name="discount_percentage" value="<?= $product['discount_percentage'] ?>" step="1" oninput="calculateDiscount()">
+                </div>
+
+                <div class="col-md-6 mb-4" id="discounted_price_field" style="<?= $product['discount_available'] == 'Yes' ? '' : 'display: none;' ?>">
+                    <label for="discounted_price" class="form-label">Discounted Price ($)</label>
+                    <input type="text" class="form-control" id="discounted_price" name="discounted_price" value="<?= $product['discounted_price'] ?>" readonly>
+                </div>
             </div>
-        </div>
 
-        <div class="row">
             <div class="col-md-6 mb-4">
-                <label for="category" class="form-label">Category</label>
-                <select class="form-control" id="category" name="category" required>
-                    <option value="Men" <?= $product['category'] == 'Men' ? 'selected' : '' ?>>Men</option>
-                    <option value="Women" <?= $product['category'] == 'Women' ? 'selected' : '' ?>>Women</option>
-                    <option value="Unisex" <?= $product['category'] == 'Unisex' ? 'selected' : '' ?>>Unisex</option>
-                </select>
+                <label for="size" class="form-label">Size</label>
+                <input type="text" class="form-control" id="size" name="size" value="<?= htmlspecialchars($product['size']); ?>" required>
             </div>
-            <div class="col-md-6 mb-4">
-                <label for="subcategory" class="form-label">SubCategory</label>
-                <select class="form-control" id="subcategory" name="subcategory" required>
-                    <option value="Discount" <?= $product['subcategory'] == 'Discount' ? 'selected' : '' ?>>Discount</option>
-                    <option value="Latest" <?= $product['subcategory'] == 'Latest' ? 'selected' : '' ?>>Latest</option>
-                    <option value="Popular" <?= $product['subcategory'] == 'Popular' ? 'selected' : '' ?>>Popular</option>
-                    <option value="Featured" <?= $product['subcategory'] == 'Featured' ? 'selected' : '' ?>>Featured</option>
-                </select>
-            </div>
-        </div>
 
-    <!-- Discount Section -->
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <label for="discount_available" class="form-label">Discount Available</label>
-        <select class="form-control" id="discount_available" name="discount_available" required onchange="toggleDiscountField()">
-            <option value="No" <?= $product['discount_available'] == 'No' ? 'selected' : '' ?>>No</option>
-            <option value="Yes" <?= $product['discount_available'] == 'Yes' ? 'selected' : '' ?>>Yes</option>
-        </select>
-    </div>
+            <form action="edit_products.php?id=<?= $product_id ?>" method="POST" enctype="multipart/form-data">
+                <div class="container mt-5">
+                    <!-- Main Image Section -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label">Main Image</label>
+                            <input type="file" id="mainImage" name="image" accept="image/*" onchange="previewImage(event, 'mainImagePreview')">
+                            <!-- Show current image if exists -->
+                            <?php if ($product['image']): ?>
+                                <div>
+                                    <img id="mainImagePreview" src="products/<?= $product['image'] ?>" alt="Main Image Preview" style="max-width: 100px; max-height: 100px;">
+                                </div>
+                            <?php else: ?>
+                                <p>No image uploaded yet.</p>
+                            <?php endif; ?>
+                        </div>
 
-    <div class="col-md-6 mb-4" id="discount_field" style="<?= $product['discount_available'] == 'Yes' ? '' : 'display: none;' ?>">
-        <label for="discount_percentage" class="form-label">Discount Percentage</label>
-        <input type="number" class="form-control" id="discount_percentage" name="discount_percentage" value="<?= $product['discount_percentage'] ?>" step="1" oninput="calculateDiscount()">
-    </div>
+                        <!-- Extra Image 1 Section -->
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label">Extra Image 1</label>
+                            <input type="file" id="extraImage1" name="extra_image_1" accept="image/*" onchange="previewImage(event, 'extraImage1Preview')">
+                            <!-- Show current image if exists -->
+                            <?php if ($product['extra_image_1']): ?>
+                                <div>
+                                    <img id="extraImage1Preview" src="products/<?= $product['extra_image_1'] ?>" alt="Extra Image 1 Preview" style="max-width: 100px; max-height: 100px;">
+                                </div>
+                            <?php else: ?>
+                                <p>No extra image uploaded yet.</p>
+                            <?php endif; ?>
+                        </div>
 
-    <div class="col-md-6 mb-4" id="discounted_price_field" style="<?= $product['discount_available'] == 'Yes' ? '' : 'display: none;' ?>">
-        <label for="discounted_price" class="form-label">Discounted Price ($)</label>
-        <input type="text" class="form-control" id="discounted_price" name="discounted_price" value="<?= $product['discounted_price'] ?>" readonly>
-    </div>
-</div>
-
-    <div class="col-md-6 mb-4">
-        <label for="size" class="form-label">Size</label>
-        <input type="text" class="form-control" id="size" name="size" value="<?= htmlspecialchars($product['size']); ?>" required>
-    </div>
-
-<form action="edit_products.php?id=<?= $product_id ?>" method="POST" enctype="multipart/form-data">
-    <div class="container mt-5">
-        <!-- Main Image Section -->
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <label class="form-label">Main Image</label>
-                <input type="file" id="mainImage" name="image" accept="image/*" onchange="previewImage(event, 'mainImagePreview')">
-                <!-- Show current image if exists -->
-                <?php if ($product['image']): ?>
-                    <div>
-                        <img id="mainImagePreview" src="products/<?= $product['image'] ?>" alt="Main Image Preview" style="max-width: 100px; max-height: 100px;">
+                        <!-- Extra Image 2 Section -->
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label">Extra Image 2</label>
+                            <input type="file" id="extraImage2" name="extra_image_2" accept="image/*" onchange="previewImage(event, 'extraImage2Preview')">
+                            <!-- Show current image if exists -->
+                            <?php if ($product['extra_image_2']): ?>
+                                <div>
+                                    <img id="extraImage2Preview" src="products/<?= $product['extra_image_2'] ?>" alt="Extra Image 2 Preview" style="max-width: 100px; max-height: 100px;">
+                                </div>
+                            <?php else: ?>
+                                <p>No extra image uploaded yet.</p>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                <?php else: ?>
-                    <p>No image uploaded yet.</p>
-                <?php endif; ?>
-            </div>
-            
-            <!-- Extra Image 1 Section -->
-            <div class="col-md-6 mb-4">
-                <label class="form-label">Extra Image 1</label>
-                <input type="file" id="extraImage1" name="extra_image_1" accept="image/*" onchange="previewImage(event, 'extraImage1Preview')">
-                <!-- Show current image if exists -->
-                <?php if ($product['extra_image_1']): ?>
-                    <div>
-                        <img id="extraImage1Preview" src="products/<?= $product['extra_image_1'] ?>" alt="Extra Image 1 Preview" style="max-width: 100px; max-height: 100px;">
+
+
+                    <div class="d-flex justify-content-between">
+                        <a href="manage_products.php" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Update Product</button>
                     </div>
-                <?php else: ?>
-                    <p>No extra image uploaded yet.</p>
-                <?php endif; ?>
+                </div>
+            </form>
+            <footer>
+        <div class="row mt-4 border-top pt-3">
+            <div class="col-md-6">
+                <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
             </div>
-            
-            <!-- Extra Image 2 Section -->
-            <div class="col-md-6 mb-4">
-                <label class="form-label">Extra Image 2</label>
-                <input type="file" id="extraImage2" name="extra_image_2" accept="image/*" onchange="previewImage(event, 'extraImage2Preview')">
-                <!-- Show current image if exists -->
-                <?php if ($product['extra_image_2']): ?>
-                    <div>
-                        <img id="extraImage2Preview" src="products/<?= $product['extra_image_2'] ?>" alt="Extra Image 2 Preview" style="max-width: 100px; max-height: 100px;">
-                    </div>
-                <?php else: ?>
-                    <p>No extra image uploaded yet.</p>
-                <?php endif; ?>
-            </div>
+    </footer>
+
+            <!-- Bootstrap JS and Custom JS -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="edit_products.js"></script>
         </div>
-
-
-        <div class="d-flex justify-content-between">
-            <a href="manage_products.php" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">Update Product</button>
-        </div>
-    </div>
-</form>
-
-
-    <!-- Bootstrap JS and Custom JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="edit_products.js"></script>
 </body>
+
 </html>

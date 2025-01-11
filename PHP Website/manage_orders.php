@@ -71,7 +71,6 @@ if (isset($_POST['update_status'])) {
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,61 +78,116 @@ if (isset($_POST['update_status'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Orders</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7fc;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9fafc;
+            color: #333;
         }
+
+
         .container {
             margin-top: 50px;
         }
+
+
         .order-table {
             margin-top: 30px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background-color: #fff;
+            overflow: hidden;
         }
-        .order-table th, .order-table td {
+
+        .order-table th {
+            background-color:rgb(46, 94, 146);
+            color: #fff;
+        }
+
+        .order-table td {
             vertical-align: middle;
+            font-size: 0.9rem;
         }
+
         .status-dropdown {
-            width: 150px;
+            width: 180px;
+            border-radius: 5px;
         }
+
+      
         .product-list {
             list-style-type: none;
             padding-left: 0;
+            margin: 0;
         }
+
         .product-list li {
-            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
         }
+
         .product-image {
             width: 50px;
             height: auto;
+            border-radius: 5px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-outline-dark {
+            border: 2px solid #333;
+        }
+
+        .btn-outline-dark:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .status-dropdown {
+                width: 100%;
+            }
+
+            .order-table {
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-            <img src="./images/Logo.png" alt="Logo" style="width:50px;">
-            <b>ADMIN DASHBOARD</b>
-        </a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="admin_index.php">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="manage_products.php">Products</a></li>
-                <li class="nav-item"><a class="nav-link" href="manage_orders.php">Orders</a></li>
-                <li class="nav-item"><a class="nav-link" href="manage_users.php">Users</a></li>
-                <li class="nav-item"><a class="nav-link" href="view_reports.php">Reports</a></li>
-            </ul>
-            <a href="admin_login.php" class="btn btn-outline-dark">Logout</a>
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="./images/Logo.png" alt="Logo" style="width:50px;">
+                <b>ADMIN DASHBOARD</b>
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="admin_index.php">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="manage_products.php">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="manage_orders.php">Orders</a></li>
+                    <li class="nav-item"><a class="nav-link" href="manage_users.php">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="view_reports.php">Reports</a></li>
+                </ul>
+                <a href="logout.php" class="btn btn-outline-dark">Logout</a>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
 <div class="container">
     <h1 class="text-center">Manage Orders</h1>
 
-    <table class="table table-striped order-table">
+    <table class="table table-striped table-hover order-table">
         <thead>
             <tr>
                 <th>Order ID</th>
@@ -171,47 +225,49 @@ if (isset($_POST['update_status'])) {
                             <td>$" . number_format($order['total_price'], 2) . "</td>
                             <td>" . htmlspecialchars($order['payment_method']) . "</td>
                             <td>" . htmlspecialchars($order['address']) . "</td>
-                            <td>" . htmlspecialchars($order['status']) . "</td>
+                            <td>
+                                <span class='badge text-bg-" . ($order['status'] == 'completed' ? 'success' : ($order['status'] == 'pending' ? 'warning' : 'secondary')) . "'>" . htmlspecialchars($order['status']) . "</span>
+                            </td>
                             <td>
                                 <ul class='product-list'>";
                     foreach ($order['products'] as $product) {
-                        // Constructing the image URL
                         $image_url = 'products/' . htmlspecialchars($product['image']);
                         echo "<li>
                                 <img src='" . $image_url . "' alt='" . htmlspecialchars($product['product_name']) . "' class='product-image'>
-                                " . htmlspecialchars($product['product_name']) . "  "." x " . $product['quantity'] . "
+                                <span>" . htmlspecialchars($product['product_name']) . " x " . $product['quantity'] . "</span>
                               </li>";
                     }
                     echo "      </ul>
                             </td>
-            <td>
-                <form method='post' action='manage_orders.php' class='d-inline'>
-                    <input type='hidden' name='order_id' value='" . $order['order_id'] . "'>
-                    <select name='status' class='form-control status-dropdown'>
-                        <option value='pending' " . ($order['status'] == 'pending' ? 'selected' : '') . ">Pending</option>
-                        <option value='completed' " . ($order['status'] == 'completed' ? 'selected' : '') . ">Completed</option>
-                        <option value='shipped' " . ($order['status'] == 'shipped' ? 'selected' : '') . ">Shipped</option>
-                        <option value='cancelled' " . ($order['status'] == 'cancelled' ? 'selected' : '') . ">Cancelled</option>
-                        <option value='delivered' " . ($order['status'] == 'delivered' ? 'selected' : '') . ">Delivered</option>
-                    </select>
-                    <button type='submit' name='update_status' class='btn btn-primary btn-sm mt-2'>Update</button>
-                </form>
-            </td>
+                            <td>
+                                <form method='post' action='manage_orders.php' class='d-inline'>
+                                    <input type='hidden' name='order_id' value='" . $order['order_id'] . "'>
+                                    <select name='status' class='form-select status-dropdown'>
+                                        <option value='pending' " . ($order['status'] == 'pending' ? 'selected' : '') . ">Pending</option>
+                                        <option value='completed' " . ($order['status'] == 'completed' ? 'selected' : '') . ">Completed</option>
+                                        <option value='shipped' " . ($order['status'] == 'shipped' ? 'selected' : '') . ">Shipped</option>
+                                        <option value='cancelled' " . ($order['status'] == 'cancelled' ? 'selected' : '') . ">Cancelled</option>
+                                        <option value='delivered' " . ($order['status'] == 'delivered' ? 'selected' : '') . ">Delivered</option>
+                                    </select>
+                                    <button type='submit' name='update_status' class='btn btn-primary btn-sm mt-2'>Update</button>
+                                </form>
+                            </td>
                         </tr>";
                 }
             } else {
-                echo "<tr><td colspan='6'>No orders found.</td></tr>";
+                echo "<tr><td colspan='8' class='text-center'>No orders found.</td></tr>";
             }
             ?>
         </tbody>
     </table>
 </div>
-
+<footer>
+        <div class="row mt-4 border-top pt-3">
+            <div class="col-md-6">
+                <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
+            </div>
+    </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
-
-<?php
-$conn->close();
-?>

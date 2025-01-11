@@ -70,10 +70,80 @@ if (isset($_POST['delete_product'])) {
     <title>Admin Dashboard - Manage Products</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .btn-outline-dark:hover {
+            background-color: #343a40;
+            color: #fff;
+        }
+        h1 {
+            font-weight: bold;
+            color: #333;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        table {
+          
+            border-radius: 10px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+
+        }
+        table img {
+            border-radius: 5px;
+        }
+        th {
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+        
+        .product-table {
+            margin-top: 30px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            background-color: #fff;
+            overflow: hidden;
+        }
+
+        .product-table th {
+            background-color:rgb(46, 94, 146);
+            color: #fff;
+        }
+
+        .product-table td {
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
                 <img src="./images/Logo.png" alt="Logo" style="width:50px;">
@@ -87,16 +157,19 @@ if (isset($_POST['delete_product'])) {
                     <li class="nav-item"><a class="nav-link" href="manage_users.php">Users</a></li>
                     <li class="nav-item"><a class="nav-link" href="view_reports.php">Reports</a></li>
                 </ul>
-                <a href="admin_login.php" class="btn btn-outline-dark">Logout</a>
+                <a href="logout.php" class="btn btn-outline-dark">Logout</a>
             </div>
         </div>
     </nav>
 
+
     <div class="container my-5">
-        <h1 class="text-center mb-4">Manage Products</h1>
-        <a href="add_product.php" class="btn btn-success mb-3">Add New Product</a>
+        <h1 class="text-center mb-2">Manage Products</h1>
+        <div class="d-flex justify-content-end">
+            <a href="add_product.php" class="btn btn-success mb-1">Add New Product</a>
+        </div>
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
+            <table class="table table-bordered table-hover align-middle product-table">
                 <thead class="table-light">
                     <tr>
                         <th>ID</th>
@@ -104,62 +177,61 @@ if (isset($_POST['delete_product'])) {
                         <th>Image</th>
                         <th>Description</th>
                         <th>Price</th>
-                        <th>Stock Quantity</th>
+                        <th>Stock</th>
                         <th>Category</th>
                         <th>Sub-Category</th>
                         <th>Size</th>
-                        <th>Discount_Available</th>
-                        <th>Discount_Percentage</th>
-                        <th>Discounted_Price</th>
+                        <th>Discount</th>
+                        <th>Discount %</th>
+                        <th>Discounted Price</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-            <?php if (!empty($products)): ?>
-                <?php foreach ($products as $product): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($product['product_id']); ?></td>
-                        <td><?= htmlspecialchars($product['product_name']); ?></td>
-                        <td><img src="products/<?= htmlspecialchars($product['image']); ?>" alt="Product Image" style="width:43px; height:55px;"></td>
-                        <td><?= nl2br(htmlspecialchars($product['description'])); ?></td>
-                        <td><?= number_format($product['price'], 2); ?></td>
-                        <td><?= $product['stock_quantity']; ?></td>
-                        <td><?= htmlspecialchars($product['category']); ?></td>
-                        <td><?= htmlspecialchars($product['subcategory'] ?? 'N/A'); ?></td>
-                        <td><?= htmlspecialchars($product['size']); ?></td>
-                        <td><?= htmlspecialchars($product['discount_available']); ?></td>
-                        <td>
-                            <?php if ($product['discount_available'] == 'Yes'): ?>
-                                <?= htmlspecialchars($product['discount_percentage']); ?>%
-                            <?php else: ?>
-                                0%
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                            <?php if ($product['discount_available'] == 'Yes'): ?>
-                                <?= number_format($product['discounted_price'], 2); ?>
-                            <?php else: ?>
-                                0.00
-                            <?php endif; ?>
-                        </td>
-                        <td>
-                <a href="edit_products.php?id=<?= $product['product_id']; ?>" class="btn btn-primary btn-sm">Edit</a>
-                <form action="manage_products.php" method="POST" style="display:inline;">
-                    <input type="hidden" name="product_id" value="<?= $product['product_id']; ?>">
-                    <button type="submit" name="delete_product" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?');">Delete</button>
-                </form>
-            </td>
-
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr><td colspan="12">No products found.</td></tr>
-            <?php endif; ?>
-            </tbody>
-
+                <?php if (!empty($products)): ?>
+                    <?php foreach ($products as $product): ?>
+                        <tr>
+                            <td class="text-center"><?= htmlspecialchars($product['product_id']); ?></td>
+                            <td><?= htmlspecialchars($product['product_name']); ?></td>
+                            <td class="text-center">
+                                <img src="products/<?= htmlspecialchars($product['image']); ?>" alt="Product Image" style="width:50px; height:60px;">
+                            </td>
+                            <td><?= nl2br(htmlspecialchars($product['description'])); ?></td>
+                            <td class="text-end">$<?= number_format($product['price'], 2); ?></td>
+                            <td class="text-center"><?= $product['stock_quantity']; ?></td>
+                            <td><?= htmlspecialchars($product['category']); ?></td>
+                            <td><?= htmlspecialchars($product['subcategory'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($product['size']); ?></td>
+                            <td class="text-center"><?= htmlspecialchars($product['discount_available']); ?></td>
+                            <td class="text-center">
+                                <?= htmlspecialchars($product['discount_available'] == 'Yes' ? $product['discount_percentage'] : '0'); ?>%
+                            </td>
+                            <td class="text-end">
+                                $<?= number_format($product['discount_available'] == 'Yes' ? $product['discounted_price'] : 0, 2); ?>
+                            </td>
+                            <td class="text-center">
+                                <a href="edit_products.php?id=<?= $product['product_id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                <form action="manage_products.php" method="POST" style="display:inline;">
+                                    <input type="hidden" name="product_id" value="<?= $product['product_id']; ?>">
+                                    <button type="submit" name="delete_product" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this product?');">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr><td colspan="13" class="text-center">No products found.</td></tr>
+                <?php endif; ?>
+                </tbody>
             </table>
         </div>
     </div>
+    <footer>
+        <div class="row mt-4 border-top pt-3">
+            <div class="col-md-6">
+                <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
+            </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 <?php

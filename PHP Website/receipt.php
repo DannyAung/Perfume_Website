@@ -12,7 +12,7 @@ if (!isset($_GET['order_id'])) {
 }
 
 $order_id = $_GET['order_id'];
-echo "Order ID: " . $order_id; // Debugging output to check order_id
+
 
 // Database connection
 $host = 'localhost';
@@ -100,83 +100,160 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receipt</title>
+    <title>Order Receipt</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+        }
+        .receipt-container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .total-summary {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            padding: 10px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
+        }
+        h2, h4, h5 {
+            color: #343a40;
+        }
+        .table {
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        .table thead {
+            background-color: #007bff;
+            color: white;
+        }
+        .table th, .table td {
+            padding: 12px;
+            text-align: center;
+        }
+        .table tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+    </style>
 </head>
-
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">Order Receipt</h1>
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Order Details</h4>
-                <p><strong>Order ID:</strong> <?php echo $order['order_id']; ?></p>
-                <p><strong>Date:</strong> <?php echo date('F j, Y', strtotime($order['created_at'])); ?></p>
-                <p><strong>Shipping Method:</strong> <?php echo $order['shipping_method']; ?></p>
-                <p><strong>Payment Method:</strong> <?php echo $order['payment_method']; ?></p>
-                <p><strong>Shipping Fee:</strong> $<?php echo number_format($order['shipping_fee'], 2); ?></p>
-                <?php if ($discount_percentage > 0): ?>
-                    <p><strong>Coupon Discount:</strong> <?php echo number_format($discount_percentage, 2); ?>%</p>
-                <?php endif; ?>
-                <?php if (!empty($order['coupon_code'])): ?>
-                    <p><strong>Coupon Code:</strong> <?php echo htmlspecialchars($order['coupon_code']); ?></p>
-                <?php endif; ?>
-            </div>
-            <div class="col-md-6">
-                <h4>Customer Details</h4>
-                <p><strong>Name:</strong> <?php echo $order['user_name']; ?></p>
-                <p><strong>Email:</strong> <?php echo $order['email']; ?></p>
-                <p><strong>Phone Number:</strong> <?php echo $order['phone_number']; ?></p>
-            </div>
-        </div>
+    <div class="container">
+        <div class="receipt-container">
+            <h2 class="text-center mb-4">Order Receipt</h2>
+            <div class="row mb-4">
+                <!-- Order Details -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Order Details</h5>
+                            <p><strong>Order ID:</strong> <?php echo $order['order_id']; ?></p>
+                            <p><strong>Date:</strong> <?php echo date('F j, Y', strtotime($order['created_at'])); ?></p>
+                            <p><strong>Shipping Method:</strong> <?php echo $order['shipping_method']; ?></p>
+                            <p><strong>Payment Method:</strong> <?php echo $order['payment_method']; ?></p>
+                            <p><strong>Shipping Fee:</strong> $<?php echo number_format($order['shipping_fee'], 2); ?></p>
+                            <?php if ($discount_percentage > 0): ?>
+                                <p><strong>Coupon Discount:</strong> <?php echo number_format($discount_percentage, 2); ?>%</p>
+                            <?php endif; ?>
+                            <?php if (!empty($order['coupon_code'])): ?>
+                                <p><strong>Coupon Code:</strong> <?php echo htmlspecialchars($order['coupon_code']); ?></p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
 
-        <h4 class="mt-5">Order Items</h4>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Product Name</th>
-                    <th>Quantity</th>
-                    <th>Size</th>
-                    <th>Price</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($order_items as $item) {
-                    $regular_price = $item['price'];
-                    $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : $regular_price;
-                    $item_total = $discounted_price * $item['quantity'];
-                ?>
+                <!-- Customer Details -->
+                <div class="col-md-6 mb-4">
+ <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Customer Details</h5>
+                            <p><strong>Name:</strong> <?php echo $order['user_name']; ?></p>
+                            <p><strong>Email:</strong> <?php echo $order['email']; ?></p>
+                            <p><strong>Phone Number:</strong> <?php echo $order['phone_number']; ?></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <h4 class="mt-4">Order Items</h4>
+            <table class="table table-bordered">
+                <thead>
                     <tr>
-                        <td><?php echo htmlspecialchars($item['product_name']); ?></td>
-                        <td><?php echo $item['quantity']; ?></td>
-                        <td><?php echo htmlspecialchars($item['size']); ?></td>
-                        <td>$<?php echo number_format($discounted_price, 2); ?></td>
-                        <td>$<?php echo number_format($item_total, 2); ?></td>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Size</th>
+                        <th>Price</th>
+                        <th>Total</th>
                     </tr>
-                <?php } ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($order_items as $item) {
+                        $regular_price = $item['price'];
+                        $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : $regular_price;
+                        $item_total = $discounted_price * $item['quantity'];
+                    ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($item['product_name']); ?></td>
+                            <td><?php echo $item['quantity']; ?></td>
+                            <td><?php echo htmlspecialchars($item['size']); ?></td>
+                            <td>$<?php echo number_format($discounted_price, 2); ?></td>
+                            <td>$<?php echo number_format($item_total, 2); ?></td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
 
-        <hr>
+            <!-- Total Summary -->
+            <div class="total-summary">
+                <h5>Total Summary</h5>
+                <p><strong>Total Price (Before Discount):</strong> $<?php echo number_format($total_price_with_discount, 2); ?></p>
+                <?php if ($discount_percentage > 0): ?>
+                    <p><strong>Coupon Discount:</strong> -$<?php echo number_format($discount_amount, 2); ?></p>
+                <?php endif; ?>
+                <p><strong>Shipping Fee:</strong> $<?php echo number_format($order['shipping_fee'], 2); ?></p>
+                <h4><strong>Total Amount (After Discount):</strong> $<?php echo number_format($final_total_price, 2); ?></h4>
+            </div>
 
-        <div class="text-right">
-            <h4>Total Price (Before Discount): $<?php echo number_format($total_price_with_discount, 2); ?></h4>
-            <?php if ($discount_percentage > 0): ?>
-                <h4>Coupon Discount: -$<?php echo number_format($discount_amount, 2); ?></h4>
-            <?php endif; ?>
-            <h4>Shipping Fee: $<?php echo number_format($order['shipping_fee'], 2); ?></h4>
-            <h4><strong>Total Amount (After Discount): $<?php echo number_format($final_total_price, 2); ?></strong></h4>
+            <!-- Continue Shopping Button -->
+            <div class="btn-container">
+                <a href="user_index.php" class="btn btn-primary">Continue Shopping</a>
+            </div>
         </div>
     </div>
-</div>
-<div class="btn-container">
-        <a href="user_index.php" class="btn btn-primary btn-lg">Continue Shopping</a>
-    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
-
-<?php
-$conn->close();
-?>

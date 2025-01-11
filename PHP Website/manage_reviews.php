@@ -44,7 +44,6 @@ if (isset($_POST['delete_review'])) {
     $stmt->close();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,18 +51,74 @@ if (isset($_POST['delete_review'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Reviews</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+        }
+    
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+        .alert {
+            font-weight: bold;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .table-striped tbody tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+        .btn-danger {
+            transition: background-color 0.3s ease;
+        }
+        .btn-danger:hover {
+            background-color: #dc3545;
+            opacity: 0.8;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .actions-form button {
+            font-size: 1rem;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Manage Reviews</h1>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="./images/Logo.png" alt="Logo" style="width:50px;">
+                <b>ADMIN DASHBOARD</b>
+            </a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="admin_index.php">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="manage_products.php">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="manage_orders.php">Orders</a></li>
+                    <li class="nav-item"><a class="nav-link" href="manage_users.php">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="view_reports.php">Reports</a></li>
+                </ul>
+                <a href="logout.php" class="btn btn-outline-dark">Logout</a>
+            </div>
+        </div>
+    </nav>
 
+    <div class="header text-center">
+        <h1>Manage Reviews</h1>
+    </div>
+
+    <div class="container mt-5">
         <?php if (isset($message)): ?>
             <div class="alert alert-info"><?php echo $message; ?></div>
         <?php endif; ?>
 
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead class="table-dark">
+            <table class="table table-bordered table-hover table-striped">
+                <thead class="table-warning">
                     <tr>
                         <th>Review ID</th>
                         <th>User</th>
@@ -86,7 +141,7 @@ if (isset($_POST['delete_review'])) {
                                 <td><?php echo htmlspecialchars($review['rating']); ?></td>
                                 <td><?php echo htmlspecialchars($review['created_at']); ?></td>
                                 <td><?php echo htmlspecialchars($review['updated_at']); ?></td>
-                                <td>
+                                <td class="actions-form">
                                     <form method="POST" class="d-inline">
                                         <input type="hidden" name="review_id" value="<?php echo $review['review_id']; ?>">
                                         <button type="submit" name="delete_review" class="btn btn-danger btn-sm" 
