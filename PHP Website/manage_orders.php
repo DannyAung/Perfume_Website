@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 
@@ -73,6 +72,7 @@ if (isset($_POST['update_status'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,6 +85,9 @@ if (isset($_POST['update_status'])) {
             color: #333;
         }
 
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
         .container {
             margin-top: 50px;
@@ -100,7 +103,7 @@ if (isset($_POST['update_status'])) {
         }
 
         .order-table th {
-            background-color:rgb(46, 94, 146);
+            background-color: rgb(46, 94, 146);
             color: #fff;
         }
 
@@ -114,7 +117,7 @@ if (isset($_POST['update_status'])) {
             border-radius: 5px;
         }
 
-      
+
         .product-list {
             list-style-type: none;
             padding-left: 0;
@@ -164,12 +167,13 @@ if (isset($_POST['update_status'])) {
         }
     </style>
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <img src="./images/Logo.png" alt="Logo" style="width:50px;">
-                <b>ADMIN DASHBOARD</b>
+                <img src="./images/perfume_logo.png" alt="Logo" style="width:50px;">
+                ADMIN DASHBOARD
             </a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
@@ -177,6 +181,7 @@ if (isset($_POST['update_status'])) {
                     <li class="nav-item"><a class="nav-link" href="manage_products.php">Products</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_orders.php">Orders</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_users.php">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="manage_coupon.php">Coupons</a></li>
                     <li class="nav-item"><a class="nav-link" href="view_reports.php">Reports</a></li>
                 </ul>
                 <a href="logout.php" class="btn btn-outline-dark">Logout</a>
@@ -184,42 +189,42 @@ if (isset($_POST['update_status'])) {
         </div>
     </nav>
 
-<div class="container">
-    <h1 class="text-center">Manage Orders</h1>
+    <div class="container">
+        <h1 class="text-center">Manage Orders</h1>
 
-    <table class="table table-striped table-hover order-table">
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Customer Name</th>
-                <th>Total Price</th>
-                <th>Payment Method</th>
-                <th>Address</th>
-                <th>Status</th>
-                <th>Products</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            if (mysqli_num_rows($result) > 0) {
-                $orders = [];
-                while ($order = mysqli_fetch_assoc($result)) {
-                    $orders[$order['order_id']]['order_id'] = $order['order_id'];
-                    $orders[$order['order_id']]['customer_name'] = $order['customer_name'];
-                    $orders[$order['order_id']]['total_price'] = $order['total_price'];
-                    $orders[$order['order_id']]['payment_method'] = $order['payment_method'];
-                    $orders[$order['order_id']]['address'] = $order['address'];
-                    $orders[$order['order_id']]['status'] = $order['status'];
-                    $orders[$order['order_id']]['products'][] = [
-                        'product_name' => $order['product_name'],
-                        'image' => $order['image'],
-                        'quantity' => $order['quantity']
-                    ];
-                }
+        <table class="table table-striped table-hover order-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer Name</th>
+                    <th>Total Price</th>
+                    <th>Payment Method</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                    <th>Products</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if (mysqli_num_rows($result) > 0) {
+                    $orders = [];
+                    while ($order = mysqli_fetch_assoc($result)) {
+                        $orders[$order['order_id']]['order_id'] = $order['order_id'];
+                        $orders[$order['order_id']]['customer_name'] = $order['customer_name'];
+                        $orders[$order['order_id']]['total_price'] = $order['total_price'];
+                        $orders[$order['order_id']]['payment_method'] = $order['payment_method'];
+                        $orders[$order['order_id']]['address'] = $order['address'];
+                        $orders[$order['order_id']]['status'] = $order['status'];
+                        $orders[$order['order_id']]['products'][] = [
+                            'product_name' => $order['product_name'],
+                            'image' => $order['image'],
+                            'quantity' => $order['quantity']
+                        ];
+                    }
 
-                foreach ($orders as $order) {
-                    echo "<tr>
+                    foreach ($orders as $order) {
+                        echo "<tr>
                             <td>" . $order['order_id'] . "</td>
                             <td>" . htmlspecialchars($order['customer_name']) . "</td>
                             <td>$" . number_format($order['total_price'], 2) . "</td>
@@ -230,14 +235,14 @@ if (isset($_POST['update_status'])) {
                             </td>
                             <td>
                                 <ul class='product-list'>";
-                    foreach ($order['products'] as $product) {
-                        $image_url = 'products/' . htmlspecialchars($product['image']);
-                        echo "<li>
+                        foreach ($order['products'] as $product) {
+                            $image_url = 'products/' . htmlspecialchars($product['image']);
+                            echo "<li>
                                 <img src='" . $image_url . "' alt='" . htmlspecialchars($product['product_name']) . "' class='product-image'>
                                 <span>" . htmlspecialchars($product['product_name']) . " x " . $product['quantity'] . "</span>
                               </li>";
-                    }
-                    echo "      </ul>
+                        }
+                        echo "      </ul>
                             </td>
                             <td>
                                 <form method='post' action='manage_orders.php' class='d-inline'>
@@ -253,21 +258,22 @@ if (isset($_POST['update_status'])) {
                                 </form>
                             </td>
                         </tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='8' class='text-center'>No orders found.</td></tr>";
                 }
-            } else {
-                echo "<tr><td colspan='8' class='text-center'>No orders found.</td></tr>";
-            }
-            ?>
-        </tbody>
-    </table>
-</div>
-<footer>
+                ?>
+            </tbody>
+        </table>
+    </div>
+    <footer>
         <div class="row mt-4 border-top pt-3">
             <div class="col-md-6">
                 <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
             </div>
     </footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
+
 </html>

@@ -159,20 +159,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </style>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <img src="./images/Logo.png" alt="Logo" style="width:50px;">
-                <b>ADMIN DASHBOARD</b>
+                <img src="./images/perfume_logo.png" alt="Logo" style="width:50px;">
+                ADMIN DASHBOARD
             </a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="admin_index.php">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_products.php">Products</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_orders.php">Orders</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_users.php">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="manage_coupon.php">Coupons</a></li>
                     <li class="nav-item"><a class="nav-link" href="view_reports.php">Reports</a></li>
                 </ul>
-                <a href="admin_login.php" class="btn btn-outline-dark">Logout</a>
+                <a href="logout.php" class="btn btn-outline-dark">Logout</a>
             </div>
         </div>
     </nav>

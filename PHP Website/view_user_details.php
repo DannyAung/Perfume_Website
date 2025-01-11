@@ -51,13 +51,18 @@ mysqli_close($conn);
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
+<style>
+    .navbar {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+</style>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <img src="./images/Logo.png" alt="Logo" style="width:50px;">
-                <b>ADMIN DASHBOARD</b>
+                <img src="./images/perfume_logo.png" alt="Logo" style="width:50px;">
+                ADMIN DASHBOARD
             </a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
@@ -65,6 +70,7 @@ mysqli_close($conn);
                     <li class="nav-item"><a class="nav-link" href="manage_products.php">Products</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_orders.php">Orders</a></li>
                     <li class="nav-item"><a class="nav-link" href="manage_users.php">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="manage_coupon.php">Coupons</a></li>
                     <li class="nav-item"><a class="nav-link" href="view_reports.php">Reports</a></li>
                 </ul>
                 <a href="logout.php" class="btn btn-outline-dark">Logout</a>
@@ -91,5 +97,17 @@ mysqli_close($conn);
             <p class="text-center">User not found.</p>
         <?php endif; ?>
     </div>
+
+
+    <div class="row mt-4 border-top pt-3">
+        <div class="col-md-6">
+            <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
+        </div>
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+
 </body>
+
 </html>

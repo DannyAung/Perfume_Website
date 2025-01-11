@@ -1,14 +1,12 @@
 <?php
 session_start();
 
-
 if (!isset($_SESSION['user_id'])) {
-    echo "You must be register or logged in to add items to your cart.";
+    echo "You must be registered or logged in to add items to your cart.";
     exit;
 }
 
 $user_id = $_SESSION['user_id'];
-
 
 $host = 'localhost';
 $username_db = 'root';
@@ -23,14 +21,24 @@ if ($conn->connect_error) {
 
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-
 if (isset($_POST['add_to_cart'])) {
     $product_id = $_POST['product_id'];
 
+    // Validate if the product exists in the database
+    $sql = "SELECT * FROM products WHERE product_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $product_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows == 0) {
+        echo "Error: Product does not exist.";
+        exit;
+    }
 
     $quantity = isset($_POST['quantity']) && is_numeric($_POST['quantity']) && $_POST['quantity'] > 0 ? $_POST['quantity'] : 1; // Default to 1 if invalid
 
-
+    // Check if the item is already in the cart
     $sql = "SELECT * FROM cart_items WHERE user_id = ? AND product_id = ? AND ordered_status = 'not_ordered'";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $user_id, $product_id);
@@ -38,6 +46,7 @@ if (isset($_POST['add_to_cart'])) {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
+        // Update the quantity if the item is already in the cart
         $cart_item = $result->fetch_assoc();
         $new_quantity = $cart_item['quantity'] + $quantity;
 
@@ -46,7 +55,7 @@ if (isset($_POST['add_to_cart'])) {
         $update_stmt->bind_param("ii", $new_quantity, $cart_item['cart_item_id']);
         $update_stmt->execute();
     } else {
-        // Insert the product into the cart
+        // Insert the product into the cart if not already added
         $sql = "INSERT INTO cart_items (user_id, product_id, quantity, ordered_status) VALUES (?, ?, ?, 'not_ordered')";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iii", $user_id, $product_id, $quantity);
@@ -54,9 +63,8 @@ if (isset($_POST['add_to_cart'])) {
         echo "Product added to your cart!";
     }
 
-    // Get the referer (page the user was on)
+    // Redirect back to the previous page (or default page)
     $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'user_index.php';
-    // Redirect back to the page the user came from (either user_index.php, product_detail.php, etc.)
     header("Location: " . $referer);
     exit;
 }
@@ -485,7 +493,53 @@ if (isset($_POST['remove_all'])) {
         ?>
     </div>
 </div>
+<footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
 
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">About Us</h5>
+                    <p class="text-muted">Fragrance Haven is your ultimate destination for high-quality perfumes that elevate your senses. Explore our wide range of fragrances designed to suit every occasion and personality.</p>
+                </div>
+
+
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="user_index.php" class="text-white text-decoration-none">Home</a></li>
+                        <li><a href="women_category.php" class="text-white text-decoration-none">Women’s Collection</a></li>
+                        <li><a href="men_category.php" class="text-white text-decoration-none">Men’s Collection</a></li>
+                        <a href="unisex_category.php" class="text-white text-decoration-none">Unisex Collection</a></li>
+                        <li><a href="about_us.php" class="text-white text-decoration-none">About Us</a></li>
+                        <li><a href="contact_us.php" class="text-white text-decoration-none">Contact Us</a></li>
+                    </ul>
+                </div>
+
+
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">Contact Info</h5>
+                    <p class="text-muted"><i class="fas fa-map-marker-alt me-2"></i> Pyi Yeik Thar Street, Kamayut, Yangon, Myanmar</p>
+                    <p class="text-muted"><i class="fas fa-phone-alt me-2"></i> +959450197415</p>
+                    <p class="text-muted"><i class="fas fa-envelope me-2"></i> support@fragrancehaven.com</p>
+                </div>
+            </div>
+
+            <div class="row mt-4 border-top pt-3">
+                <div class="col-md-6">
+                    <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="https://www.instagram.com/" class="text-white me-3 text-decoration-none"><i class="fab fa-instagram fa-lg"></i></a>
+                    <a href="https://www.facebook.com/" class="text-white me-3 text-decoration-none"><i class="fab fa-facebook fa-lg"></i></a>
+                    <a href="https://twitter.com/" class="text-white text-decoration-none"><i class="fab fa-twitter fa-lg"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

@@ -57,29 +57,29 @@ if (isset($_POST['apply_coupon'])) {
     if ($total_price < 300) {
         echo "<script>alert('Coupons can only be applied to orders above $300.');</script>";
     } else {
-        // Only allow "SAVE20" coupon to be applied
-        if ($manual_coupon_code === "SAVE20") {
-            // Check if the "SAVE20" coupon code is active
-            $coupon_sql = "SELECT discount_percentage FROM coupons WHERE coupon_code = ? AND is_active = 1";
-            $coupon_stmt = $conn->prepare($coupon_sql);
-            $coupon_stmt->bind_param("s", $manual_coupon_code);
-            $coupon_stmt->execute();
-            $coupon_result = $coupon_stmt->get_result();
+        // Validate the coupon from the `coupons` table
+        $coupon_sql = "SELECT discount_percentage, valid_from, valid_to, minimum_purchase_amount 
+                       FROM coupons 
+                       WHERE coupon_code = ? AND valid_from <= NOW() AND valid_to >= NOW()";
+        $coupon_stmt = $conn->prepare($coupon_sql);
+        $coupon_stmt->bind_param("s", $manual_coupon_code);
+        $coupon_stmt->execute();
+        $coupon_result = $coupon_stmt->get_result();
 
-            if ($coupon_result->num_rows > 0) {
-                // Apply the coupon and store it in the session
-                $coupon_data = $coupon_result->fetch_assoc();
+        if ($coupon_result->num_rows > 0) {
+            $coupon_data = $coupon_result->fetch_assoc();
+            if ($total_price >= $coupon_data['minimum_purchase_amount']) {
+                // Apply the discount and store it in the session
                 $discount_percentage = $coupon_data['discount_percentage'];
                 $_SESSION['discount_percentage'] = $discount_percentage;
                 $_SESSION['applied_coupon_code'] = $manual_coupon_code;
                 echo "<script>alert('Coupon applied successfully!');</script>";
             } else {
-                // Invalid coupon if not found
-                echo "<script>alert('Invalid or expired coupon code!');</script>";
+                echo "<script>alert('This coupon requires a minimum purchase of $" . $coupon_data['minimum_purchase_amount'] . ".');</script>";
             }
         } else {
-            // If the code is not "SAVE20", it is invalid
-            echo "<script>alert('Invalid coupon code! Only SAVE20 is accepted.');</script>";
+            // Invalid coupon if not found or expired
+            echo "<script>alert('Invalid or expired coupon code!');</script>";
         }
     }
 }
@@ -165,11 +165,12 @@ if (isset($_POST['checkout'])) {
 // Before using $applied_coupon_code, check if it's set in the session
 $applied_coupon_code = isset($_SESSION['applied_coupon_code']) ? $_SESSION['applied_coupon_code'] : "N/A";
 
+// Using htmlspecialchars safely to avoid deprecated behavior
+$applied_coupon_code_html = htmlspecialchars($applied_coupon_code, ENT_QUOTES, 'UTF-8');
+
 // Check if discount_percentage is set in the session, else default to 0
 $discount_percentage = isset($_SESSION['discount_percentage']) ? $_SESSION['discount_percentage'] : 0;
 
-// Using htmlspecialchars safely to avoid deprecated behavior
-$applied_coupon_code_html = htmlspecialchars($applied_coupon_code, ENT_QUOTES, 'UTF-8');
 unset($_SESSION['discount_percentage']);
 unset($_SESSION['applied_coupon_code']);
 
@@ -316,7 +317,6 @@ session_regenerate_id(true);
             <input type="text" name="coupon_code" id="coupon_code" class="form-control" value="<?php echo htmlspecialchars($applied_coupon_code !== 'N/A' ? $applied_coupon_code : ''); ?>">
             <button type="submit" name="apply_coupon" class="btn btn-primary">Apply Coupon</button>
         </form>
-        <p>SAVE 20% with 'SAVE10' if you buy above $300!!</p>
 
         <form method="post" class="checkout-form">
             <h3>Shipping Details</h3>
@@ -340,7 +340,7 @@ session_regenerate_id(true);
             <!-- Payment Method -->
             <div class="mb-3">
                 <label for="payment_method" class="form-label">Payment Method</label>
-                <select class="form-control" id="payment_method" name="payment_method" required>
+                <select class="form-control" id="payment_method" name="payment_method" required onchange="handlePaymentMethodChange()">
                     <option value="" selected disabled>Select Payment Method</option>
                     <option value="kpay">K Pay</option>
                     <option value="credit_card">Credit Card</option>
@@ -348,13 +348,90 @@ session_regenerate_id(true);
                 </select>
             </div>
 
+            <!-- Additional Fields -->
+            <div id="kpay_fields" class="d-none">
+                <div class="mb-3">
+                    <label for="phone_number" class="form-label">Phone Number</label>
+                    <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Enter your phone number" oninput="validatePhoneNumber()">
+                    <div id="phone_number_error" class="text-danger d-none">Invalid Phone Number</div>
+                </div>
+                <div class="mb-3">
+                    <label for="otp" class="form-label">OTP</label>
+                    <input type="text" class="form-control" id="otp" name="otp" placeholder="Enter OTP">
+                </div>
+                <button type="button" id="get_otp_button" class="btn btn-primary d-none" onclick="generateOTP()">Get OTP</button>
+            </div>
+
+            <div id="credit_card_fields" class="d-none">
+                <div class="mb-3">
+                    <label for="card_number" class="form-label">Card Number</label>
+                    <input type="text" class="form-control" id="card_number" name="card_number" placeholder="Enter your credit card number">
+                </div>
+                <div class="mb-3">
+                    <label for="expiry_date" class="form-label">Expiry Date</label>
+                    <input type="month" class="form-control" id="expiry_date" name="expiry_date">
+                </div>
+                <div class="mb-3">
+                    <label for="cvv" class="form-label">CVV</label>
+                    <input type="text" class="form-control" id="cvv" name="cvv" placeholder="Enter CVV">
+                </div>
+            </div>
+
+            <div id="cash_on_delivery_fields" class="d-none">
+                <div class="mb-3">
+                    <p>Cash on Delivery selected. No additional information needed.</p>
+                </div>
+            </div>
+
+            <!-- JavaScript to Handle Payment Method Change -->
+            <script>
+                function handlePaymentMethodChange() {
+                    const paymentMethod = document.getElementById('payment_method').value;
+
+                    // Hide all additional fields initially
+                    document.getElementById('kpay_fields').classList.add('d-none');
+                    document.getElementById('credit_card_fields').classList.add('d-none');
+                    document.getElementById('cash_on_delivery_fields').classList.add('d-none');
+
+                    // Show fields based on the selected payment method
+                    if (paymentMethod === 'kpay') {
+                        document.getElementById('kpay_fields').classList.remove('d-none');
+                    } else if (paymentMethod === 'credit_card') {
+                        document.getElementById('credit_card_fields').classList.remove('d-none');
+                    } else if (paymentMethod === 'cash_on_delivery') {
+                        document.getElementById('cash_on_delivery_fields').classList.remove('d-none');
+                    }
+                }
+
+                function validatePhoneNumber() {
+                    const phoneNumber = document.getElementById('phone_number').value;
+                    const phoneError = document.getElementById('phone_number_error');
+                    const getOtpButton = document.getElementById('get_otp_button');
+
+                    // Validate phone number (must be exactly 11 digits)
+                    if (/^\d{11}$/.test(phoneNumber)) {
+                        phoneError.classList.add('d-none'); // Hide error message
+                        getOtpButton.classList.remove('d-none'); // Show "Get OTP" button
+                    } else {
+                        phoneError.classList.remove('d-none'); // Show error message
+                        getOtpButton.classList.add('d-none'); // Hide "Get OTP" button
+                    }
+                }
+
+                function generateOTP() {
+                    // This function will handle OTP generation logic (e.g., sending OTP to the server)
+                    alert('OTP has been sent to your phone number.');
+                }
+            </script>
+
+
             <!-- Shipping Method -->
             <div class="mb-3">
                 <label for="shipping_method" class="form-label">Shipping Method</label>
                 <select class="form-control" id="shipping_method" name="shipping_method" onchange="updateTotalPrice()" required>
                     <option value="" disabled selected>Select Shipping Method</option>
-                    <option value="standard">Standard - $20</option>
-                    <option value="express">Express - $40</option>
+                    <option value="standard">Standard - $20 [2-3days]</option>
+                    <option value="express">Express - $40 [1 day]</option>
                 </select>
             </div>
 

@@ -107,34 +107,41 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
         }
+
         .container {
             max-width: 1000px;
             margin: 50px auto;
         }
+
         .receipt-container {
             background-color: #ffffff;
             border-radius: 15px;
             padding: 40px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
         }
+
         .card {
             border: none;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
+
         .card-body {
             padding: 20px;
         }
+
         .total-summary {
             background: linear-gradient(135deg, #f8f9fa, #e9ecef);
             border-radius: 10px;
             padding: 20px;
             margin-top: 20px;
         }
+
         .btn-container {
             text-align: center;
             margin-top: 30px;
         }
+
         .btn-primary {
             background-color: #007bff;
             border: none;
@@ -143,42 +150,55 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
             border-radius: 25px;
             box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
         }
+
         .btn-primary:hover {
             background-color: #0056b3;
             box-shadow: 0 6px 15px rgba(0, 123, 255, 0.4);
         }
-        h2, h4, h5 {
+
+        h4,
+        h3,
+        h5 {
             color: #343a40;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
         }
+
         .table {
             margin-top: 20px;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
+
         .table thead {
             background-color: #007bff;
             color: white;
         }
-        .table th, .table td {
+
+        .table th,
+        .table td {
             padding: 12px;
             text-align: center;
         }
+
         .table tbody tr:hover {
             background-color: rgba(0, 123, 255, 0.05);
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <div class="receipt-container">
-            <h2 class="text-center mb-4">Order Receipt</h2>
+    <div class="receipt-container">
+    <h2 class="text-center mb-4">Order Receipt</h2>
+        <h5 class="text-center mb-4">Thank You For Your Shipping!!</h5>
             <div class="row mb-4">
                 <!-- Order Details -->
                 <div class="col-md-6 mb-4">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Order Details</h5>
+                           
                             <p><strong>Order ID:</strong> <?php echo $order['order_id']; ?></p>
                             <p><strong>Date:</strong> <?php echo date('F j, Y', strtotime($order['created_at'])); ?></p>
                             <p><strong>Shipping Method:</strong> <?php echo $order['shipping_method']; ?></p>
@@ -196,7 +216,7 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
 
                 <!-- Customer Details -->
                 <div class="col-md-6 mb-4">
- <div class="card">
+                    <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Customer Details</h5>
                             <p><strong>Name:</strong> <?php echo $order['user_name']; ?></p>
@@ -238,13 +258,13 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
 
             <!-- Total Summary -->
             <div class="total-summary">
-                <h5>Total Summary</h5>
-                <p><strong>Total Price (Before Discount):</strong> $<?php echo number_format($total_price_with_discount, 2); ?></p>
-                <?php if ($discount_percentage > 0): ?>
-                    <p><strong>Coupon Discount:</strong> -$<?php echo number_format($discount_amount, 2); ?></p>
-                <?php endif; ?>
-                <p><strong>Shipping Fee:</strong> $<?php echo number_format($order['shipping_fee'], 2); ?></p>
-                <h4><strong>Total Amount (After Discount):</strong> $<?php echo number_format($final_total_price, 2); ?></h4>
+                <h3><strong>Total Summary</strong></h4>
+                    <p><strong>Total Price(Before Discount):</strong> $<?php echo number_format($total_price_with_discount, 2); ?></p>
+                    <?php if ($discount_percentage > 0): ?>
+                        <p><strong>Coupon Discount:</strong> -$<?php echo number_format($discount_amount, 2); ?></p>
+                    <?php endif; ?>
+                    <p><strong>Shipping Fee:</strong> $<?php echo number_format($order['shipping_fee'], 2); ?></p>
+                    <h5><strong>Total Amount:</strong> $<?php echo number_format($final_total_price, 2); ?></h2>
             </div>
 
             <!-- Continue Shopping Button -->
@@ -253,7 +273,13 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
             </div>
         </div>
     </div>
-
+    <footer>
+        <div class="row mt-4 border-top pt-3">
+            <div class="col-md-6">
+                <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
+            </div>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

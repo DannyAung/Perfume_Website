@@ -558,20 +558,6 @@ footer .fab:hover {
 }
 
 
-/*Admin Nav*/
-.custom-navbar-spacing .nav-item {
-    margin-right: -15px;
-    /* Reduce spacing between items */
-
-}
-
-.custom-navbar-spacing .nav-link {
-    padding-left: 25px;
-    /* Reduce left padding inside links */
-    padding-right: 5px;
-    /* Reduce right padding inside links */
-}
-
 
 /*file upload*/
 .file-upload {
