@@ -1,126 +1,32 @@
 <?php
-// Check if user is logged in
+session_start();
+if (isset($_SESSION['success'])) {
+    echo '<div class="alert alert-success">' . htmlspecialchars($_SESSION['success']) . '</div>';
+    unset($_SESSION['success']);
+}
+if (isset($_SESSION['error'])) {
+    echo '<div class="alert alert-danger">' . htmlspecialchars($_SESSION['error']) . '</div>';
+    unset($_SESSION['error']);
+}
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>How to Spray Perfume | Your Perfume Website</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .section-header h1 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 36px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .video-container {
-            max-width: 800px;
-            margin: 0 auto;
-            margin-bottom: 40px;
-        }
-
-        .video-container iframe {
-            width: 100%;
-            height: 450px;
-            border-radius: 10px;
-        }
-
-        .content {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .content p {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        .content ol {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        .tips-list {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .tips-list li {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 10px;
-            padding-left: 25px;
-            position: relative;
-        }
-
-        .tips-list li::before {
-            content: '\2022';
-            color: #e74c3c;
-            font-size: 24px;
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
-
-        .call-to-action {
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .call-to-action h2 {
-            font-size: 30px;
-            font-family: 'Poppins', sans-serif;
-            color: #e74c3c;
-        }
-
-        .call-to-action p {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .btn-gradient {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            font-size: 18px;
-            padding: 12px 40px;
-            border-radius: 50px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-gradient:hover {
-            background: linear-gradient(135deg, #c0392b, #e74c3c);
-        }
-
-        footer {
-            background-color: #333;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-        }
-    </style>
+    <title>Contact Us - Fragrance Haven</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
 </head>
 
 <body>
@@ -188,45 +94,61 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             </div>
         </div>
     </nav>
-    <!-- Header -->
-    <header class="container my-5">
-        <div class="section-header">
-            <h1>How to Spray Perfume Effectively</h1>
+    <!-- Hero Section -->
+    <header class="bg-light py-5">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold">Get in Touch</h1>
+            <p class="lead text-muted">We’re here to assist you. Reach out to us anytime!</p>
         </div>
     </header>
 
-    <!-- YouTube Video Section -->
-    <div class="container">
-        <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/KTrgDAlkt4E" title="How to Spray Perfume" allowfullscreen></iframe>
+    <!-- Contact Form Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <h2 class="mb-4">Contact Form</h2>
+                    <form action="contact_process.php" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" placeholder="Write your message here" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+
+                <div class="col-md-6">
+                    <h2 class="mb-4">Contact Details</h2>
+                    <p class="text-muted"><i class="bi bi-geo-alt-fill"></i> Pyi Yeik Thar Street, Kamayut, Yangon, Myanmar</p>
+                    <p class="text-muted"><i class="bi bi-phone-fill"></i> +959450197415</p>
+                    <p class="text-muted"><i class="bi bi-envelope-fill"></i> support@fragrancehaven.com</p>
+                    <h5 class="mt-4">Business Hours</h5>
+                    <p class="text-muted">Monday - Friday: 9:00 AM - 6:00 PM</p>
+                    <p class="text-muted">Saturday: 10:00 AM - 4:00 PM</p>
+                    <p class="text-muted">Sunday: Closed</p>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Content Section -->
-    <div class="container content">
-        <h2>Step-by-Step Guide</h2>
-        <p>Learn the best techniques for applying perfume to ensure a lasting fragrance. Follow these steps to enhance your fragrance application:</p>
-        <ol>
-            <li><strong>Prep Your Skin:</strong> Apply perfume on clean, moisturized skin. This helps the fragrance last longer.</li>
-            <li><strong>Spray on Pulse Points:</strong> Target areas like the wrist, behind the ears, and the base of your throat for a longer-lasting scent.</li>
-            <li><strong>Don’t Rub:</strong> Avoid rubbing your wrist together after spraying. This can break down the scent molecules.</li>
-            <li><strong>Keep a Safe Distance:</strong> Hold the perfume bottle about 6-8 inches away from your skin for an even spray.</li>
-        </ol>
+    <!-- Map Section -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center mb-3">Our Location</h2>
+            <div class="map-container rounded shadow-sm overflow-hidden">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3832.4929049234636!2d96.14201991480174!3d16.83087312393282!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30c19491d5fc4915%3A0xbc8c93b252e3f2f5!2sKamayut%20Township%2C%20Yangon%2C%20Myanmar%20(Burma)!5e0!3m2!1sen!2smm!4v1689567890123!5m2!1sen!2smm" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
 
-        <h3>Perfume Tips</h3>
-        <ul class="tips-list">
-            <li>For a more intense fragrance, consider spraying on your clothes as well.</li>
-            <li>Choose the right fragrance for the occasion: lighter scents for daytime and richer scents for evening.</li>
-            <li>Store your perfume in a cool, dark place to preserve its longevity.</li>
-        </ul>
-
-        <!-- Call-to-Action Section -->
-        <div class="call-to-action">
-            <h2>Ready to Choose Your Perfect Scent?</h2>
-            <p>Explore our wide collection of perfumes and find your new favorite fragrance today!</p>
-            <a href="user_index.php" class="btn-gradient">Shop Now</a>
-        </div><br>
-    </div>
     <footer class="bg-dark text-white py-5">
         <div class="container">
             <div class="row">
@@ -277,14 +199,8 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
         </div>
     </footer>
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

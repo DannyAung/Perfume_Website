@@ -1,130 +1,85 @@
 <?php
-// Check if user is logged in
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Location: user_login.php');
+    exit;
+}
+
+// Database connection
+$host = 'localhost';
+$username_db = 'root';
+$password_db = '';
+$db_name = 'ecom_website';
+$port = 3306;
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8mb4;port=$port", $username_db, $password_db);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
+
+// Get user ID
+$user_id = $_SESSION['user_id'];
+
+// Fetch chat messages for the user
+$stmt = $pdo->prepare("SELECT * FROM chats WHERE user_id = :user_id ORDER BY sent_at ASC");
+$stmt->execute([':user_id' => $user_id]);
+$chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>How to Spray Perfume | Your Perfume Website</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Chat with Admin</title>
+     <!-- Bootstrap CSS -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .section-header h1 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 36px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .video-container {
-            max-width: 800px;
-            margin: 0 auto;
-            margin-bottom: 40px;
-        }
-
-        .video-container iframe {
-            width: 100%;
-            height: 450px;
+        .chat-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
             border-radius: 10px;
-        }
-
-        .content {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .content p {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        .content ol {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        .tips-list {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .tips-list li {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 10px;
-            padding-left: 25px;
-            position: relative;
-        }
-
-        .tips-list li::before {
-            content: '\2022';
-            color: #e74c3c;
-            font-size: 24px;
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
-
-        .call-to-action {
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .call-to-action h2 {
-            font-size: 30px;
-            font-family: 'Poppins', sans-serif;
-            color: #e74c3c;
-        }
-
-        .call-to-action p {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .btn-gradient {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            font-size: 18px;
-            padding: 12px 40px;
-            border-radius: 50px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-gradient:hover {
-            background: linear-gradient(135deg, #c0392b, #e74c3c);
-        }
-
-        footer {
-            background-color: #333;
-            color: white;
             padding: 20px;
-            text-align: center;
-            font-size: 14px;
+        }
+
+        .chat-bubble {
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 75%;
+            word-wrap: break-word;
+        }
+
+        .user-bubble {
+            background-color: #007bff;
+            color: white;
+            text-align: left;
+            margin-left: auto;
+        }
+
+        .admin-bubble {
+            background-color: #e9ecef;
+            text-align: left;
+            margin-right: auto;
         }
     </style>
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
         <div class="container-fluid">
             <!-- Logo and Brand -->
             <a class="navbar-brand d-flex align-items-center" href="user_index.php">
@@ -188,48 +143,40 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             </div>
         </div>
     </nav>
-    <!-- Header -->
-    <header class="container my-5">
-        <div class="section-header">
-            <h1>How to Spray Perfume Effectively</h1>
+
+
+    <div class="container py-5">
+    <div class="chat-container p-9 rounded-3 shadow-sm" style="background: #f8f9fa;">
+        <!-- Chat GIF Section -->
+        <div class="text-center mb-1">
+            <img src="images/chat.gif" alt="Chat GIF" class="img-fluid" style="max-width: 180px;">
         </div>
-    </header>
 
-    <!-- YouTube Video Section -->
-    <div class="container">
-        <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/KTrgDAlkt4E" title="How to Spray Perfume" allowfullscreen></iframe>
+        <!-- Chat Heading -->
+        <h3 class="text-center mb-3" style="font-family: 'Roboto', sans-serif; font-weight: 400; color: #333;">Let's Talk!!</h3>
+        <div class="chat-box mb-2" style="height: 250px; overflow-y: scroll; padding-right: 15px;">
+            <?php foreach ($chats as $chat): ?>
+                <div class="chat-bubble <?php echo $chat['sender'] === 'user' ? 'user-bubble' : 'admin-bubble'; ?> mb-3">
+                    <small class="fw-bold"><?php echo $chat['sender'] === 'user' ? 'You' : 'Admin'; ?></small><br>
+                    <p class="m-0"><?php echo htmlspecialchars($chat['message']); ?></p>
+                    <small class="text-muted"><?php echo $chat['sent_at']; ?></small>
+                </div>
+            <?php endforeach; ?>
         </div>
+
+        <!-- Input Section -->
+        <form action="user_send_message.php" method="POST">
+            <div class="input-group">
+                <input type="text" name="message" class="form-control rounded-pill border-0 shadow-sm" placeholder="Type your message..." required>
+                <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">Send</button>
+            </div>
+        </form>
     </div>
-
-    <!-- Content Section -->
-    <div class="container content">
-        <h2>Step-by-Step Guide</h2>
-        <p>Learn the best techniques for applying perfume to ensure a lasting fragrance. Follow these steps to enhance your fragrance application:</p>
-        <ol>
-            <li><strong>Prep Your Skin:</strong> Apply perfume on clean, moisturized skin. This helps the fragrance last longer.</li>
-            <li><strong>Spray on Pulse Points:</strong> Target areas like the wrist, behind the ears, and the base of your throat for a longer-lasting scent.</li>
-            <li><strong>Don’t Rub:</strong> Avoid rubbing your wrist together after spraying. This can break down the scent molecules.</li>
-            <li><strong>Keep a Safe Distance:</strong> Hold the perfume bottle about 6-8 inches away from your skin for an even spray.</li>
-        </ol>
-
-        <h3>Perfume Tips</h3>
-        <ul class="tips-list">
-            <li>For a more intense fragrance, consider spraying on your clothes as well.</li>
-            <li>Choose the right fragrance for the occasion: lighter scents for daytime and richer scents for evening.</li>
-            <li>Store your perfume in a cool, dark place to preserve its longevity.</li>
-        </ul>
-
-        <!-- Call-to-Action Section -->
-        <div class="call-to-action">
-            <h2>Ready to Choose Your Perfect Scent?</h2>
-            <p>Explore our wide collection of perfumes and find your new favorite fragrance today!</p>
-            <a href="user_index.php" class="btn-gradient">Shop Now</a>
-        </div><br>
-    </div>
+</div>
     <footer class="bg-dark text-white py-5">
         <div class="container">
             <div class="row">
+
                 <div class="col-md-4 mb-4">
                     <h5 class="mb-3">About Us</h5>
                     <p class="text-muted">Fragrance Haven is your ultimate destination for high-quality perfumes that elevate your senses. Explore our wide range of fragrances designed to suit every occasion and personality.</p>
@@ -252,7 +199,6 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                     <ul class="list-unstyled">
                         <li><a href="privacy_policy.php" class="text-white text-decoration-none">Privacy Policy</a></li>
                         <li><a href="term_and_conditions.php" class="text-white text-decoration-none">Terms and Conditions</a></li>
-                        <li><a href="faq.php" class="text-white text-decoration-none">FAQ</a></li>
                     </ul>
                 </div>
 
@@ -277,14 +223,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
         </div>
     </footer>
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+
 </body>
 
 </html>

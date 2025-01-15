@@ -173,25 +173,95 @@ $top_sales_json = json_encode($top_sales);
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <img src="./images/perfume_logo.png" alt="Logo" style="width:50px;">
-                ADMIN DASHBOARD
-            </a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="admin_index.php">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manage_products.php">Products</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manage_orders.php">Orders</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manage_users.php">Users</a></li>
-                    <li class="nav-item"><a class="nav-link" href="manage_coupon.php">Coupons</a></li>
-                    <li class="nav-item"><a class="nav-link" href="view_reports.php">Reports</a></li>
-                </ul>
-                <a href="logout.php" class="btn btn-outline-dark">Logout</a>
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg">
+            <!-- Sidebar Toggle Button -->
+            <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="container-fluid">
+                <a class="navbar-brand" href="admin_index.php">
+                    <img src="./images/perfume_logo.png" alt="Logo" style="width:50px;">
+                    ADMIN DASHBOARD
+                </a>
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav me-auto">
+                    </ul>
+                    <a href="admin_login.php" class="btn btn-outline-dark">Logout</a>
+                </div>
             </div>
+        </nav>
+        <br>
+    </div>
+
+    <!-- Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+        <div class="offcanvas-header bg-light border-bottom">
+            <h5 class="offcanvas-title fw-bold" id="sidebarLabel">Admin Dashboard</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-    </nav>
+        <div class="offcanvas-body p-0">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center p-3 hover-bg" href="admin_index.php">
+                        <i class="bi bi-house-door me-3 fs-5"></i>
+                        <span class="fs-6">Home</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_products.php">
+                        <i class="bi bi-box me-3 fs-5"></i>
+                        <span class="fs-6">Manage Products</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_orders.php">
+                        <i class="bi bi-cart me-3 fs-5"></i>
+                        <span class="fs-6">Manage Orders</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_coupon.php">
+                        <i class="bi bi-tag me-3 fs-5"></i>
+                        <span class="fs-6">Manage Coupons</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_users.php">
+                        <i class="bi bi-person me-3 fs-5"></i>
+                        <span class="fs-6">Manage Users</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_reviews.php">
+                        <i class="bi bi-star me-3 fs-5"></i>
+                        <span class="fs-6">Manage Reviews</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_contact_us.php">
+                        <i class="bi bi-star me-3 fs-5"></i>
+                        <span class="fs-6">Manage Contact</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center p-3 hover-bg" href="view_reports.php">
+                        <i class="bi bi-bar-chart me-3 fs-5"></i>
+                        <span class="fs-6">Reports</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center p-3 hover-bg" href="admin_chat.php">
+                        <i class="bi bi-chat me-3 fs-5"></i>
+                        <span class="fs-6">Chat With Customer</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
     <div class="container my-5">
         <h1 class="text-center mb-4">Admin Reports Dashboard</h1>
 
@@ -262,14 +332,6 @@ $top_sales_json = json_encode($top_sales);
             </div>
         </div>
     </div>
-
-    <footer>
-        <div class="row mt-4 border-top pt-3">
-            <div class="col-md-6">
-                <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
-            </div>
-    </footer>
-    <!-- Chart.js Scripts -->
     <script>
         // Donut Chart for Top 5 Products
         var donutCtx = document.getElementById('topProductsDonutChart').getContext('2d');

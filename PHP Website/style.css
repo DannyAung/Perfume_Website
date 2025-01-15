@@ -706,6 +706,21 @@ footer .fab:hover {
 .hidden {
     display: none;
 }
+/* see more button */
+.btn-see-more {
+    font-size: 0.8rem;
+    width: 100px;
+    margin-left: 1200px;
+    border: none;
+    background-color: transparent;
+    color: #5c5a5a;
+    text-decoration:bold;
+}
+
+.btn-see-more:hover {
+    color:#000;
+    background-color:rgb(249, 249, 249);
+}
 
 .carousel-control-prev1,
 .carousel-control-next1 {

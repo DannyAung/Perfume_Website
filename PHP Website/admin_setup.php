@@ -14,21 +14,26 @@ if (!$conn) {
 
 // New admin data
 $admin_username = 'admin';
-$admin_password = 'admin12';  // Plain text password
+$admin_email = 'admin@gmail.com';  // Fixed typo in email domain
+$admin_password = 'admin123!@#';  // Plain text password
 
 // Hash the password
 $hashed_password = password_hash($admin_password, PASSWORD_DEFAULT);
 
-// Insert the new admin data into the database
-$sql = "INSERT INTO admin (username, email, password, created_at, updated_at) 
-        VALUES ('$admin_username', 'admin@example.com', '$hashed_password', NOW(), NOW())";
+$sql = "INSERT INTO admin (admin_id, username, email, password, created_at, updated_at) 
+        VALUES (?, ?, ?, ?, NOW(), NOW())";
 
-if (mysqli_query($conn, $sql)) {
+$stmt = $conn->prepare($sql);
+$admin_id = 1; // Manually specify the admin_id
+$stmt->bind_param("isss", $admin_id, $admin_username, $admin_email, $hashed_password);
+
+if ($stmt->execute()) {
     echo "Admin account created successfully.";
 } else {
-    echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+    echo "Error: " . $stmt->error;
 }
 
-// Close the database connection
-mysqli_close($conn);
+// Close the statement and database connection
+$stmt->close();
+$conn->close();
 ?>

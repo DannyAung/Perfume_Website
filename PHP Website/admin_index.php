@@ -1,12 +1,6 @@
 <?php
 // Start session
 session_start();
-
-if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
-    header('Location: admin_login.php');
-    exit;
-}
-
 // Connect to the database
 $host = 'localhost';
 $username = 'root';
@@ -20,6 +14,35 @@ $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
+
+// Check if admin is logged in
+if (!isset($_SESSION['admin_id']) || !$_SESSION['admin_logged_in']) {
+    echo "Error: Admin ID not set. Please log in again.";
+    header('Location: admin_login.php');
+    exit;
+}
+
+// You can access the admin ID like this:
+$admin_id = $_SESSION['admin_id'];
+
+
+$query = "SELECT COUNT(*) as unread_count FROM chats WHERE admin_id = ? AND unread = TRUE";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $admin_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$unreadCount = $row['unread_count'];
+
+if (isset($_GET['user_id'])) {
+    $user_id = $_GET['user_id'];
+    $query = "UPDATE chats SET unread = FALSE WHERE admin_id = ? AND user_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ii", $admin_id, $user_id);
+    $stmt->execute();
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -32,12 +55,11 @@ if (!$conn) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Lilita+One&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <style>
 
-/*Admin Nav*/
+/*Nav*/
 .custom-navbar-spacing .nav-item {
     margin-right: -15px;
    
@@ -49,6 +71,9 @@ if (!$conn) {
     padding-right: 5px;
    
 }
+.navbar {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 .hover-bg:hover {
         background-color: rgba(0, 123, 255, 0.1); /* Light blue hover effect */
         border-radius: 5px;
@@ -57,7 +82,7 @@ if (!$conn) {
 </style>
 <body>
 
-<!-- Main Content -->
+
 <div class="container-fluid">
     <nav class="navbar navbar-expand-lg">
         <!-- Sidebar Toggle Button -->
@@ -72,12 +97,11 @@ if (!$conn) {
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto">
                 </ul>
-                <a href="logout.php" class="btn btn-outline-dark">Logout</a>
+                <a href="admin_login.php" class="btn btn-outline-dark">Logout</a>
             </div>
         </div>
     </nav>
     <br>
-    <!-- Rest of your content -->
 </div>
 
    <!-- Offcanvas Sidebar -->
@@ -125,17 +149,28 @@ if (!$conn) {
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_contact_us.php">
+                    <i class="bi bi-star me-3 fs-5"></i>
+                    <span class="fs-6">Manage Contact</span>
+                </a>
+            </li>
+           
+            <li class="nav-item">
                 <a class="nav-link d-flex align-items-center p-3 hover-bg" href="view_reports.php">
                     <i class="bi bi-bar-chart me-3 fs-5"></i>
                     <span class="fs-6">Reports</span>
                 </a>
             </li>
+
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="admin_chat.php">
+                <i class="bi bi-chat me-3 fs-5"></i>
+                    <span class="fs-6">Chat With Customer</span>
+                </a>
+            </li>
         </ul>
     </div>
 </div>
-
-
-
 
   
     <div class="container my-5">
@@ -201,14 +236,36 @@ if (!$conn) {
             </div>
         </div>
 
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+                    <i class="fas fa-star fa-3x mb-3 text-secondary"></i>
+                    <h5 class="card-title mb-2">Manage Contact</h5>
+                    <p class="card-text mb-3">View or manage contacts.</p>
+                    <a href="manage_contact_us.php" class="btn btn-outline-secondary w-100">Go</a>
+                </div>
+            </div>
+        </div>
+
         <!-- Reports -->
         <div class="col-md-3">
             <div class="card text-center shadow-sm h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
                     <i class="fas fa-chart-line fa-3x mb-3 text-danger"></i>
-                    <h5 class="card-title mb-2">Reports</h5>
+                    <h5 class="card-title mb-2">View Reports</h5>
                     <p class="card-text mb-3">View sales and performance reports.</p>
                     <a href="view_reports.php" class="btn btn-outline-danger w-100">Go</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+                    <i class="fas fa-star fa-3x mb-3 text-secondary"></i>
+                    <h5 class="card-title mb-2">Chat</h5>
+                    <p class="card-text mb-3">Chat with Customers.</p>
+                    <a href="admin_chat.php" class="btn btn-outline-secondary w-100">Go</a>
                 </div>
             </div>
         </div>

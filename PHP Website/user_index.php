@@ -48,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
     }
 }
 
-
 // Check if user is logged in
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
@@ -111,14 +110,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
 </head>
 
 <body style="background-color:rgb(249, 249, 249);">
@@ -195,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a class="nav-link active" href="user_index.php">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
+                    <a class="nav-link" href="about_us.php">About</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -209,14 +203,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="#" id="deliveryLink">Delivery</a>
+                    <a class="nav-link" href="delivery.php" id="deliveryLink">Delivery</a>
                     <div class="delivery-tooltip" id="deliveryTooltip">
-                        <p><b>Delivery: Within 2 or 3 days for YGN</b></p>
-                        <p><b>Delivery: Within 2 or 5 days for Other Locations</b></p>
+                        <p>Delivery: Royal Express</p>
+
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Contact</a>
+                    <a class="nav-link" href="contact_us.php">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="user_chat.php">Chat</a>
                 </li>
             </ul>
         </div>
@@ -256,92 +253,115 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Product Grid -->
     <div class="container my-5">
         <h1 class="text-center mb-4" style="font-family: 'Playfair Display', serif;"><b>Our Products</b></h1>
-        <div class="row row-cols-1 row-cols-md-4 g-4">
-            <?php
-            if ($discounted_result) {
-                while ($discounted_product = mysqli_fetch_assoc($discounted_result)) {
-                    $stock_quantity = $discounted_product['stock_quantity'];
-                    $is_sold_out = $stock_quantity == 0;
+        <a href="discounted_product.php" class="btn btn-primary btn-see-more"><b>See More ></b></a>
+        <div id="discountedProductsCarousel" class="carousel slide" data-bs-ride="false">
+            <div class="carousel-inner">
+                <?php
+                if ($discounted_result) {
+                    $counter = 0;  // To count products and create new carousel items after every 4 products
+                    while ($discounted_product = mysqli_fetch_assoc($discounted_result)) {
+                        $stock_quantity = $discounted_product['stock_quantity'];
+                        $is_sold_out = $stock_quantity == 0;
 
-                    $image = isset($discounted_product['image']) && !empty($discounted_product['image'])
-                        ? 'products/' . htmlspecialchars($discounted_product['image'])
-                        : 'images/default-image.jpg';
+                        $image = isset($discounted_product['image']) && !empty($discounted_product['image'])
+                            ? 'products/' . htmlspecialchars($discounted_product['image'])
+                            : 'images/default-image.jpg';
 
-                    $product_name = htmlspecialchars($discounted_product['product_name']);
-                    $product_price = htmlspecialchars($discounted_product['price']);
-                    $product_discounted_price = htmlspecialchars($discounted_product['discounted_price']);
+                        $product_name = htmlspecialchars($discounted_product['product_name']);
+                        $product_price = htmlspecialchars($discounted_product['price']);
+                        $product_discounted_price = htmlspecialchars($discounted_product['discounted_price']);
 
-                    // Calculate discount percentage
-                    $discount_percentage = 0;
-                    if ($product_price > 0) {
-                        $discount_percentage = round((($product_price - $product_discounted_price) / $product_price) * 100);
-                    }
-            ?>
-                    <div class="col">
-                        <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
-                            <div class="image-container position-relative overflow-hidden">
-                                <!-- Discount Badge -->
-                                <?php if ($discount_percentage > 0): ?>
-                                    <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end" style="font-size: 0.9rem;">
-                                        <?php echo $discount_percentage; ?>% OFF
-                                    </div>
-                                <?php endif; ?>
-                                <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
-                                    alt="<?php echo $product_name; ?>"
-                                    style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
-                                <!-- Sold Out Badge -->
-                                <?php if ($is_sold_out): ?>
-                                    <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex justify-content-center align-items-center"
-                                        style="background: rgba(52, 51, 51, 0.7);">
-                                        <div class="sold-out-badge text-center bg-red px-2 py-0 rounded-pill shadow-sm"
-                                            style="color:rgb(253, 253, 255); font-weight: 550; border: 2px">
-                                            Sold Out
+                        // Calculate discount percentage
+                        $discount_percentage = 0;
+                        if ($product_price > 0) {
+                            $discount_percentage = round((($product_price - $product_discounted_price) / $product_price) * 100);
+                        }
+
+                        // Create a new carousel item every 4 products
+                        if ($counter % 4 == 0) {
+                            echo $counter == 0 ? '<div class="carousel-item active">' : '<div class="carousel-item">';
+                            echo '<div class="row row-cols-1 row-cols-md-4 g-4">';
+                        }
+                ?>
+                        <div class="col">
+                            <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
+                                <div class="image-container position-relative overflow-hidden">
+                                    <!-- Discount Badge -->
+                                    <?php if ($discount_percentage > 0): ?>
+                                        <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end" style="font-size: 0.9rem;">
+                                            <?php echo $discount_percentage; ?>% OFF
                                         </div>
-                                    </div>
-                                <?php endif; ?>
-
-
-                                <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
-                                    <?php if (!$is_sold_out): ?>
-                                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                                            <input type="hidden" name="product_id" value="<?php echo $discounted_product['product_id']; ?>">
-                                            <input type="hidden" name="product_name" value="<?php echo $product_name; ?>">
-                                            <input type="hidden" name="product_price" value="<?php echo $product_discounted_price; ?>">
-                                            <input type="hidden" name="product_image" value="<?php echo $image; ?>">
-
-                                            <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
-                                                <i class="fa fa-cart-plus"></i>
-                                            </button>
-                                            <a href="product_details.php?product_id=<?php echo $discounted_product['product_id']; ?>" class="btn btn-light btn-sm">
-                                                <i class="fa fa-info-circle"></i>
-                                            </a>
-                                        </form>
                                     <?php endif; ?>
-                                </div>
-                            </div>
-                            <div class="card-body d-flex flex-column justify-content-between">
-                                <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
-                                <div class="pricing mb-3">
-                                    <h6 class="normal-price text-muted">
-                                        <del>$<?php echo number_format($product_price, 2); ?></del>
-                                    </h6>
-                                    <h6 class="discount-price text-danger fw-bold">
-                                        $<?php echo number_format($product_discounted_price, 2); ?>
-                                    </h6>
-                                </div>
+                                    <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
+                                        alt="<?php echo $product_name; ?>"
+                                        style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
+                                    <!-- Sold Out Badge -->
+                                    <?php if ($is_sold_out): ?>
+                                        <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex justify-content-center align-items-center"
+                                            style="background: rgba(52, 51, 51, 0.7);">
+                                            <div class="sold-out-badge text-center bg-red px-2 py-0 rounded-pill shadow-sm"
+                                                style="color:rgb(253, 253, 255); font-weight: 550; border: 2px">
+                                                Sold Out
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
 
+                                    <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
+                                        <?php if (!$is_sold_out): ?>
+                                            <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                                                <input type="hidden" name="product_id" value="<?php echo $discounted_product['product_id']; ?>">
+                                                <input type="hidden" name="product_name" value="<?php echo $product_name; ?>">
+                                                <input type="hidden" name="product_price" value="<?php echo $product_discounted_price; ?>">
+                                                <input type="hidden" name="product_image" value="<?php echo $image; ?>">
+
+                                                <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
+                                                    <i class="fa fa-cart-plus"></i>
+                                                </button>
+                                                <a href="product_details.php?product_id=<?php echo $discounted_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                                    <i class="fa fa-info-circle"></i>
+                                                </a>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="card-body d-flex flex-column justify-content-between">
+                                    <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
+                                    <div class="pricing mb-3">
+                                        <h6 class="normal-price text-muted">
+                                            <del>$<?php echo number_format($product_price, 2); ?></del>
+                                        </h6>
+                                        <h6 class="discount-price text-danger fw-bold">
+                                            $<?php echo number_format($product_discounted_price, 2); ?>
+                                        </h6>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-            <?php
+
+                <?php
+                        $counter++;
+                        // Close carousel item after every 4 products or at the end
+                        if ($counter % 4 == 0 || $counter == mysqli_num_rows($discounted_result)) {
+                            echo '</div></div>';
+                        }
+                    }
+                } else {
+                    echo '<p class="text-center text-muted">No discounted products found.</p>';
                 }
-            } else {
-                echo '<p class="text-center text-muted">No discounted products found.</p>';
-            }
-            ?>
+                ?>
+            </div>
+
+
+            <!-- Carousel Controls for Discounted Products -->
+            <button class="carousel-control-prev1" type="button" data-bs-target="#discountedProductsCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next1" type="button" data-bs-target="#discountedProductsCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
-
-
 
         <!-- Category Section -->
         <div class="container my-5">
@@ -410,7 +430,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
         <!-- Carousel for Popular Products -->
+      
         <div id="popularProductsCarousel" class="carousel slide" data-bs-ride="false">
+        <a href="popular_product.php" class="btn btn-primary btn-see-more"><b>See More ></b></a>
             <div class="carousel-inner">
                 <?php
                 $popular_query = "SELECT * FROM products WHERE subcategory = 'popular' ORDER BY created_at";
@@ -484,6 +506,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <!-- Carousel Controls for Popular Products -->
+           
             <button class="carousel-control-prev1" type="button" data-bs-target="#popularProductsCarousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Previous</span>
@@ -495,7 +518,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <!-- Carousel for Latest Products -->
+        
         <div id="latestProductsCarousel" class="carousel slide" data-bs-ride="false" style="display: none;">
+        <a href="latest_product.php" class="btn btn-primary btn-see-more"><b>See More ></b></a>
             <div class="carousel-inner">
                 <?php
                 $latest_query = "SELECT * FROM products WHERE subcategory = 'latest' ORDER BY created_at";
@@ -588,8 +613,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         </script>
 
-
+       
         <h2 class="mb-4 mt-5" style="font-family: 'Roboto', sans-serif; font-weight: 500;">Featured Products</h2>
+        <a href="featured_product.php" class="btn btn-primary btn-see-more"><b>See More ></b></a>
         <div id="featuredProductsCarousel" class="carousel slide" data-bs-ride="false">
             <div class="carousel-inner">
                 <?php
@@ -730,60 +756,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </section>
     </div>
-   <!-- Footer -->
-<footer class="bg-dark text-white py-5">
-    <div class="container">
-        <div class="row">
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">About Us</h5>
+                    <p class="text-muted">Fragrance Haven is your ultimate destination for high-quality perfumes that elevate your senses. Explore our wide range of fragrances designed to suit every occasion and personality.</p>
+                </div>
 
-            <div class="col-md-4 mb-4">
-                <h5 class="mb-3">About Us</h5>
-                <p class="text-muted">Fragrance Haven is your ultimate destination for high-quality perfumes that elevate your senses. Explore our wide range of fragrances designed to suit every occasion and personality.</p>
+                <div class="col-md-2 mb-4">
+                    <h5 class="mb-1">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="user_index.php" class="text-white text-decoration-none">Home</a></li>
+                        <li><a href="women_category.php" class="text-white text-decoration-none">Women’s Collection</a></li>
+                        <li><a href="men_category.php" class="text-white text-decoration-none">Men’s Collection</a></li>
+                        <li><a href="unisex_category.php" class="text-white text-decoration-none">Unisex Collection</a></li>
+                        <li><a href="about_us.php" class="text-white text-decoration-none">About Us</a></li>
+                        <li><a href="contact_us.php" class="text-white text-decoration-none">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-2 mb-4">
+                    <h5 class="mb-1">Customer Care</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="privacy_policy.php" class="text-white text-decoration-none">Privacy Policy</a></li>
+                        <li><a href="term_and_conditions.php" class="text-white text-decoration-none">Terms and Conditions</a></li>
+                        <li><a href="faq.php" class="text-white text-decoration-none">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <h5 class="mb-4">Contact Info</h5>
+                    <p class="text-muted"><i class="fas fa-map-marker-alt me-2"></i> Pyi Yeik Thar Street, Kamayut, Yangon, Myanmar</p>
+                    <p class="text-muted"><i class="fas fa-phone-alt me-2"></i> +959450197415</p>
+                    <p class="text-muted"><i class="fas fa-envelope me-2"></i> support@fragrancehaven.com</p>
+                </div>
             </div>
 
-            <div class="col-md-2 mb-4">
-                <h5 class="mb-1">Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="user_index.php" class="text-white text-decoration-none">Home</a></li>
-                    <li><a href="women_category.php" class="text-white text-decoration-none">Women’s Collection</a></li>
-                    <li><a href="men_category.php" class="text-white text-decoration-none">Men’s Collection</a></li>
-                    <li><a href="unisex_category.php" class="text-white text-decoration-none">Unisex Collection</a></li>
-                    <li><a href="about_us.php" class="text-white text-decoration-none">About Us</a></li>
-                    <li><a href="contact_us.php" class="text-white text-decoration-none">Contact Us</a></li>
-                </ul>
-            </div>
-
-            <div class="col-md-2 mb-4">
-                <h5 class="mb-1">Customer Care</h5>
-                <ul class="list-unstyled">
-                    <li><a href="privacy_policy.php" class="text-white text-decoration-none">Privacy Policy</a></li>
-                    <li><a href="term_and_conditions.php" class="text-white text-decoration-none">Terms and Conditions</a></li>
-                </ul>
-            </div>
-
-            <div class="col-md-3 mb-4">
-                <h5 class="mb-4">Contact Info</h5>
-                <p class="text-muted"><i class="fas fa-map-marker-alt me-2"></i> Pyi Yeik Thar Street, Kamayut, Yangon, Myanmar</p>
-                <p class="text-muted"><i class="fas fa-phone-alt me-2"></i> +959450197415</p>
-                <p class="text-muted"><i class="fas fa-envelope me-2"></i> support@fragrancehaven.com</p>
+            <div class="row mt-4 border-top pt-3">
+                <div class="col-md-6">
+                    <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="https://www.instagram.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-instagram fa-lg"></i></a>
+                    <a href="https://www.facebook.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-facebook fa-lg"></i></a>
+                    <a href="https://twitter.com/" class="text-white text-decoration-none" target="_blank"><i class="fab fa-twitter fa-lg"></i></a>
+                </div>
             </div>
         </div>
-
-        <div class="row mt-4 border-top pt-3">
-            <div class="col-md-6">
-                <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <a href="https://www.instagram.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-instagram fa-lg"></i></a>
-                <a href="https://www.facebook.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-facebook fa-lg"></i></a>
-                <a href="https://twitter.com/" class="text-white text-decoration-none" target="_blank"><i class="fab fa-twitter fa-lg"></i></a>
-            </div>
-        </div>
-    </div>
-</footer>
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+    </footer>
 
 </body>
 

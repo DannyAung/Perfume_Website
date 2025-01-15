@@ -1,126 +1,27 @@
 <?php
-// Check if user is logged in
+// Include the necessary files, such as header and session management
+session_start();
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>How to Spray Perfume | Your Perfume Website</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Delivery Information</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .section-header h1 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 36px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .video-container {
-            max-width: 800px;
-            margin: 0 auto;
-            margin-bottom: 40px;
-        }
-
-        .video-container iframe {
-            width: 100%;
-            height: 450px;
-            border-radius: 10px;
-        }
-
-        .content {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .content p {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        .content ol {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        .tips-list {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .tips-list li {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 10px;
-            padding-left: 25px;
-            position: relative;
-        }
-
-        .tips-list li::before {
-            content: '\2022';
-            color: #e74c3c;
-            font-size: 24px;
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
-
-        .call-to-action {
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .call-to-action h2 {
-            font-size: 30px;
-            font-family: 'Poppins', sans-serif;
-            color: #e74c3c;
-        }
-
-        .call-to-action p {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .btn-gradient {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            font-size: 18px;
-            padding: 12px 40px;
-            border-radius: 50px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-gradient:hover {
-            background: linear-gradient(135deg, #c0392b, #e74c3c);
-        }
-
-        footer {
-            background-color: #333;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 14px;
-        }
     </style>
+</head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
 </head>
 
 <body>
@@ -188,46 +89,55 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             </div>
         </div>
     </nav>
-    <!-- Header -->
-    <header class="container my-5">
-        <div class="section-header">
-            <h1>How to Spray Perfume Effectively</h1>
-        </div>
-    </header>
 
-    <!-- YouTube Video Section -->
-    <div class="container">
-        <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/KTrgDAlkt4E" title="How to Spray Perfume" allowfullscreen></iframe>
+   <!-- Delivery Information Section -->
+<div class="container mt-5">
+    <h2 class="text-center mb-4" style="font-size: 2.5rem; color: #343a40; font-weight: 600;">Delivery Information</h2>
+    <p class="text-center mb-5" style="font-size: 1.1rem; color: #555;">
+        We offer fast and reliable delivery for your convenience.
+    </p>
+
+    <!-- Delivery Timeframes -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-light">
+                <div class="card-body">
+                    <h4 class="card-title text-center" style="font-size: 1.5rem; color:rgb(23, 79, 139);">Delivery Timeframes</h4>
+                    <ul class="list-unstyled">
+                        <li style="font-size: 1.1rem; margin-bottom: 10px;">
+                            <b>Standard [Yangon]:</b> <span style="color:rgb(1, 2, 10);">Within 2-3 days</span>
+                        </li>
+                        <li style="font-size: 1.1rem; margin-bottom: 10px;">
+                            <b>Standard [Other Cities]:</b> <span style="color:rgb(14, 24, 16);">Within 3-5 days</span>
+                        </li>
+                        <li style="font-size: 1.1rem; margin-bottom: 10px;">
+                            <b>Express [Yangon/Other Cities]:</b> <span style="color: #ff5733;">Within 1 day</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Content Section -->
-    <div class="container content">
-        <h2>Step-by-Step Guide</h2>
-        <p>Learn the best techniques for applying perfume to ensure a lasting fragrance. Follow these steps to enhance your fragrance application:</p>
-        <ol>
-            <li><strong>Prep Your Skin:</strong> Apply perfume on clean, moisturized skin. This helps the fragrance last longer.</li>
-            <li><strong>Spray on Pulse Points:</strong> Target areas like the wrist, behind the ears, and the base of your throat for a longer-lasting scent.</li>
-            <li><strong>Don’t Rub:</strong> Avoid rubbing your wrist together after spraying. This can break down the scent molecules.</li>
-            <li><strong>Keep a Safe Distance:</strong> Hold the perfume bottle about 6-8 inches away from your skin for an even spray.</li>
-        </ol>
-
-        <h3>Perfume Tips</h3>
-        <ul class="tips-list">
-            <li>For a more intense fragrance, consider spraying on your clothes as well.</li>
-            <li>Choose the right fragrance for the occasion: lighter scents for daytime and richer scents for evening.</li>
-            <li>Store your perfume in a cool, dark place to preserve its longevity.</li>
-        </ul>
-
-        <!-- Call-to-Action Section -->
-        <div class="call-to-action">
-            <h2>Ready to Choose Your Perfect Scent?</h2>
-            <p>Explore our wide collection of perfumes and find your new favorite fragrance today!</p>
-            <a href="user_index.php" class="btn-gradient">Shop Now</a>
-        </div><br>
+    <!-- How Delivery Works -->
+    <div class="row justify-content-center mt-5">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-light">
+                <div class="card-body">
+                    <h4 class="card-title text-center" style="font-size: 1.5rem; color:rgb(12, 70, 132);">How Delivery Works</h4>
+                    <p style="font-size: 1.1rem; color: #555;">
+                        Once your order is placed, we process it and dispatch it as soon as possible. You will receive a tracking number once your order is on its way.
+                    </p>
+                    <p style="font-size: 1.1rem; color: #555;">
+                        If you have any questions or concerns about delivery, feel free to <a href="contact_us.php" class="text-decoration-none" style="color: #007bff;">contact us</a>!
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
-    <footer class="bg-dark text-white py-5">
+</div><br>
+
+<footer class="bg-dark text-white py-5">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
@@ -276,15 +186,6 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             </div>
         </div>
     </footer>
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

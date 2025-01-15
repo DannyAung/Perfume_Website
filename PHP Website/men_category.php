@@ -33,7 +33,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
         <div class="container-fluid">
             <!-- Logo and Brand -->
             <a class="navbar-brand d-flex align-items-center" href="user_index.php">
@@ -83,7 +83,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                     <!-- Login and Cart Buttons -->
                     <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
                         <?php if (!$is_logged_in): ?>
-                            <a href="user_login.php" class="btn login-btn me-3">Login/Register</a>
+                            <a href="user_login.php" class="btn login-btn me-3 ">Login/Register</a>
                         <?php endif; ?>
                         <!-- Favorite Link -->
                         <a class="nav-link d-flex align-items-center justify-content-center mx-lg-3 my-2 my-lg-0" href="favorite.php">
@@ -256,11 +256,11 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                                                 style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
                                                 <?php if (!$is_sold_out): ?>
                                                     <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                                                        <input type="hidden" name="product_id" value="<?php echo $popular_product['product_id']; ?>">
+                                                        <input type="hidden" name="product_id" value="<?php echo $men_product['product_id']; ?>">
                                                         <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
                                                             <i class="fa fa-cart-plus"></i>
                                                         </button>
-                                                        <a href="product_details.php?product_id=<?php echo $popular_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                                        <a href="product_details.php?product_id=<?php echo $men_product['product_id']; ?>" class="btn btn-light btn-sm">
                                                             <i class="fa fa-info-circle"></i>
                                                         </a>
                                                     </form>
@@ -296,57 +296,55 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                 });
             });
         </script>
+ <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">About Us</h5>
+                    <p class="text-muted">Fragrance Haven is your ultimate destination for high-quality perfumes that elevate your senses. Explore our wide range of fragrances designed to suit every occasion and personality.</p>
+                </div>
 
-<footer class="bg-dark text-white py-5">
-    <div class="container">
-        <div class="row">
+                <div class="col-md-2 mb-4">
+                    <h5 class="mb-1">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="user_index.php" class="text-white text-decoration-none">Home</a></li>
+                        <li><a href="women_category.php" class="text-white text-decoration-none">Women’s Collection</a></li>
+                        <li><a href="men_category.php" class="text-white text-decoration-none">Men’s Collection</a></li>
+                        <li><a href="unisex_category.php" class="text-white text-decoration-none">Unisex Collection</a></li>
+                        <li><a href="about_us.php" class="text-white text-decoration-none">About Us</a></li>
+                        <li><a href="contact_us.php" class="text-white text-decoration-none">Contact Us</a></li>
+                    </ul>
+                </div>
 
-            <div class="col-md-4 mb-4">
-                <h5 class="mb-3">About Us</h5>
-                <p class="text-muted">Fragrance Haven is your ultimate destination for high-quality perfumes that elevate your senses. Explore our wide range of fragrances designed to suit every occasion and personality.</p>
+                <div class="col-md-2 mb-4">
+                    <h5 class="mb-1">Customer Care</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="privacy_policy.php" class="text-white text-decoration-none">Privacy Policy</a></li>
+                        <li><a href="term_and_conditions.php" class="text-white text-decoration-none">Terms and Conditions</a></li>
+                        <li><a href="faq.php" class="text-white text-decoration-none">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-md-3 mb-4">
+                    <h5 class="mb-4">Contact Info</h5>
+                    <p class="text-muted"><i class="fas fa-map-marker-alt me-2"></i> Pyi Yeik Thar Street, Kamayut, Yangon, Myanmar</p>
+                    <p class="text-muted"><i class="fas fa-phone-alt me-2"></i> +959450197415</p>
+                    <p class="text-muted"><i class="fas fa-envelope me-2"></i> support@fragrancehaven.com</p>
+                </div>
             </div>
 
-            <div class="col-md-2 mb-4">
-                <h5 class="mb-1">Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="user_index.php" class="text-white text-decoration-none">Home</a></li>
-                    <li><a href="women_category.php" class="text-white text-decoration-none">Women’s Collection</a></li>
-                    <li><a href="men_category.php" class="text-white text-decoration-none">Men’s Collection</a></li>
-                    <li><a href="unisex_category.php" class="text-white text-decoration-none">Unisex Collection</a></li>
-                    <li><a href="about_us.php" class="text-white text-decoration-none">About Us</a></li>
-                    <li><a href="contact_us.php" class="text-white text-decoration-none">Contact Us</a></li>
-                </ul>
-            </div>
-
-            <div class="col-md-2 mb-4">
-                <h5 class="mb-1">Customer Care</h5>
-                <ul class="list-unstyled">
-                    <li><a href="privacy_policy.php" class="text-white text-decoration-none">Privacy Policy</a></li>
-                    <li><a href="term_and_conditions.php" class="text-white text-decoration-none">Terms and Conditions</a></li>
-                </ul>
-            </div>
-
-            <div class="col-md-3 mb-4">
-                <h5 class="mb-4">Contact Info</h5>
-                <p class="text-muted"><i class="fas fa-map-marker-alt me-2"></i> Pyi Yeik Thar Street, Kamayut, Yangon, Myanmar</p>
-                <p class="text-muted"><i class="fas fa-phone-alt me-2"></i> +959450197415</p>
-                <p class="text-muted"><i class="fas fa-envelope me-2"></i> support@fragrancehaven.com</p>
+            <div class="row mt-4 border-top pt-3">
+                <div class="col-md-6">
+                    <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="https://www.instagram.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-instagram fa-lg"></i></a>
+                    <a href="https://www.facebook.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-facebook fa-lg"></i></a>
+                    <a href="https://twitter.com/" class="text-white text-decoration-none" target="_blank"><i class="fab fa-twitter fa-lg"></i></a>
+                </div>
             </div>
         </div>
-
-        <div class="row mt-4 border-top pt-3">
-            <div class="col-md-6">
-                <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <a href="https://www.instagram.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-instagram fa-lg"></i></a>
-                <a href="https://www.facebook.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-facebook fa-lg"></i></a>
-                <a href="https://twitter.com/" class="text-white text-decoration-none" target="_blank"><i class="fab fa-twitter fa-lg"></i></a>
-            </div>
-        </div>
-    </div>
-</footer>
-
+    </footer>
 
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
