@@ -29,16 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($result->num_rows > 0) {
         $admin = $result->fetch_assoc();
-        //ChawNadi@2003!
-        $hash_code = password_hash($password, PASSWORD_BCRYPT);
-        echo "<br>" . $hash_code;
-        echo "<br>" . strlen($hash_code);
         // Verify the password
-        /* The line `if ( === ['password']) {` is checking if the plain text password
-        provided by the user matches the hashed password stored in the database for the admin
-        account. */
-        // if ($password === $admin['password']) {
-            if (password_verify($password, $admin['password'])) {
+        if (password_verify($password, $admin['password'])) {
             // Store admin data in session
             $_SESSION['admin_id'] = $admin['admin_id'];
             $_SESSION['username'] = $admin['username'];
@@ -46,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             echo "Login successful! Welcome, " . $admin['username'] . ".";
             // Redirect to admin dashboard
-            $_SESSION['admin_logged_in']=true;
+            $_SESSION['admin_logged_in'] = true;
             header("Location: admin_index.php");
             exit;
         } else {
@@ -70,19 +62,89 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .login-container label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            text-align: left;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .login-container button {
+            width: 426px;
+            padding: 0.75rem;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .login-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .login-container .error-message {
+            color: #ff0000;
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Admin Login</h1>
-    <form action="admin_login.php" method="POST">
-        <label for="email">Email:</label><br>
-        <input type="email" name="email" id="email" required><br><br>
+    <div class="login-container">
+        <h1>Admin Login</h1>
+        <?php
+        if (isset($_SESSION['error_message'])) {
+            echo '<div class="error-message">' . $_SESSION['error_message'] . '</div>';
+            unset($_SESSION['error_message']);
+        }
+        ?>
+        <form action="admin_login.php" method="POST">
+            <label for="email">Email:</label>
+            <input type="email" name="email" id="email" required>
 
-        <label for="password">Password:</label><br>
-        <input type="password" name="password" id="password" required><br><br>
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" required>
 
-        <button type="submit">Login</button>
-    </form>
+            <button type="submit">Login</ button>
+        </form>
+    </div>
 </body>
 
 </html>

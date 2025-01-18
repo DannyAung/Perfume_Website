@@ -38,6 +38,12 @@ if (isset($_POST['delete_product'])) {
     $stmt->execute();
     $stmt->close();
 
+    $delete_reviews_query = "DELETE FROM reviews WHERE product_id = ?";
+    $stmt = $conn->prepare($delete_reviews_query);
+    $stmt->bind_param("i", $product_id);
+    $stmt->execute();
+    $stmt->close();
+
     // Delete related records from order_items table
     $delete_order_items_query = "DELETE FROM order_items WHERE product_id = ?";
     $stmt = $conn->prepare($delete_order_items_query);

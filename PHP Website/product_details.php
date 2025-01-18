@@ -1,8 +1,6 @@
 <?php
 session_start();  // Start the session to access session variables
 
-// Check if u
-
 require_once 'db_connection.php';  // Ensure the connection file is correct
 
 if (isset($_SESSION['user_id'])) {
@@ -66,7 +64,7 @@ if ($product_id) {
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
         <div class="container-fluid">
             <!-- Logo and Brand -->
             <a class="navbar-brand d-flex align-items-center" href="user_index.php">
@@ -247,12 +245,64 @@ if ($product_id) {
 
                     </div>
                 </div>
+                <?php
+                // Fetch related products based on the same category and excluding sold-out items
+                $related_sql = "SELECT * FROM products WHERE category = :category AND product_id != :product_id AND stock_quantity > 0 LIMIT 4";
+                $related_stmt = $conn->prepare($related_sql);
+                $related_stmt->bindParam(':category', $product['category'], PDO::PARAM_STR); // Bind category of the current product
+                $related_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+                $related_stmt->execute();
+                $related_products = $related_stmt->fetchAll(PDO::FETCH_ASSOC);
+                ?>
 
                 <!-- Product Description-->
                 <div class="row mt-4">
                     <div class="col-12" style="font-family: 'Roboto', sans-serif; font-size: 16px;">
                         <h6 style="font-family: 'Poppins', sans-serif; font-size: 18px; color: #333;"><strong>Description</strong></h6>
                         <p><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
+                    </div>
+                </div>
+                <!-- You May Also Like Section -->
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <h6 style="font-family: 'Poppins', sans-serif; font-size: 18px; color: #333;"><strong>You may also like</strong></h6>
+                        <div class="row">
+                            <?php
+                            // Fetch related products based on the same category and excluding sold-out items
+                            $related_sql = "SELECT * FROM products WHERE category = :category AND product_id != :product_id AND stock_quantity > 0 LIMIT 4";
+                            $related_stmt = $conn->prepare($related_sql);
+                            $related_stmt->bindParam(':category', $product['category'], PDO::PARAM_STR); // Bind category of the current product
+                            $related_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+                            $related_stmt->execute();
+                            $related_products = $related_stmt->fetchAll(PDO::FETCH_ASSOC);
+                            ?>
+
+                            <?php if ($related_products): ?>
+                                <?php foreach ($related_products as $related_product): ?>
+                                    <div class="col-md-3 mb-3">
+                                        <div class="card">
+                                            <img src="products/<?php echo htmlspecialchars($related_product['image']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($related_product['product_name']); ?>">
+                                            <div class="card-body">
+                                                <h5 class="card-title"><?php echo htmlspecialchars($related_product['product_name']); ?></h5>
+
+                                                <?php if ($related_product['subcategory'] === 'discount' && isset($related_product['discounted_price']) && $related_product['discounted_price'] < $related_product['price']): ?>
+                                                    <!-- Display Discount Price -->
+                                                    <p class="text-muted"><del>$<?php echo number_format($related_product['price'], 2); ?></del></p>
+                                                    <p class="card-text text-danger"><strong>$<?php echo number_format($related_product['discounted_price'], 2); ?></strong></p>
+                                                <?php else: ?>
+                                                    <!-- Regular Price -->
+                                                    <p class="card-text">$<?php echo number_format($related_product['price'], 2); ?></p>
+                                                <?php endif; ?>
+
+                                                <a href="product_details.php?product_id=<?php echo $related_product['product_id']; ?>" class="btn btn-primary">View Details</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p>No related products found.</p>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
 
@@ -309,55 +359,55 @@ if ($product_id) {
                 });
             });
         </script>
- <footer class="bg-dark text-white py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="mb-3">About Us</h5>
-                    <p class="text-muted">Fragrance Haven is your ultimate destination for high-quality perfumes that elevate your senses. Explore our wide range of fragrances designed to suit every occasion and personality.</p>
+        <footer class="bg-dark text-white py-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <h5 class="mb-3">About Us</h5>
+                        <p class="text-muted">Fragrance Haven is your ultimate destination for high-quality perfumes that elevate your senses. Explore our wide range of fragrances designed to suit every occasion and personality.</p>
+                    </div>
+
+                    <div class="col-md-2 mb-4">
+                        <h5 class="mb-1">Quick Links</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="user_index.php" class="text-white text-decoration-none">Home</a></li>
+                            <li><a href="women_category.php" class="text-white text-decoration-none">Women’s Collection</a></li>
+                            <li><a href="men_category.php" class="text-white text-decoration-none">Men’s Collection</a></li>
+                            <li><a href="unisex_category.php" class="text-white text-decoration-none">Unisex Collection</a></li>
+                            <li><a href="about_us.php" class="text-white text-decoration-none">About Us</a></li>
+                            <li><a href="contact_us.php" class="text-white text-decoration-none">Contact Us</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-2 mb-4">
+                        <h5 class="mb-1">Customer Care</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="privacy_policy.php" class="text-white text-decoration-none">Privacy Policy</a></li>
+                            <li><a href="term_and_conditions.php" class="text-white text-decoration-none">Terms and Conditions</a></li>
+                            <li><a href="faq.php" class="text-white text-decoration-none">FAQ</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-3 mb-4">
+                        <h5 class="mb-4">Contact Info</h5>
+                        <p class="text-muted"><i class="fas fa-map-marker-alt me-2"></i> Pyi Yeik Thar Street, Kamayut, Yangon, Myanmar</p>
+                        <p class="text-muted"><i class="fas fa-phone-alt me-2"></i> +959450197415</p>
+                        <p class="text-muted"><i class="fas fa-envelope me-2"></i> support@fragrancehaven.com</p>
+                    </div>
                 </div>
 
-                <div class="col-md-2 mb-4">
-                    <h5 class="mb-1">Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="user_index.php" class="text-white text-decoration-none">Home</a></li>
-                        <li><a href="women_category.php" class="text-white text-decoration-none">Women’s Collection</a></li>
-                        <li><a href="men_category.php" class="text-white text-decoration-none">Men’s Collection</a></li>
-                        <li><a href="unisex_category.php" class="text-white text-decoration-none">Unisex Collection</a></li>
-                        <li><a href="about_us.php" class="text-white text-decoration-none">About Us</a></li>
-                        <li><a href="contact_us.php" class="text-white text-decoration-none">Contact Us</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-md-2 mb-4">
-                    <h5 class="mb-1">Customer Care</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="privacy_policy.php" class="text-white text-decoration-none">Privacy Policy</a></li>
-                        <li><a href="term_and_conditions.php" class="text-white text-decoration-none">Terms and Conditions</a></li>
-                        <li><a href="faq.php" class="text-white text-decoration-none">FAQ</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-md-3 mb-4">
-                    <h5 class="mb-4">Contact Info</h5>
-                    <p class="text-muted"><i class="fas fa-map-marker-alt me-2"></i> Pyi Yeik Thar Street, Kamayut, Yangon, Myanmar</p>
-                    <p class="text-muted"><i class="fas fa-phone-alt me-2"></i> +959450197415</p>
-                    <p class="text-muted"><i class="fas fa-envelope me-2"></i> support@fragrancehaven.com</p>
+                <div class="row mt-4 border-top pt-3">
+                    <div class="col-md-6">
+                        <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="https://www.instagram.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="https://www.facebook.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="https://twitter.com/" class="text-white text-decoration-none" target="_blank"><i class="fab fa-twitter fa-lg"></i></a>
+                    </div>
                 </div>
             </div>
-
-            <div class="row mt-4 border-top pt-3">
-                <div class="col-md-6">
-                    <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="https://www.instagram.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-instagram fa-lg"></i></a>
-                    <a href="https://www.facebook.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-facebook fa-lg"></i></a>
-                    <a href="https://twitter.com/" class="text-white text-decoration-none" target="_blank"><i class="fab fa-twitter fa-lg"></i></a>
-                </div>
-            </div>
-        </div>
-    </footer>
+        </footer>
 
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

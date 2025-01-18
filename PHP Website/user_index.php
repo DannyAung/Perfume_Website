@@ -212,9 +212,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <li class="nav-item">
                     <a class="nav-link" href="contact_us.php">Contact</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="user_chat.php">Chat</a>
-                </li>
             </ul>
         </div>
     </div>
@@ -248,53 +245,257 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <span class="visually-hidden">Next</span>
         </button>
     </div>
-
-
-    <!-- Product Grid -->
+    <!-- Category Section -->
     <div class="container my-5">
-        <h1 class="text-center mb-4" style="font-family: 'Playfair Display', serif;"><b>Our Products</b></h1>
-        <a href="discounted_product.php" class="btn btn-primary btn-see-more"><b>See More ></b></a>
-        <div id="discountedProductsCarousel" class="carousel slide" data-bs-ride="false">
-            <div class="carousel-inner">
-                <?php
-                if ($discounted_result) {
-                    $counter = 0;  // To count products and create new carousel items after every 4 products
-                    while ($discounted_product = mysqli_fetch_assoc($discounted_result)) {
-                        $stock_quantity = $discounted_product['stock_quantity'];
+        <h2 class="text-center mb-7 mt-7" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #2c3e50;">Browse by Category</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <!-- Men Category -->
+            <div class="col">
+                <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
+                    <div class="position-relative">
+                        <video class="card-img-top" autoplay muted loop style="height: 250px; object-fit: cover;">
+                            <source src="videos/video8.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                            <a href="men_category.php" class="btn btn-light btn-lg rounded-pill">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #34495e;">Men</h5>
+                        <p class="card-text text-muted">Explore our collection of men's products.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Women Category -->
+            <div class="col">
+                <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
+                    <div class="position-relative">
+                        <video class="card-img-top" autoplay muted loop style="height: 250px; object-fit: cover;">
+                            <source src="videos/video6.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                            <a href="women_category.php" class="btn btn-light btn-lg rounded-pill">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #34495e;">Women</h5>
+                        <p class="card-text text-muted">Discover elegant products for women.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unisex Category -->
+            <div class="col">
+                <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
+                    <div class="position-relative">
+                        <video class="card-img-top" autoplay muted loop style="height: 250px; object-fit: cover;">
+                            <source src="videos/video7.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                            <a href="unisex_category.php" class="btn btn-light btn-lg rounded-pill">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #34495e;">Unisex</h5>
+                        <p class="card-text text-muted">Browse unisex products suitable for everyone.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Product Grid -->
+        <div class="container my-5">
+            <h2 class="text-center mb-6" style="font-family: 'Cinzel', serif; font-weight: 600; font-size: 2rem; color: #333;">
+                <b>Exclusive Discounts Just for You!</b>
+            </h2>
+            <p class="text-center text-muted mb-3" style="font-size: 1.2rem;">
+                Don't miss out on these limited-time offers. Indulge in luxury at unbeatable prices.
+            </p>
+            <a href="discounted_product.php" class="btn btn-primary1 btn-see-more"><b>See More</b></a>
+            <div id="discountedProductsCarousel" class="carousel slide" data-bs-ride="false">
+                <div class="carousel-inner">
+                    <?php
+                    if ($discounted_result) {
+                        $counter = 0;  // To count products and create new carousel items after every 4 products
+                        while ($discounted_product = mysqli_fetch_assoc($discounted_result)) {
+                            $stock_quantity = $discounted_product['stock_quantity'];
+                            $is_sold_out = $stock_quantity == 0;
+
+                            $image = isset($discounted_product['image']) && !empty($discounted_product['image'])
+                                ? 'products/' . htmlspecialchars($discounted_product['image'])
+                                : 'images/default-image.jpg';
+
+                            $product_name = htmlspecialchars($discounted_product['product_name']);
+                            $product_price = htmlspecialchars($discounted_product['price']);
+                            $product_discounted_price = htmlspecialchars($discounted_product['discounted_price']);
+
+                            // Calculate discount percentage
+                            $discount_percentage = 0;
+                            if ($product_price > 0) {
+                                $discount_percentage = round((($product_price - $product_discounted_price) / $product_price) * 100);
+                            }
+
+                            // Create a new carousel item every 4 products
+                            if ($counter % 4 == 0) {
+                                echo $counter == 0 ? '<div class="carousel-item active">' : '<div class="carousel-item">';
+                                echo '<div class="row row-cols-1 row-cols-md-4 g-4">';
+                            }
+                    ?>
+                            <div class="col">
+                                <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
+                                    <div class="image-container position-relative overflow-hidden">
+                                        <!-- Discount Badge -->
+                                        <?php if ($discount_percentage > 0): ?>
+                                            <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end" style="font-size: 0.9rem;">
+                                                <?php echo $discount_percentage; ?>% OFF
+                                            </div>
+                                        <?php endif; ?>
+                                        <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
+                                            alt="<?php echo $product_name; ?>"
+                                            style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
+                                        <!-- Sold Out Badge -->
+                                        <?php if ($is_sold_out): ?>
+                                            <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex justify-content-center align-items-center"
+                                                style="background: rgba(52, 51, 51, 0.7);">
+                                                <div class="sold-out-badge text-center bg-red px-2 py-0 rounded-pill shadow-sm"
+                                                    style="color:rgb(253, 253, 255); font-weight: 550; border: 2px">
+                                                    Sold Out
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
+                                            <?php if (!$is_sold_out): ?>
+                                                <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                                                    <input type="hidden" name="product_id" value="<?php echo $discounted_product['product_id']; ?>">
+                                                    <input type="hidden" name="product_name" value="<?php echo $product_name; ?>">
+                                                    <input type="hidden" name="product_price" value="<?php echo $product_discounted_price; ?>">
+                                                    <input type="hidden" name="product_image" value="<?php echo $image; ?>">
+
+                                                    <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
+                                                        <i class="fa fa-cart-plus"></i>
+                                                    </button>
+                                                    <a href="product_details.php?product_id=<?php echo $discounted_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                                        <i class="fa fa-info-circle"></i>
+                                                    </a>
+                                                </form>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    <div class="card-body d-flex flex-column justify-content-between">
+                                        <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
+                                        <div class="pricing mb-3">
+                                            <h6 class="normal-price text-muted">
+                                                <del>$<?php echo number_format($product_price, 2); ?></del>
+                                            </h6>
+                                            <h6 class="discount-price text-danger fw-bold">
+                                                $<?php echo number_format($product_discounted_price, 2); ?>
+                                            </h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                    <?php
+                            $counter++;
+                            // Close carousel item after every 4 products or at the end
+                            if ($counter % 4 == 0 || $counter == mysqli_num_rows($discounted_result)) {
+                                echo '</div></div>';
+                            }
+                        }
+                    } else {
+                        echo '<p class="text-center text-muted">No discounted products found.</p>';
+                    }
+                    ?>
+                </div>
+
+
+                <!-- Carousel Controls for Discounted Products -->
+                <button class="carousel-control-prev1" type="button" data-bs-target="#discountedProductsCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next1" type="button" data-bs-target="#discountedProductsCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div><br><br>
+
+
+            <h2 class="text-center mb-4" style="font-family: 'Cinzel', serif; font-weight: 600; font-size: 2rem; color: #333;">
+                <b>Step Into Our World of Elegance</b>
+            </h2>
+            <p class="text-center text-muted mb-2" style="font-size: 1.2rem;">
+                Be the first to explore our latest collections. Fresh scents and stunning designs await you!
+            </p>
+
+            <div class="latest mb-3 d-flex align-items-center">
+                <div class="video-advertisement mb-5 text-center">
+                    <video autoplay muted loop class="shadow rounded" style="width: 90%;  border-radius: 15px; object-fit: cover; height:360px; margin-right:230px; margin-top:30px;">
+                        <source src="./videos/video5.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="text-left" style="width: 50%; margin-left:10px;">
+                    <h3><b>Popular</b></h3>
+                    <p class="text-muted mt-1">Experience the essence of our popular scent</p>
+                    <a href="latest_product.php" class="btn btn-primary mt-1">See More</a>
+                </div>
+            </div>
+
+            <div class="latest mb-1 d-flex align-items-center">
+                <div class="text-right" style="width: 50%; margin-left:170px;">
+                    <h3><b>New Arrival</b></h3>
+                    <p class="text-muted mt-2">Experience the essence of our new arrival scent</p>
+
+                    <a href="popular_product.php" class="btn btn-primary mt-1">See More</a>
+                </div>
+
+                <div class="video-advertisement mb-5 text-center">
+                    <video autoplay muted loop class="shadow rounded" style="width: 100%;  border-radius: 15px; object-fit: cover; height:400px; margin-right:230px;">
+                        <source src="./videos/video2.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+
+            <!-- Featured Products Section -->
+            <h2 class="mb-2 mt-2" style="font-family: 'Roboto', sans-serif; font-weight: 500; "><b>Featured Products</b></h2>
+            <a href="featured_product.php" class="btn btn-primary1 btn-see-more"><b>See More </b></a>
+            <div id="featuredProductsCarousel" class="carousel slide" data-bs-ride="false">
+                <div class="carousel-inner">
+                    <?php
+                    $featured_query = "SELECT * FROM products WHERE subcategory = 'featured' ORDER BY created_at";
+                    $featured_result = mysqli_query($conn, $featured_query);
+
+                    $counter = 0;
+                    while ($featured_product = mysqli_fetch_assoc($featured_result)) {
+                        $stock_quantity = $featured_product['stock_quantity'];
                         $is_sold_out = $stock_quantity == 0;
 
-                        $image = isset($discounted_product['image']) && !empty($discounted_product['image'])
-                            ? 'products/' . htmlspecialchars($discounted_product['image'])
+                        $image = isset($featured_product['image']) && !empty($featured_product['image'])
+                            ? 'products/' . htmlspecialchars($featured_product['image'])
                             : 'images/default-image.jpg';
 
-                        $product_name = htmlspecialchars($discounted_product['product_name']);
-                        $product_price = htmlspecialchars($discounted_product['price']);
-                        $product_discounted_price = htmlspecialchars($discounted_product['discounted_price']);
+                        $product_name = htmlspecialchars($featured_product['product_name']);
+                        $product_price = htmlspecialchars($featured_product['price']);
 
-                        // Calculate discount percentage
-                        $discount_percentage = 0;
-                        if ($product_price > 0) {
-                            $discount_percentage = round((($product_price - $product_discounted_price) / $product_price) * 100);
-                        }
-
-                        // Create a new carousel item every 4 products
                         if ($counter % 4 == 0) {
                             echo $counter == 0 ? '<div class="carousel-item active">' : '<div class="carousel-item">';
                             echo '<div class="row row-cols-1 row-cols-md-4 g-4">';
                         }
-                ?>
+                    ?>
                         <div class="col">
                             <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
                                 <div class="image-container position-relative overflow-hidden">
-                                    <!-- Discount Badge -->
-                                    <?php if ($discount_percentage > 0): ?>
-                                        <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end" style="font-size: 0.9rem;">
-                                            <?php echo $discount_percentage; ?>% OFF
-                                        </div>
-                                    <?php endif; ?>
                                     <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
                                         alt="<?php echo $product_name; ?>"
                                         style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
+
                                     <!-- Sold Out Badge -->
                                     <?php if ($is_sold_out): ?>
                                         <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex justify-content-center align-items-center"
@@ -306,455 +507,125 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         </div>
                                     <?php endif; ?>
 
-                                    <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
+                                    <!-- Hover Overlay -->
+                                    <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+                                        style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
                                         <?php if (!$is_sold_out): ?>
                                             <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                                                <input type="hidden" name="product_id" value="<?php echo $discounted_product['product_id']; ?>">
-                                                <input type="hidden" name="product_name" value="<?php echo $product_name; ?>">
-                                                <input type="hidden" name="product_price" value="<?php echo $product_discounted_price; ?>">
-                                                <input type="hidden" name="product_image" value="<?php echo $image; ?>">
-
+                                                <input type="hidden" name="product_id" value="<?php echo $featured_product['product_id']; ?>">
                                                 <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
                                                     <i class="fa fa-cart-plus"></i>
                                                 </button>
-                                                <a href="product_details.php?product_id=<?php echo $discounted_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                                <a href="product_details.php?product_id=<?php echo $featured_product['product_id']; ?>" class="btn btn-light btn-sm">
                                                     <i class="fa fa-info-circle"></i>
                                                 </a>
                                             </form>
                                         <?php endif; ?>
                                     </div>
+
                                 </div>
-                                <div class="card-body d-flex flex-column justify-content-between">
+                                <div class="card-body d-flex flex-column">
                                     <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
-                                    <div class="pricing mb-3">
-                                        <h6 class="normal-price text-muted">
-                                            <del>$<?php echo number_format($product_price, 2); ?></del>
-                                        </h6>
-                                        <h6 class="discount-price text-danger fw-bold">
-                                            $<?php echo number_format($product_discounted_price, 2); ?>
-                                        </h6>
-                                    </div>
+                                    <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
                                 </div>
                             </div>
                         </div>
-
-                <?php
+                    <?php
                         $counter++;
-                        // Close carousel item after every 4 products or at the end
-                        if ($counter % 4 == 0 || $counter == mysqli_num_rows($discounted_result)) {
+                        if ($counter % 4 == 0 || $counter == mysqli_num_rows($featured_result)) {
                             echo '</div></div>';
                         }
                     }
-                } else {
-                    echo '<p class="text-center text-muted">No discounted products found.</p>';
-                }
-                ?>
-            </div>
-
-
-            <!-- Carousel Controls for Discounted Products -->
-            <button class="carousel-control-prev1" type="button" data-bs-target="#discountedProductsCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next1" type="button" data-bs-target="#discountedProductsCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
-
-        <!-- Category Section -->
-        <div class="container my-5">
-            <h2 class="text-center mb-5 mt-5" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #2c3e50;">Browse by Category</h2>
-
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                <!-- Men Category -->
-                <div class="col">
-                    <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
-                        <div class="position-relative">
-                            <img src="images/men-category.jpg" class="card-img-top" alt="Men Products" style="height: 250px; object-fit: cover;">
-                            <div class="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                                <a href="men_category.php" class="btn btn-light btn-lg rounded-pill">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
-                            </div>
-                        </div>
-                        <div class="card-body p-4">
-                            <h5 class="card-title mb-3" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #34495e;">Men</h5>
-                            <p class="card-text text-muted">Explore our collection of men's products.</p>
-                        </div>
-                    </div>
+                    ?>
                 </div>
 
-                <!-- Women Category -->
-                <div class="col">
-                    <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
-                        <div class="position-relative">
-                            <img src="images/women-category.jpg" class="card-img-top" alt="Women Products" style="height: 250px; object-fit: cover;">
-                            <div class="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                                <a href="women_category.php" class="btn btn-light btn-lg rounded-pill">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
-                            </div>
-                        </div>
-                        <div class="card-body p-4">
-                            <h5 class="card-title mb-3" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #34495e;">Women</h5>
-                            <p class="card-text text-muted">Discover elegant products for women.</p>
-                        </div>
-                    </div>
-                </div>
+                <!-- Carousel Controls for Featured Products -->
+                <button class="carousel-control-prev1" type="button" data-bs-target="#featuredProductsCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next1" type="button" data-bs-target="#featuredProductsCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div><br>
+            <script>
+                const productCards = document.querySelectorAll('.product-card .image-container');
+                productCards.forEach(card => {
+                    card.addEventListener('mouseover', () => {
+                        card.querySelector('.hover-overlay').style.opacity = '1';
+                        card.querySelector('img').style.transform = 'scale(1.1)';
+                    });
 
-                <!-- Unisex Category -->
-                <div class="col">
-                    <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
-                        <div class="position-relative">
-                            <img src="images/unisex-category.jpg" class="card-img-top" alt="Unisex Products" style="height: 250px; object-fit: cover;">
-                            <div class="overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                                <a href="unisex_category.php" class="btn btn-light btn-lg rounded-pill">Shop Now <i class="fa fa-arrow-right ms-2"></i></a>
-                            </div>
-                        </div>
-                        <div class="card-body p-4">
-                            <h5 class="card-title mb-3" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #34495e;">Unisex</h5>
-                            <p class="card-text text-muted">Browse unisex products suitable for everyone.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <h2 class="text-center mb-4 mt-5"></h2>
-        <div class="d-flex justify-content-center mb-4 gap-3">
-            <button id="popularBtn" class="btn btn-dark px-4 py-2 rounded-pill" onclick="showPopular()">
-                <i class="fa fa-star me-2"></i> Popular
-            </button>
-            <button id="latestBtn" class="btn btn-outline-dark px-4 py-2 rounded-pill" onclick="showLatest()">
-                <i class="fa fa-clock me-2"></i> New Arrival
-            </button>
-        </div>
-
-
-        <!-- Carousel for Popular Products -->
-      
-        <div id="popularProductsCarousel" class="carousel slide" data-bs-ride="false">
-        <a href="popular_product.php" class="btn btn-primary btn-see-more"><b>See More ></b></a>
-            <div class="carousel-inner">
-                <?php
-                $popular_query = "SELECT * FROM products WHERE subcategory = 'popular' ORDER BY created_at";
-                $popular_result = mysqli_query($conn, $popular_query);
-
-                $counter = 0;
-                while ($popular_product = mysqli_fetch_assoc($popular_result)) {
-                    $stock_quantity = $popular_product['stock_quantity'];
-                    $is_sold_out = $stock_quantity == 0;
-
-                    $image = isset($popular_product['image']) && !empty($popular_product['image'])
-                        ? 'products/' . htmlspecialchars($popular_product['image'])
-                        : 'images/default-image.jpg';
-
-                    $product_name = htmlspecialchars($popular_product['product_name']);
-                    $product_price = htmlspecialchars($popular_product['price']);
-
-                    if ($counter % 4 == 0) {
-                        echo $counter == 0 ? '<div class="carousel-item active">' : '<div class="carousel-item">';
-                        echo '<div class="row row-cols-1 row-cols-md-4 g-4">';
-                    }
-                ?>
-                    <div class="col">
-                        <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
-                            <div class="image-container position-relative overflow-hidden">
-                                <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
-                                    alt="<?php echo $product_name; ?>"
-                                    style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
-
-                                <!-- Sold Out Badge -->
-                                <?php if ($is_sold_out): ?>
-                                    <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex justify-content-center align-items-center"
-                                        style="background: rgba(52, 51, 51, 0.7);">
-                                        <div class="sold-out-badge text-center bg-red px-2 py-0 rounded-pill shadow-sm"
-                                            style="color:rgb(253, 253, 255); font-weight: 550; border: 2px">
-                                            Sold Out
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
-
-                                <!-- Hover Overlay -->
-                                <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-                                    style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
-                                    <?php if (!$is_sold_out): ?>
-                                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                                            <input type="hidden" name="product_id" value="<?php echo $popular_product['product_id']; ?>">
-                                            <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
-                                                <i class="fa fa-cart-plus"></i>
-                                            </button>
-                                            <a href="product_details.php?product_id=<?php echo $popular_product['product_id']; ?>" class="btn btn-light btn-sm">
-                                                <i class="fa fa-info-circle"></i>
-                                            </a>
-                                        </form>
-                                    <?php endif; ?>
-                                </div>
-
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
-                                <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-                            </div>
-                        </div>
-                    </div>
-                <?php
-                    $counter++;
-                    if ($counter % 4 == 0 || $counter == mysqli_num_rows($popular_result)) {
-                        echo '</div></div>';
-                    }
-                }
-                ?>
-            </div>
-
-            <!-- Carousel Controls for Popular Products -->
-           
-            <button class="carousel-control-prev1" type="button" data-bs-target="#popularProductsCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next1" type="button" data-bs-target="#popularProductsCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
-
-        <!-- Carousel for Latest Products -->
-        
-        <div id="latestProductsCarousel" class="carousel slide" data-bs-ride="false" style="display: none;">
-        <a href="latest_product.php" class="btn btn-primary btn-see-more"><b>See More ></b></a>
-            <div class="carousel-inner">
-                <?php
-                $latest_query = "SELECT * FROM products WHERE subcategory = 'latest' ORDER BY created_at";
-                $latest_result = mysqli_query($conn, $latest_query);
-
-                $counter = 0;
-                while ($latest_product = mysqli_fetch_assoc($latest_result)) {
-                    $stock_quantity = $latest_product['stock_quantity'];
-                    $is_sold_out = $stock_quantity == 0;
-
-                    $image = isset($latest_product['image']) && !empty($latest_product['image'])
-                        ? 'products/' . htmlspecialchars($latest_product['image'])
-                        : 'images/default-image.jpg';
-
-                    $product_name = htmlspecialchars($latest_product['product_name']);
-                    $product_price = htmlspecialchars($latest_product['price']);
-
-                    if ($counter % 4 == 0) {
-                        echo $counter == 0 ? '<div class="carousel-item active">' : '<div class="carousel-item">';
-                        echo '<div class="row row-cols-1 row-cols-md-4 g-4">';
-                    }
-                ?>
-                    <div class="col">
-                        <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
-                            <div class="image-container position-relative overflow-hidden">
-                                <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
-                                    alt="<?php echo $product_name; ?>"
-                                    style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
-                                <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
-                                    <?php if (!$is_sold_out): ?>
-                                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                                            <input type="hidden" name="product_id" value="<?php echo $latest_product['product_id']; ?>">
-                                            <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
-                                                <i class="fa fa-cart-plus"></i>
-                                            </button>
-                                            <a href="product_details.php?product_id=<?php echo $latest_product['product_id']; ?>" class="btn btn-light btn-sm">
-                                                <i class="fa fa-info-circle"></i>
-                                            </a>
-                                        </form>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
-                                <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-                                <?php if ($is_sold_out): ?>
-                                    <p class="text-danger fw-bold">Sold Out</p>
-                                    <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php
-                    $counter++;
-                    if ($counter % 4 == 0 || $counter == mysqli_num_rows($latest_result)) {
-                        echo '</div></div>';
-                    }
-                }
-                ?>
-            </div>
-
-            <!-- Carousel Controls for Latest Products -->
-            <button class="carousel-control-prev1" type="button" data-bs-target="#latestProductsCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next1" type="button" data-bs-target="#latestProductsCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
-
-        <script>
-            function showPopular() {
-                document.getElementById("popularProductsCarousel").style.display = "block";
-                document.getElementById("latestProductsCarousel").style.display = "none";
-                document.getElementById("popularBtn").classList.add("btn-dark");
-                document.getElementById("popularBtn").classList.remove("btn-outline-dark");
-                document.getElementById("latestBtn").classList.remove("btn-dark");
-                document.getElementById("latestBtn").classList.add("btn-outline-dark");
-            }
-
-            function showLatest() {
-                document.getElementById("popularProductsCarousel").style.display = "none";
-                document.getElementById("latestProductsCarousel").style.display = "block";
-                document.getElementById("latestBtn").classList.add("btn-dark");
-                document.getElementById("latestBtn").classList.remove("btn-outline-dark");
-                document.getElementById("popularBtn").classList.remove("btn-dark");
-                document.getElementById("popularBtn").classList.add("btn-outline-dark");
-            }
-        </script>
-
-       
-        <h2 class="mb-4 mt-5" style="font-family: 'Roboto', sans-serif; font-weight: 500;">Featured Products</h2>
-        <a href="featured_product.php" class="btn btn-primary btn-see-more"><b>See More ></b></a>
-        <div id="featuredProductsCarousel" class="carousel slide" data-bs-ride="false">
-            <div class="carousel-inner">
-                <?php
-                $featured_query = "SELECT * FROM products WHERE subcategory = 'featured' ORDER BY created_at";
-                $featured_result = mysqli_query($conn, $featured_query);
-
-                $counter = 0;
-                while ($featured_product = mysqli_fetch_assoc($featured_result)) {
-                    $stock_quantity = $featured_product['stock_quantity'];
-                    $is_sold_out = $stock_quantity == 0;
-
-                    $image = isset($featured_product['image']) && !empty($featured_product['image'])
-                        ? 'products/' . htmlspecialchars($featured_product['image'])
-                        : 'images/default-image.jpg';
-
-                    $product_name = htmlspecialchars($featured_product['product_name']);
-                    $product_price = htmlspecialchars($featured_product['price']);
-
-                    if ($counter % 4 == 0) {
-                        echo $counter == 0 ? '<div class="carousel-item active">' : '<div class="carousel-item">';
-                        echo '<div class="row row-cols-1 row-cols-md-4 g-4">';
-                    }
-                ?>
-                    <div class="col">
-                        <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
-                            <div class="image-container position-relative overflow-hidden">
-                                <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
-                                    alt="<?php echo $product_name; ?>"
-                                    style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
-                                <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
-                                    <?php if (!$is_sold_out): ?>
-                                        <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                                            <input type="hidden" name="product_id" value="<?php echo $featured_product['product_id']; ?>">
-                                            <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
-                                                <i class="fa fa-cart-plus"></i>
-                                            </button>
-                                            <a href="product_details.php?product_id=<?php echo $featured_product['product_id']; ?>" class="btn btn-light btn-sm">
-                                                <i class="fa fa-info-circle"></i>
-                                            </a>
-                                        </form>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
-                                <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
-                                <?php if ($is_sold_out): ?>
-                                    <p class="text-danger fw-bold">Sold Out</p>
-                                    <button class="btn btn-outline-secondary btn-sm" disabled>Out of Stock</button>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php
-                    $counter++;
-                    if ($counter % 4 == 0 || $counter == mysqli_num_rows($featured_result)) {
-                        echo '</div></div>';
-                    }
-                }
-                ?>
-            </div>
-
-            <!-- Carousel Controls for Latest Products -->
-            <button class="carousel-control-prev1" type="button" data-bs-target="#latestProductsCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next1" type="button" data-bs-target="#latestProductsCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
-        <script>
-            const productCards = document.querySelectorAll('.product-card .image-container');
-            productCards.forEach(card => {
-                card.addEventListener('mouseover', () => {
-                    card.querySelector('.hover-overlay').style.opacity = '1';
-                    card.querySelector('img').style.transform = 'scale(1.1)';
+                    card.addEventListener('mouseout', () => {
+                        card.querySelector('.hover-overlay').style.opacity = '0';
+                        card.querySelector('img').style.transform = 'scale(1)';
+                    });
                 });
+            </script>
 
-                card.addEventListener('mouseout', () => {
-                    card.querySelector('.hover-overlay').style.opacity = '0';
-                    card.querySelector('img').style.transform = 'scale(1)';
-                });
-            });
-        </script>
+            <!-- Video Advertisement -->
+            <div class="video-advertisement mb-5 text-center">
+                <h2 class="fw-bold text-black mb-3">Step into the World of Luxury</h2>
+                <p class="text-muted mb-4">Discover the allure of our premium fragrances through this captivating visual journey.</p>
+                <video autoplay muted loop class="shadow rounded" style="width: 100%; max-width: 2200px; border-radius: 15px; object-fit: cover; height: 320px;">
+                    <source src="./videos/videoplayback1.mp4" type="video/mp4">
+                </video>
+            </div>
 
-        <!-- Related Resources Section -->
-        <section class="related-resources py-4">
-            <div class="container">
-                <h3 class="text-center mb-4 display-5 font-weight-bold">Related Resources</h3>
-                <div class="row">
-                    <!-- Resource Card Template -->
-                    <div class="col-md-3 mb-4">
-                        <div class="card h-100 shadow-sm border-0">
-                            <img src="images/resource1.jpg" class="card-img-top">
-                            <div class="card-body d-flex flex-column justify-content-between text-center">
-                                <h5 class="card-title font-weight-bold">How to Spray Perfume</h5>
-                                <p class="card-text text-muted">Learn the best ways to apply perfume throughout the day for lasting fragrance.</p>
-                                <a href="how_to_spray_perfume.php" class="btn btn-gradient-primary w-100">Read More</a>
+            <!-- Related Resources Section -->
+            <section class="related-resources py-2">
+                <div class="container">
+                    <h3 class="text-center mb-2 display-5 font-weight-bold">Related Resources</h3>
+                    <div class="row">
+                        <!-- Resource Card Template -->
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <img src="images/resource1.jpg" class="card-img-top">
+                                <div class="card-body d-flex flex-column justify-content-between text-center">
+                                    <h5 class="card-title font-weight-bold">How to Spray Perfume</h5>
+                                    <p class="card-text text-muted">Learn the best ways to apply perfume throughout the day for lasting fragrance.</p>
+                                    <a href="how_to_spray_perfume.php" class="btn btn-gradient-primary w-100">Read More</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-3 mb-4">
-                        <div class="card h-100 shadow-sm border-0">
-                            <img src="images/resource2.jpg" class="card-img-top">
-                            <div class="card-body d-flex flex-column justify-content-between text-center">
-                                <h5 class="card-title font-weight-bold">How to Find Your Signature Scent</h5>
-                                <p class="card-text text-muted">A guide to help you find the perfect fragrance for your personality and lifestyle.</p>
-                                <a href="choosing_right_perfume.php" class="btn btn-gradient-primary w-100">Read More</a>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <img src="images/resource2.jpg" class="card-img-top">
+                                <div class="card-body d-flex flex-column justify-content-between text-center">
+                                    <h5 class="card-title font-weight-bold">How to Find Your Signature Scent</h5>
+                                    <p class="card-text text-muted">A guide to help you find the perfect fragrance for your personality and lifestyle.</p>
+                                    <a href="choosing_right_perfume.php" class="btn btn-gradient-primary w-100">Read More</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-3 mb-4">
-                        <div class="card h-100 shadow-sm border-0">
-                            <img src="images/resource3.jpg" class="card-img-top">
-                            <div class="card-body d-flex flex-column justify-content-between text-center">
-                                <h5 class="card-title font-weight-bold">Perfume Tips for Different Occasions</h5>
-                                <p class="card-text text-muted">Tips on selecting the perfect scent for work, date, and more.</p>
-                                <a href="perfume_tips_occasion.php" class="btn btn-gradient-primary w-100">Read More</a>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <img src="images/resource3.jpg" class="card-img-top">
+                                <div class="card-body d-flex flex-column justify-content-between text-center">
+                                    <h5 class="card-title font-weight-bold">Perfume Tips for Different Occasions</h5>
+                                    <p class="card-text text-muted">Tips on selecting the perfect scent for work, date, and more.</p>
+                                    <a href="perfume_tips_occasion.php" class="btn btn-gradient-primary w-100">Read More</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="col-md-3 mb-4">
-                        <div class="card h-100 shadow-sm border-0">
-                            <img src="images/resource4.jpg" class="card-img-top" alt="Perfume Storage Guide">
-                            <div class="card-body d-flex flex-column justify-content-between text-center">
-                                <h5 class="card-title font-weight-bold">Perfume Storage Guide</h5>
-                                <p class="card-text text-muted">How to store your perfumes properly to maintain their fragrance and quality.</p>
-                                <a href="perfume_storage.php" class="btn btn-gradient-primary w-100">Read More</a>
+                        <div class="col-md-3 mb-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <img src="images/resource4.jpg" class="card-img-top" alt="Perfume Storage Guide">
+                                <div class="card-body d-flex flex-column justify-content-between text-center">
+                                    <h5 class="card-title font-weight-bold">Perfume Storage Guide</h5>
+                                    <p class="card-text text-muted">How to store your perfumes properly to maintain their fragrance and quality.</p>
+                                    <a href="perfume_storage.php" class="btn btn-gradient-primary w-100">Read More</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
     </div>
     <footer class="bg-dark text-white py-5">
         <div class="container">

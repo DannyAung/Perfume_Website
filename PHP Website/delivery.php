@@ -105,13 +105,13 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                     <h4 class="card-title text-center" style="font-size: 1.5rem; color:rgb(23, 79, 139);">Delivery Timeframes</h4>
                     <ul class="list-unstyled">
                         <li style="font-size: 1.1rem; margin-bottom: 10px;">
-                            <b>Standard [Yangon]:</b> <span style="color:rgb(1, 2, 10);">Within 2-3 days</span>
+                           Standard [Yangon]:<span style="color:rgb(1, 2, 10);">Within 2-3 days</span>
                         </li>
                         <li style="font-size: 1.1rem; margin-bottom: 10px;">
-                            <b>Standard [Other Cities]:</b> <span style="color:rgb(14, 24, 16);">Within 3-5 days</span>
+                           Standard [Other Cities]: <span style="color:rgb(14, 24, 16);">Within 3-5 days</span>
                         </li>
                         <li style="font-size: 1.1rem; margin-bottom: 10px;">
-                            <b>Express [Yangon/Other Cities]:</b> <span style="color: #ff5733;">Within 1 day</span>
+                           Express [Yangon/Other Cities]: <span style="color: #ff5733;">Within 1 day</span>
                         </li>
                     </ul>
                 </div>

@@ -719,7 +719,7 @@ footer .fab:hover {
 
 .btn-see-more:hover {
     color:#000;
-    background-color:rgb(249, 249, 249);
+    background-color:transparent;
 }
 
 .carousel-control-prev1,

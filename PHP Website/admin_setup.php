@@ -12,11 +12,6 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// New admin data
-$admin_username = 'admin';
-$admin_email = 'admin@gmail.com';  // Fixed typo in email domain
-$admin_password = 'admin123!@#';  // Plain text password
-
 // Hash the password
 $hashed_password = password_hash($admin_password, PASSWORD_DEFAULT);
 

@@ -56,6 +56,7 @@ if (isset($_POST['delete_user'])) {
     $stmt->bind_param("i", $user_id);  
     $stmt->execute();
     $stmt->close();
+    
 
     // Delete user
     $delete_user_sql = "DELETE FROM users WHERE user_id = ?";
@@ -67,6 +68,9 @@ if (isset($_POST['delete_user'])) {
         $message = "Failed to delete the user: " . $conn->error;
     }
     $stmt->close();
+    header("Location: manage_users.php");
+    exit;
+    
 }
 
 ?>

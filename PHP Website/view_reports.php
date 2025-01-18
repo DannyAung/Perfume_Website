@@ -58,6 +58,8 @@ $user_activity_query = "SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(
                         ORDER BY month ASC";
 $user_activity_result = mysqli_query($conn, $user_activity_query);
 
+
+
 // Prepare arrays for chart data
 $login_dates = [];
 $active_users_data = [];
@@ -83,6 +85,26 @@ $coupon_usage_query = "SELECT coupon_code, COUNT(*) AS usage_count
                        GROUP BY coupon_code";
 $coupon_usage_result = mysqli_query($conn, $coupon_usage_query);
 
+// Query to get top 10 loyal customers by order count (or total spent)
+$loyal_customers_query = "
+    SELECT u.user_name, COUNT(o.order_id) AS order_count 
+    FROM orders o
+    JOIN users u ON o.user_id = u.user_id
+    GROUP BY u.user_id
+    ORDER BY order_count DESC
+    LIMIT 10";
+$loyal_customers_result = mysqli_query($conn, $loyal_customers_query);
+
+// Prepare arrays for customer names and order count
+$loyal_customers_names = [];
+$loyal_customers_orders = [];
+while ($row = mysqli_fetch_assoc($loyal_customers_result)) {
+    $loyal_customers_names[] = $row['user_name'];
+    $loyal_customers_orders[] = $row['order_count'];
+}
+$loyal_customers_names_json = json_encode($loyal_customers_names);
+$loyal_customers_orders_json = json_encode($loyal_customers_orders);
+
 // Query to get monthly sales
 $monthly_sales_query = "
     SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, 
@@ -101,7 +123,7 @@ while ($row = mysqli_fetch_assoc($monthly_sales_result)) {
 }
 $monthly_sales_months_json = json_encode($monthly_sales_months);
 $monthly_sales_totals_json = json_encode($monthly_sales_totals);
-// Query: Top 5 products by sales
+// Query: Top 5 products by sales===
 $product_performance_query = "SELECT p.product_name, SUM(ci.quantity) AS total_sold
                               FROM cart_items ci
                               JOIN products p ON ci.product_id = p.product_id
@@ -118,6 +140,43 @@ while ($row = mysqli_fetch_assoc($product_performance_result)) {
 }
 $top_products_json = json_encode($top_products);
 $top_sales_json = json_encode($top_sales);
+
+
+// Query to get total sales by day for the current month
+$daily_sales_query = "
+    SELECT DATE(created_at) AS day, SUM(total_price) AS total_sales
+    FROM orders
+    WHERE YEAR(created_at) = 2025
+    GROUP BY day
+    ORDER BY day ASC";
+$daily_sales_result = mysqli_query($conn, $daily_sales_query);
+
+$daily_sales_dates = [];
+$daily_sales_totals = [];
+while ($row = mysqli_fetch_assoc($daily_sales_result)) {
+    $daily_sales_dates[] = $row['day'];
+    $daily_sales_totals[] = $row['total_sales'];
+}
+$daily_sales_dates_json = json_encode($daily_sales_dates);
+$daily_sales_totals_json = json_encode($daily_sales_totals);
+
+
+// Query to get total sales by year
+$yearly_sales_query = "
+    SELECT YEAR(created_at) AS year, SUM(total_price) AS total_sales
+    FROM orders
+    GROUP BY year
+    ORDER BY year ASC";
+$yearly_sales_result = mysqli_query($conn, $yearly_sales_query);
+
+$yearly_sales_years = [];
+$yearly_sales_totals = [];
+while ($row = mysqli_fetch_assoc($yearly_sales_result)) {
+    $yearly_sales_years[] = $row['year'];
+    $yearly_sales_totals[] = $row['total_sales'];
+}
+$yearly_sales_years_json = json_encode($yearly_sales_years);
+$yearly_sales_totals_json = json_encode($yearly_sales_totals);
 
 ?>
 
@@ -263,24 +322,46 @@ $top_sales_json = json_encode($top_sales);
     </div>
 
     <div class="container my-5">
-        <h1 class="text-center mb-4">Admin Reports Dashboard</h1>
+        <h1 class="text-center mb-4">Admin Dashboards</h1>
 
         <div class="row g-4 mt-4">
             <!-- Total Sales by Month Line Chart -->
+
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h5 class="card-title text-center mb-4">Total Sales by Month (2025)</h5>
+                        <h5 class="card-title text-center mb-4">Total Sales by Day</h5>
+                        <canvas id="dailySalesLineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-4">Total Sales by Month</h5>
                         <canvas id="salesLineChart"></canvas>
                     </div>
                 </div>
             </div>
 
+            <!-- Daily Sales Line Chart -->
+
+            <!-- Yearly Sales Bar Chart -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-4">Total Sales by Year</h5>
+                        <canvas id="yearlySalesBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+
             <!-- Active Users Bar Chart -->
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h5 class="card-title text-center mb-4"><i class="bi bi-person-circle"></i> Active Users in 2025</h5>
+                        <h5 class="card-title text-center mb-4"><i class="bi bi-person-circle"></i> Active Users</h5>
                         <canvas id="activeUsersChart"></canvas>
                     </div>
                 </div>
@@ -331,8 +412,59 @@ $top_sales_json = json_encode($top_sales);
                 </div>
             </div>
         </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-4"><i class="bi bi-person-bounding-box"></i> Top 10 Loyal Customers</h5>
+                        <canvas id="loyalCustomersChart" class="small-chart" style="height: 300px;"></canvas> <!-- Adjust height if needed -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
     </div>
     <script>
+        // Bar Chart for Top 10 Loyal Customers
+        var loyalCtx = document.getElementById('loyalCustomersChart').getContext('2d');
+        var loyalCustomersChart = new Chart(loyalCtx, {
+            type: 'bar',
+            data: {
+                labels: <?php echo $loyal_customers_names_json; ?>,
+                datasets: [{
+                    label: 'Order Count',
+                    data: <?php echo $loyal_customers_orders_json; ?>,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Customers'
+                        },
+                        ticks: {
+                            maxRotation: 90,
+                            minRotation: 45
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Order Count'
+                        }
+                    }
+                }
+            }
+        });
+
         // Donut Chart for Top 5 Products
         var donutCtx = document.getElementById('topProductsDonutChart').getContext('2d');
         var topProductsDonutChart = new Chart(donutCtx, {
@@ -364,6 +496,84 @@ $top_sales_json = json_encode($top_sales);
                     legend: {
                         display: true,
                         position: 'top'
+                    }
+                }
+            }
+        });
+        // Line Chart for Total Sales by Day
+        var dailySalesCtx = document.getElementById('dailySalesLineChart').getContext('2d');
+        var dailySalesLineChart = new Chart(dailySalesCtx, {
+            type: 'line',
+            data: {
+                labels: <?php echo $daily_sales_dates_json; ?>,
+                datasets: [{
+                    label: 'Total Sales ($)',
+                    data: <?php echo $daily_sales_totals_json; ?>,
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    },
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Day'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Sales ($)'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        // Bar Chart for Total Sales by Year
+        var yearlySalesCtx = document.getElementById('yearlySalesBarChart').getContext('2d');
+        var yearlySalesBarChart = new Chart(yearlySalesCtx, {
+            type: 'bar',
+            data: {
+                labels: <?php echo $yearly_sales_years_json; ?>,
+                datasets: [{
+                    label: 'Total Sales ($)',
+                    data: <?php echo $yearly_sales_totals_json; ?>,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Sales ($)'
+                        },
+                        beginAtZero: true
                     }
                 }
             }

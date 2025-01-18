@@ -25,6 +25,21 @@ try {
 $stmt = $pdo->prepare("SELECT DISTINCT user_id, MAX(sent_at) AS last_message_time FROM chats GROUP BY user_id ORDER BY last_message_time DESC");
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+if (isset($_GET['user_id'])) {
+    $user_id = $_GET['user_id'];
+
+    // Delete all chats for this user
+    $stmt = $pdo->prepare("DELETE FROM chats WHERE user_id = :user_id");
+    $stmt->execute([
+        ':user_id' => $user_id
+    ]);
+
+    // Redirect back to the admin chat page with a success message
+    header("Location: admin_chat.php?message=Chat deleted successfully");
+    exit;
+    
+}
 ?>
 
 <!DOCTYPE html>
@@ -142,7 +157,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container mt-5">
         <h2>Customer Messages</h2>
         <table class="table table-striped">
-        <thead class=table-warning>
+            <thead class=table-warning>
                 <tr>
                     <th>User ID</th>
                     <th>Last Message Time</th>
@@ -156,8 +171,10 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <td><?php echo htmlspecialchars($user['last_message_time']); ?></td>
                         <td>
                             <a href="admin_chat_reply.php?user_id=<?php echo $user['user_id']; ?>" class="btn btn-primary btn-sm">View Chat</a>
+                            <a href="delete_chat.php?user_id=<?php echo $user['user_id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this chat?')">Delete Chat</a>
                         </td>
                     </tr>
+
                 <?php endforeach; ?>
             </tbody>
         </table>

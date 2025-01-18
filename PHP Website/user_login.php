@@ -43,11 +43,12 @@ if (isset($_POST['login']) && $_SERVER['REQUEST_METHOD'] == "POST") {
     }
 }
 
-if (isset($_POST['remember_me'])) {
-    // Set cookies for 30 days
-    setcookie("user_email", $email, time() + (30 * 24 * 60 * 60), "/"); // 30 days
-    setcookie("user_name", $info['user_name'], time() + (30 * 24 * 60 * 60), "/"); // Optional
-}
+// if (isset($_POST['remember_me'])) {
+//     setcookie("user_email", $email, time() + (30 * 24 * 60 * 60), "/"); // 30 days
+//     setcookie("user_name", $info['user_name'], time() + (30 * 24 * 60 * 60), "/"); // Optional
+// }
+// $email = isset($_COOKIE['user_email']) ? $_COOKIE['user_email'] : '';
+// $password = isset($_COOKIE['user_password']) ? $_COOKIE['user_password'] : '';
 
 // Check if user is logged in
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
@@ -65,151 +66,163 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        /* Form Container Styling */
-        .form-container {
-            margin-bottom: 160px;
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
+        /* Gradient Background */
+        body {
 
-        /* Login Button */
-        .btn-login {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            transition: background-color 0.3s;
-        }
-
-        .btn-login:hover {
-            background-color: #0056b3;
-        }
-
-        /* Center the form on the page */
-        .login-container {
-
+            font-family: 'Poppins', sans-serif;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin: 0;
+        }
+
+        /* Container for Animation and Form */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 90%;
+            border-radius: 15px;
+            max-width: 1000px;
+            animation: fadeIn 0.5s ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            /* Optional: Adds a subtle border */
+        }
+
+        /* Login Card Styling */
+        .login-card {
+            flex: 1;
+            margin-left: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+            backdrop-filter: blur(5px);
+            /* Optional: Adds a subtle blur to the card itself */
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animation Column */
+        .animation-column {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px
+        }
+
+
+        /* Input Field Styling */
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            padding: 12px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Button Styling */
+        .btn-login {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .btn-login:hover {
+            background: linear-gradient(45deg, #0056b3, #004494);
+            transform: translateY(-2px);
+        }
+
+        /* Centered Text */
+        .text-center {
+            margin-bottom: 20px;
         }
 
         /* Mobile Responsiveness */
         @media (max-width: 576px) {
-            .form-container {
-                padding: 20px;
-                width: 90%;
+            .login-container {
+                flex-direction: column;
+            }
+
+            .login-card {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .animation-column {
+                display: none;
+                /* Hide animation on small screens */
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
-        <div class="container-fluid">
-            <!-- Logo and Brand -->
-            <a class="navbar-brand d-flex align-items-center" href="user_index.php">
-                <img src="./images/perfume_logo.png" alt="Logo" style="width:50px; height:auto;">
-                <b class="ms-2 dm-serif-display-regular-italic custom-font-color">FRAGRANCE HAVEN</b>
-            </a>
-
-            <!-- Collapsible Content -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
-
-                    <!-- Modern Search Bar in the Center -->
-                    <div class="search-bar-container mx-auto my-2 my-lg-0">
-                        <form method="GET" action="search.php" class="search-form mb-2">
-                            <div class="input-group">
-                                <input type="text" class="form-control border-end-0 search-input" name="query" placeholder="Search for a product..." aria-label="Search" required>
-                                <button class="btn btn-primary search-btn border-start-0 rounded-end px-4 py-2 shadow-lg" type="submit">
-                                    <i class="bi bi-search"></i> <!-- FontAwesome or Bootstrap Icons -->
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <!-- Display Username or Guest -->
-                    <span class="navbar-text me-3 my-2 my-lg-0">
-                        Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
-                    </span>
-
-                    <!-- Account Dropdown for Logged-In Users -->
-                    <?php if ($is_logged_in): ?>
-                        <div class="dropdown me-3">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Account
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                                <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
-                                <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
-                                <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <!-- Login and Cart Buttons on the Right -->
-            <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
-                <?php if (!$is_logged_in): ?>
-                    <a href="user_login.php" class="btn login-btn me-3">Login/Register</a>
-                <?php endif; ?>
-                <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
-                    <img src="./images/cart-icon.jpg" alt="Cart" style="width:20px; height:20px; margin-right:6px;">
-                    Cart
-                </a>
-            </div>
+    <!-- Login Form Container -->
+    <div class="login-container">
+        <!-- Animation Column -->
+        <div class="animation-column">
+            <img src="images/login1.png" alt="Login Animation" style="width: 100%; height: auto;">
         </div>
-    </nav>
 
 
-<!-- Login Form -->
-<div class="login-container">
-    <div class="col-md-6 col-sm-12 form-container">
-        <h4 class="text-center text-primary mb-4">Login Form</h4>
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
-            <!-- Display Password Error -->
-            <?php if (isset($password_err)): ?>
-                <p class="alert alert-danger"><?php echo htmlspecialchars($password_err); ?></p>
-            <?php endif; ?>
+        <div class="login-card">
+            <h4 class="text-center text-primary mb-4">Login Form</h4>
+            <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
 
-            <!-- Email Input -->
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" name="email" id="email" required>
-            </div>
+                <?php if (isset($password_err)): ?>
+                    <p class="alert alert-danger"><?php echo htmlspecialchars($password_err); ?></p>
+                <?php endif; ?>
 
-            <!-- Password Input -->
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" name="password" id="password" required>
-            </div>
 
-            <!-- Remember Me Checkbox -->
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" name="remember_me" id="remember_me">
-                <label class="form-check-label" for="remember_me">Remember Me</label>
-            </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" name="email" id="email" required>
+                </div>
 
-            <!-- Login Button -->
-            <button type="submit" class="btn btn-login w-100" name="login">Login</button>
-        </form>
 
-        <!-- Forgot Password -->
-        <p class="mt-3 text-center">
-            Forgot your password? <a href="forgot_password.php">Click here</a>
-        </p>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" name="password" id="password" required>
+                </div>
 
-        <!-- Register Link -->
-        <p class="mt-3 text-center">
-            If you are not a member, <a href="user_register.php">Sign Up</a> here.
-        </p>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" name="remember_me" id="remember_me">
+                    <label class="form-check-label" for="remember_me">Remember Me</label>
+                </div>
+                <button type="submit" class="btn btn-login w-100" name="login">Login</button>
+            </form>
+
+            <p class="mt-3 ">
+                <a href="forgot_password.php">Forgot your password</a>
+            </p>
+
+            <!-- Register Link -->
+            <p class="mt-3 btn-signup">
+                <a href="user_register.php">Create new account</a>
+            </p>
+        </div>
     </div>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>

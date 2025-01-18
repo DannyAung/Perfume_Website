@@ -32,10 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':user_id' => $user_id,
             ':message' => $message,
         ]);
-
-        // Redirect back to the chat page
-        header('Location: user_chat.php');
-        exit;
+ // Redirect back to the chat section
+ header("Location: contact_us.php?page=chatSection");
+ exit;
     }
 }
 ?>
