@@ -49,55 +49,67 @@ while ($item = $result->fetch_assoc()) {
     $cart_items[] = $item;
 }
 
-// Handle manual coupon application only when the user submits it
+// Handle coupon application
 if (isset($_POST['apply_coupon'])) {
     $manual_coupon_code = trim($_POST['coupon_code']); // Get the submitted coupon code
 
-    // Only allow coupon if the order total is above $300
-    if ($total_price < 300) {
-        echo "<script>alert('Coupons can only be applied to orders above $300.');</script>";
-    } else {
-        // Validate the coupon from the `coupons` table
-        $coupon_sql = "SELECT discount_percentage, valid_from, valid_to, minimum_purchase_amount 
-                       FROM coupons 
-                       WHERE coupon_code = ? AND valid_from <= NOW() AND valid_to >= NOW()";
-        $coupon_stmt = $conn->prepare($coupon_sql);
-        $coupon_stmt->bind_param("s", $manual_coupon_code);
-        $coupon_stmt->execute();
-        $coupon_result = $coupon_stmt->get_result();
+    // Validate the coupon from the `coupons` table
+    $coupon_sql = "SELECT coupon_id, discount_percentage, minimum_purchase_amount, valid_from, valid_to 
+                   FROM coupons 
+                   WHERE coupon_code = ? AND valid_from <= NOW() AND valid_to >= NOW()";
+    $coupon_stmt = $conn->prepare($coupon_sql);
+    $coupon_stmt->bind_param("s", $manual_coupon_code);
+    $coupon_stmt->execute();
+    $coupon_result = $coupon_stmt->get_result();
 
-        if ($coupon_result->num_rows > 0) {
-            $coupon_data = $coupon_result->fetch_assoc();
-            if ($total_price >= $coupon_data['minimum_purchase_amount']) {
-                // Apply the discount and store it in the session
-                $discount_percentage = $coupon_data['discount_percentage'];
-                $_SESSION['discount_percentage'] = $discount_percentage;
-                $_SESSION['applied_coupon_code'] = $manual_coupon_code;
-                echo "<script>alert('Coupon applied successfully!');</script>";
-            } else {
-                echo "<script>alert('This coupon requires a minimum purchase of $" . $coupon_data['minimum_purchase_amount'] . ".');</script>";
-            }
+    if ($coupon_result->num_rows > 0) {
+        $coupon_data = $coupon_result->fetch_assoc();
+
+        // Check if the order total meets the minimum purchase amount
+        if ($total_price >= $coupon_data['minimum_purchase_amount']) {
+            // Store coupon details in the session only when applied
+            $_SESSION['discount_percentage'] = $coupon_data['discount_percentage'];
+            $_SESSION['applied_coupon_code'] = $manual_coupon_code;
+            $_SESSION['coupon_id'] = $coupon_data['coupon_id'];
+            echo "<script>alert('Coupon applied successfully!');</script>";
         } else {
-            // Invalid coupon if not found or expired
-            echo "<script>alert('Invalid or expired coupon code!');</script>";
+            echo "<script>alert('This coupon requires a minimum purchase of $" . $coupon_data['minimum_purchase_amount'] . ".');</script>";
         }
+    } else {
+        // Invalid coupon if not found or expired
+        echo "<script>alert('Invalid or expired coupon code!');</script>";
     }
 }
 
 // Calculate final price with discount
-$final_price = $total_price - ($total_price * ($discount_percentage / 100));
+$discount_amount = $total_price * ($discount_percentage / 100);
+$final_price = $total_price - $discount_amount;
+
+// Fetch shipping methods and fees from the database
+$shipping_sql = "SELECT shipping_method, shipping_fee FROM shipping";
+$shipping_result = $conn->query($shipping_sql);
+
+$shipping_methods = [];
+if ($shipping_result->num_rows > 0) {
+    while ($row = $shipping_result->fetch_assoc()) {
+        $shipping_methods[$row['shipping_method']] = $row['shipping_fee'];
+    }
+}
 
 // Apply shipping fee
 $shipping_fee = 0;
-if (isset($_POST['shipping_method'])) {
+if (isset($_POST['shipping_method']) && !empty($_POST['shipping_method'])) {
     $shipping_method = $_POST['shipping_method'];
-    $shipping_fee = ($shipping_method === "express") ? 40 : 20; // Adjust fees based on the selected method
+    // Fetch the shipping fee from the $shipping_methods array
+    $shipping_fee = $shipping_methods[$shipping_method] ?? 0; // Default to 0 if the method is not found
 }
 
 // Calculate final total price
 $final_total_price = $final_price + $shipping_fee;
 
-// Handle checkout process
+
+
+// Handle the checkout process
 if (isset($_POST['checkout'])) {
     $name = $_POST['name'];
     $address = $_POST['address'];
@@ -106,21 +118,16 @@ if (isset($_POST['checkout'])) {
     $payment_method = $_POST['payment_method'];
     $shipping_method = $_POST['shipping_method'];
 
-    // Get the coupon code and discount percentage (from the session)
+    // Get the coupon details from the session
     $coupon_code = $_SESSION['applied_coupon_code'] ?? null;
     $discount_percentage = $_SESSION['discount_percentage'] ?? 0;
+    $coupon_id = $_SESSION['coupon_id'] ?? null;
 
-    // Update user's address and phone number
-    $update_sql = "UPDATE users SET address = ?, phone_number = ? WHERE user_id = ?";
-    $update_stmt = $conn->prepare($update_sql);
-    $update_stmt->bind_param("ssi", $address, $phone, $user_id);
-    $update_stmt->execute();
-
-    // Insert order into the orders table, including the coupon code and discount percentage
-    $order_sql = "INSERT INTO orders (user_id, total_price, name, address, phone, email, payment_method, shipping_method, shipping_fee, coupon_code, discount_percentage) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    // Insert order into the orders table, including the coupon details
+    $order_sql = "INSERT INTO orders (user_id, total_price, name, address, phone, email, payment_method, shipping_method, shipping_fee, discount_percentage, coupon_code, coupon_id) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $order_stmt = $conn->prepare($order_sql);
-    $order_stmt->bind_param("idssssssdsd", $user_id, $final_total_price, $name, $address, $phone, $email, $payment_method, $shipping_method, $shipping_fee, $coupon_code, $discount_percentage);
+    $order_stmt->bind_param("idssssssdssi", $user_id, $final_total_price, $name, $address, $phone, $email, $payment_method, $shipping_method, $shipping_fee, $discount_percentage, $coupon_code, $coupon_id);
 
     if ($order_stmt->execute()) {
         $order_id = $conn->insert_id;
@@ -153,6 +160,7 @@ if (isset($_POST['checkout'])) {
         // Clear coupon session variables after the order is placed
         unset($_SESSION['discount_percentage']);
         unset($_SESSION['applied_coupon_code']);
+        unset($_SESSION['coupon_id']);
 
         // Redirect to receipt page
         header("Location: receipt.php?order_id=" . $order_id);
@@ -163,7 +171,7 @@ if (isset($_POST['checkout'])) {
 }
 
 // Before using $applied_coupon_code, check if it's set in the session
-$applied_coupon_code = isset($_SESSION['applied_coupon_code']) ? $_SESSION['applied_coupon_code'] : "N/A";
+$applied_coupon_code = isset($_SESSION['applied_coupon_code']) ? $_SESSION['applied_coupon_code'] : "";
 
 // Using htmlspecialchars safely to avoid deprecated behavior
 $applied_coupon_code_html = htmlspecialchars($applied_coupon_code, ENT_QUOTES, 'UTF-8');
@@ -171,13 +179,8 @@ $applied_coupon_code_html = htmlspecialchars($applied_coupon_code, ENT_QUOTES, '
 // Check if discount_percentage is set in the session, else default to 0
 $discount_percentage = isset($_SESSION['discount_percentage']) ? $_SESSION['discount_percentage'] : 0;
 
-unset($_SESSION['discount_percentage']);
-unset($_SESSION['applied_coupon_code']);
-
 // Regenerate session ID to prevent session hijacking and ensure the session data is reset
 session_regenerate_id(true);
-
-
 ?>
 
 
@@ -311,10 +314,10 @@ session_regenerate_id(true);
             ?>
         </div>
 
-        <!-- Coupon Application -->
-        <form method="POST" action="checkout.php">
+        <!-- Coupon Application Form -->
+        <form method="POST" action="checkout.php" onsubmit="return applyCoupon(event)">
             <label for="coupon_code">Enter Coupon Code:</label>
-            <input type="text" name="coupon_code" id="coupon_code" class="form-control" value="<?php echo htmlspecialchars($applied_coupon_code !== 'N/A' ? $applied_coupon_code : ''); ?>">
+            <input type="text" name="coupon_code" id="coupon_code" class="form-control" value="<?php echo htmlspecialchars($applied_coupon_code); ?>">
             <button type="submit" name="apply_coupon" class="btn btn-primary">Apply Coupon</button>
         </form>
 
@@ -424,24 +427,41 @@ session_regenerate_id(true);
                 }
             </script>
 
+           <!-- Shipping Method -->
+<div class="mb-3">
+    <label for="shipping_method" class="form-label">Shipping Method</label>
+    <select class="form-control" id="shipping_method" name="shipping_method" onchange="updateTotalPrice()" required>
+        <option value="" disabled selected>Select Shipping Method</option>
+        <?php
+        foreach ($shipping_methods as $method => $fee) {
+            echo "<option value='" . htmlspecialchars($method) . "' data-fee='" . $fee . "'>"
+                . htmlspecialchars($method) . " - $" . $fee . "</option>";
+        }
+        ?>
+    </select>
+</div>
 
-            <!-- Shipping Method -->
-            <div class="mb-3">
-                <label for="shipping_method" class="form-label">Shipping Method</label>
-                <select class="form-control" id="shipping_method" name="shipping_method" onchange="updateTotalPrice()" required>
-                    <option value="" disabled selected>Select Shipping Method</option>
-                    <option value="standard">Standard - $20 [2-3days]</option>
-                    <option value="express">Express - $40 [1 day]</option>
-                </select>
-            </div>
+<div class="total-price">
+    <p id="total-amount">Subtotal: $<?php echo number_format($total_price, 2); ?></p> <!-- Display Subtotal -->
 
-            <div class="total-price">
-                <p id="total-amount">Total Amount: $<?php echo number_format($total_price, 2); ?></p>
-                <p id="coupon-discount"><?php if ($discount_percentage > 0) echo "Coupon Applied: -$" . number_format($total_price * ($discount_percentage / 100), 2); ?></p>
-                <p id="shipping-fee">Shipping Fee: $<?php echo number_format($shipping_fee, 2); ?></p>
-                <hr>
-                <p id="final-total"><strong>Total Amount: $<?php echo number_format($final_total_price, 2); ?></strong></p>
-            </div>
+    <?php if ($discount_percentage > 0): ?>
+        <p id="coupon-discount">Coupon Applied: -$<?php echo number_format($discount_amount, 2); ?></p> <!-- Display Coupon Discount -->
+    <?php else: ?>
+        <p id="coupon-discount"></p> <!-- Hide coupon discount if no coupon is applied -->
+    <?php endif; ?>
+
+    <p id="shipping-fee">Shipping Fee: $<?php echo number_format($shipping_fee, 2); ?></p> <!-- Display Shipping Fee -->
+
+    <hr>
+
+    <p id="final-total">
+        <strong>Total Amount: $<?php
+            // Final total calculation after applying the discount and adding the shipping fee
+            $final_total_price = $total_price - $discount_amount + $shipping_fee;
+            echo number_format($final_total_price, 2);
+        ?></strong>
+    </p> <!-- Display Final Total Amount -->
+</div>
 
             <button type="submit" name="checkout" class="btn btn-success btn-lg w-100">Confirm and Checkout</button>
         </form>
@@ -449,24 +469,58 @@ session_regenerate_id(true);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        const baseTotalPrice = <?php echo $total_price; ?>;
-        const discountPercentage = <?php echo $discount_percentage; ?>;
-        let shippingFee = <?php echo $shipping_fee; ?>;
-        let finalTotalPrice = baseTotalPrice - (baseTotalPrice * (discountPercentage / 100)) + shippingFee;
+<script>
+    // Get the current shipping fee from PHP variable
+    let shippingFee = <?php echo json_encode($shipping_fee); ?>;
+    const baseTotalPrice = <?php echo $total_price; ?>; // Base total price without shipping or discount
+    const discountPercentage = <?php echo $discount_percentage; ?>; // Discount percentage (0 if no coupon)
 
-        function updateTotalPrice() {
-            const shippingMethod = document.getElementById('shipping_method').value;
-            shippingFee = shippingMethod === 'express' ? 40 : 20; // Assign correct shipping fee based on selection
-            finalTotalPrice = baseTotalPrice - (baseTotalPrice * (discountPercentage / 100)) + shippingFee;
+    // Function to update total price dynamically
+    function updateTotalPrice() {
+        const shippingMethodSelect = document.getElementById('shipping_method');
 
-            // Update displayed prices dynamically
-            document.getElementById('total-amount').innerText = "Total Amount: $" + baseTotalPrice.toFixed(2);
-            document.getElementById('coupon-discount').innerText = discountPercentage > 0 ? "Coupon Applied: -$" + (baseTotalPrice * (discountPercentage / 100)).toFixed(2) : '';
-            document.getElementById('shipping-fee').innerText = "Shipping Fee: $" + shippingFee.toFixed(2);
-            document.getElementById('final-total').innerText = "Total Amount: $" + finalTotalPrice.toFixed(2);
+        // Check if a shipping method is selected
+        if (shippingMethodSelect && shippingMethodSelect.selectedIndex >= 0) {
+            const selectedOption = shippingMethodSelect.options[shippingMethodSelect.selectedIndex];
+            shippingFee = parseFloat(selectedOption.getAttribute('data-fee')) || 0; // Get shipping fee from selected option or default to 0
+        } else {
+            shippingFee = 0; // If no shipping method is selected, set fee to 0
         }
-    </script>
+
+        // Calculate discount amount (if any)
+        const discountAmount = baseTotalPrice * (discountPercentage / 100);
+
+        // Calculate final price after discount
+        const finalPrice = baseTotalPrice - discountAmount;
+
+        // Calculate the final total price (after discount and including shipping fee)
+        const finalTotalPrice = finalPrice + shippingFee;
+
+        // Update the displayed prices dynamically
+        document.getElementById('total-amount').innerText = "Subtotal: $" + baseTotalPrice.toFixed(2);
+        document.getElementById('shipping-fee').innerText = "Shipping Fee: $" + shippingFee.toFixed(2);
+
+        // Display coupon discount only if a coupon is applied
+        if (discountPercentage > 0) {
+            const discountAmount = baseTotalPrice * (discountPercentage / 100);
+            document.getElementById('coupon-discount').innerText = "Coupon Applied: -$" + discountAmount.toFixed(2);
+        } else {
+            document.getElementById('coupon-discount').innerText = ""; // Clear coupon discount if no coupon is applied
+        }
+
+        // Update the final total price
+        document.getElementById('final-total').innerText = "Total Amount: $" + finalTotalPrice.toFixed(2);
+    }
+
+    // Trigger the update when the page loads (to apply the discount and shipping immediately)
+    window.onload = updateTotalPrice;
+
+    // Add an event listener to the shipping method dropdown to update the total price when the shipping method changes
+    document.getElementById('shipping_method').addEventListener('change', updateTotalPrice);
+</script>
+
+
+
 
     <?php
     $conn->close();

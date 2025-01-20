@@ -437,19 +437,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="latest mb-3 d-flex align-items-center">
                 <div class="video-advertisement mb-5 text-center">
-                    <video autoplay muted loop class="shadow rounded" style="width: 90%;  border-radius: 15px; object-fit: cover; height:360px; margin-right:230px; margin-top:30px;">
+                    <video autoplay muted loop class="shadow rounded" style="width: 100%;  border-radius: 15px; object-fit: cover; height:360px; margin-right:230px; margin-top:30px;">
                         <source src="./videos/video5.mp4" type="video/mp4">
                     </video>
                 </div>
-                <div class="text-left" style="width: 50%; margin-left:10px;">
+                <div class="text-left" style="width: 50%; margin-left:50px;">
                     <h3><b>Popular</b></h3>
-                    <p class="text-muted mt-1">Experience the essence of our popular scent</p>
+                   <p class="text-muted mt-1">Experience the essence of our popular scent</p>
                     <a href="latest_product.php" class="btn btn-primary mt-1">See More</a>
                 </div>
             </div>
 
             <div class="latest mb-1 d-flex align-items-center">
-                <div class="text-right" style="width: 50%; margin-left:170px;">
+                <div class="text-right" style="width: 50%; margin-left:120px;">
                     <h3><b>New Arrival</b></h3>
                     <p class="text-muted mt-2">Experience the essence of our new arrival scent</p>
 

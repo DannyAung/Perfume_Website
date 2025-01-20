@@ -1,8 +1,15 @@
-body {
+html, body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;  /* Prevent horizontal scrolling on the page */
 }
+
+* {
+    box-sizing: border-box;  /* Ensures padding and borders do not cause overflow */
+}
+
 /* Responsive Container */
 .container {
     width: 100%;
@@ -24,6 +31,44 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
 }
+
+.carousel-control-prev1,
+.carousel-control-next1 {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    background-color: transparent;
+    /* Set background to transparent */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid white;
+    /* Optional: Add black border around buttons */
+}
+
+/* Left arrow positioning */
+.carousel-control-prev1 {
+    left: -60px;
+    /* Adjust as needed */
+}
+
+/* Right arrow positioning */
+.carousel-control-next1 {
+    margin-top:-7px;
+    right: -60px;
+    /* Adjust as needed */
+}
+
+/* Customize the arrow icons inside the buttons */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+
+    filter: invert(1);
+}
+
 
 .btn-gradient-primary {
     background: linear-gradient(45deg, #6a11cb, #2575fc);
@@ -303,12 +348,12 @@ body {
 }
 /* Styling for buttons */
 .btn-outline-primary {
-    border-color: #007bff;
+    border-color: transparent;
     color: #007bff;
 }
 
 .btn-outline-danger {
-    border-color: #dc3545;
+    border-color:transparent;
     color: #dc3545;
 }
 
@@ -322,13 +367,15 @@ body {
 
 /* Hover effects for buttons */
 .btn-outline-primary:hover {
-    background-color: #007bff;
-    color: white;
+    border-color:transparent;
+    background-color: transparent;
+    color: rgb(22, 60, 229);
 }
 
 .btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: white;
+    border-color:transparent;
+    background-color: transparent;
+   
 }
 
 /* Adjust spacing between the elements */
@@ -336,43 +383,7 @@ body {
     margin-right: 15px; /* Add space between the username and the next item */
 }
 
-.modern-favorite-link {
-    margin-left: -25px; /* Add space before the favorite icon */
-}
 
-/* Icon styling for consistent size */
-.favorite-icon {
-    font-size: 1.5rem; /* Adjust the size of the icon */
-    margin-right: 10px; /* Add space to the right of the icon */
-}
-
-.modern-favorite-link {
-    margin-bottom: -20px;
-    margin-right: 10px;
-    position: relative;
-    display: block;
-    border-radius: 20px;
-    background-color: transparent; /* Transparent background */
-    text-decoration: none;
-    transition: all 0.1s ease;
- 
-}
-
-
-.modern-favorite-link:hover .favorite-icon {
-    transform: scale(1.2); /* Icon grows slightly on hover */
-}
-
-/* Optional: Add a pulse animation for the icon */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
-
-.modern-favorite-link:hover .favorite-icon {
-    animation: pulse 1s infinite; /* Continuous pulse effect on hover */
-}
 
 
 .dm-serif-display-regular {
@@ -721,43 +732,6 @@ footer .fab:hover {
     color:#000;
     background-color:transparent;
 }
-
-.carousel-control-prev1,
-.carousel-control-next1 {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 5;
-    background-color: transparent;
-    /* Set background to transparent */
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid white;
-    /* Optional: Add black border around buttons */
-}
-
-/* Left arrow positioning */
-.carousel-control-prev1 {
-    left: -60px;
-    /* Adjust as needed */
-}
-
-/* Right arrow positioning */
-.carousel-control-next1 {
-    right: -60px;
-    /* Adjust as needed */
-}
-
-/* Customize the arrow icons inside the buttons */
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-
-    filter: invert(1);
-}
-
 
 .cancelled-status {
     color: red;

@@ -214,7 +214,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             </form>
 
             <p class="mt-3 ">
-                <a href="forgot_password.php">Forgot your password</a>
+                <a href="forgot_password.php">Forgot your password?</a>
             </p>
 
             <!-- Register Link -->

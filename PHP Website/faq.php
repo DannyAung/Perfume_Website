@@ -148,7 +148,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                 </h2>
                 <div id="faqCollapseFour" class="accordion-collapse collapse" aria-labelledby="faqHeadingFour" data-bs-parent="#faqAccordion">
                     <div class="accordion-body">
-                        Yes, we offer international shipping. Additional charges may apply depending on the destination.
+                       No, we cannot offer international shipping. We are trying to offer :)
                     </div>
                 </div>
             </div>

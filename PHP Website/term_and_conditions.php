@@ -146,13 +146,13 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
     <div class="container">
         <div class="terms-container">
             <h2>Terms and Conditions</h2>
-            <p>Welcome to [Your Company Name]. These Terms and Conditions outline the rules and regulations for the use of our website and services. By using this website, you agree to comply with these terms. Please read them carefully.</p>
+            <p>Welcome to Fragrance Haven. These Terms and Conditions outline the rules and regulations for the use of our website and services. By using this website, you agree to comply with these terms. Please read them carefully.</p>
 
             <h4>1. General Information</h4>
             <p>These Terms and Conditions govern the use of the website, including but not limited to the purchasing of products, registration, and other services provided through the website.</p>
 
             <h4>2. Intellectual Property</h4>
-            <p>All content on the website, including text, images, graphics, logos, and trademarks, are owned by [Your Company Name] or its licensors. Unauthorized use of the website’s content is prohibited.</p>
+            <p>All content on the website, including text, images, graphics, logos, and trademarks, are owned by Fragrance Haven. Unauthorized use of the website’s content is prohibited.</p>
 
             <h4>3. Use of the Website</h4>
             <p>By using this website, you agree to:</p>
@@ -189,7 +189,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             <h4>12. Contact Information</h4>
             <p>If you have any questions about these Terms and Conditions, please contact us at:</p>
             <p><b>Email:</b> [fragrancehaven@gmail.com]</p>
-            <p><b>Phone:</b> [+95945-197415]</p>
+            <p><b>Phone:</b> [+959450197415]</p>
         </div>
     </div>
     <footer class="bg-dark text-white py-5">

@@ -81,95 +81,8 @@ if (isset($_GET['user_id'])) {
 </style>
 <body>
 
-
-<div class="container-fluid">
-<nav class="navbar navbar-expand-lg">
-    <!-- Sidebar Toggle Button -->
-    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
-        <i class="bi bi-list"></i>
-    </button>
-    <div class="container-fluid">
-        <a class="navbar-brand" href="admin_index.php">
-            <img src="./images/perfume_logo.png" alt="Logo" style="width:50px;">
-            ADMIN DASHBOARD
-        </a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav me-auto">
-            </ul>
-            <a href="admin_login.php" class="btn btn-outline-dark">Logout</a>        
-    </div>
-</nav>
-
-    <br>
-</div>
-
-   <!-- Offcanvas Sidebar -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
-    <div class="offcanvas-header bg-light border-bottom">
-        <h5 class="offcanvas-title fw-bold" id="sidebarLabel">Admin Dashboard</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body p-0">
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="admin_index.php">
-                    <i class="bi bi-house-door me-3 fs-5"></i>
-                    <span class="fs-6">Home</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_products.php">
-                    <i class="bi bi-box me-3 fs-5"></i>
-                    <span class="fs-6">Manage Products</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_orders.php">
-                    <i class="bi bi-cart me-3 fs-5"></i>
-                    <span class="fs-6">Manage Orders</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_coupon.php">
-                    <i class="bi bi-tag me-3 fs-5"></i>
-                    <span class="fs-6">Manage Coupons</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_users.php">
-                    <i class="bi bi-person me-3 fs-5"></i>
-                    <span class="fs-6">Manage Users</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_reviews.php">
-                    <i class="bi bi-star me-3 fs-5"></i>
-                    <span class="fs-6">Manage Reviews</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_contact_us.php">
-                    <i class="bi bi-star me-3 fs-5"></i>
-                    <span class="fs-6">Manage Contact</span>
-                </a>
-            </li>
-           
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="view_reports.php">
-                    <i class="bi bi-bar-chart me-3 fs-5"></i>
-                    <span class="fs-6">Reports</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="admin_chat.php">
-                <i class="bi bi-chat me-3 fs-5"></i>
-                    <span class="fs-6">Chat With Customer</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-</div>
+<?php include 'admin_navbar.php'; ?>
+    <?php include 'offcanvas_sidebar.php'; ?>
 
     <div class="container my-5">
     <h1 class="text-center mb-4">Welcome, Admin!</h1>
@@ -244,13 +157,22 @@ if (isset($_GET['user_id'])) {
                 </div>
             </div>
         </div>
-
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+                    <i class="fas fa-star fa-3x mb-3 text-secondary"></i>
+                    <h5 class="card-title mb-2">Manage Shipping</h5>
+                    <p class="card-text mb-3">View or manage shipping methods.</p>
+                    <a href="manage_shipping.php" class="btn btn-outline-secondary w-100">Go</a>
+                </div>
+            </div>
+        </div>
         <!-- Reports -->
         <div class="col-md-3">
             <div class="card text-center shadow-sm h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
                     <i class="fas fa-chart-line fa-3x mb-3 text-danger"></i>
-                    <h5 class="card-title mb-2">View Reports</h5>
+                    <h5 class="card-title mb-2">Reports</h5>
                     <p class="card-text mb-3">View sales and performance reports.</p>
                     <a href="view_reports.php" class="btn btn-outline-danger w-100">Go</a>
                 </div>

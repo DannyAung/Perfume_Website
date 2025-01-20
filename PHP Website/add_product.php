@@ -143,7 +143,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 12px;
         }
 
-     
+     .btn-primary{
+        font-size: 1.0rem;
+     }
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
@@ -185,94 +187,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-<div class="container-fluid">
-    <nav class="navbar navbar-expand-lg">
-        <!-- Sidebar Toggle Button -->
-        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
-            <i class="bi bi-list"></i>
-        </button>
-        <div class="container-fluid">
-            <a class="navbar-brand" href="admin_index.php">
-                <img src="./images/perfume_logo.png" alt="Logo" style="width:50px;">
-                ADMIN DASHBOARD
-            </a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav me-auto">
-                </ul>
-                <a href="admin_login.php" class="btn btn-outline-dark">Logout</a>
-            </div>
-        </div>
-    </nav>
-    <br>
-</div>
-
-   <!-- Offcanvas Sidebar -->
-<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
-    <div class="offcanvas-header bg-light border-bottom">
-        <h5 class="offcanvas-title fw-bold" id="sidebarLabel">Admin Dashboard</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body p-0">
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="admin_index.php">
-                    <i class="bi bi-house-door me-3 fs-5"></i>
-                    <span class="fs-6">Home</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_products.php">
-                    <i class="bi bi-box me-3 fs-5"></i>
-                    <span class="fs-6">Manage Products</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_orders.php">
-                    <i class="bi bi-cart me-3 fs-5"></i>
-                    <span class="fs-6">Manage Orders</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_coupon.php">
-                    <i class="bi bi-tag me-3 fs-5"></i>
-                    <span class="fs-6">Manage Coupons</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_users.php">
-                    <i class="bi bi-person me-3 fs-5"></i>
-                    <span class="fs-6">Manage Users</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_reviews.php">
-                    <i class="bi bi-star me-3 fs-5"></i>
-                    <span class="fs-6">Manage Reviews</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_contact_us.php">
-                    <i class="bi bi-star me-3 fs-5"></i>
-                    <span class="fs-6">Manage Contact</span>
-                </a>
-            </li>
-           
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="view_reports.php">
-                    <i class="bi bi-bar-chart me-3 fs-5"></i>
-                    <span class="fs-6">Reports</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="admin_chat.php">
-                <i class="bi bi-chat me-3 fs-5"></i>
-                    <span class="fs-6">Chat With Customer</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-</div>
+<?php include 'admin_navbar.php'; ?>
+<?php include 'offcanvas_sidebar.php'; ?>
 
     <form action="add_product.php" method="POST" enctype="multipart/form-data">
         <div class="container mt-5">
@@ -376,13 +292,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button type="submit" class="btn btn-primary btn-lg">Add Product</button>
             </div>
 </div>
-    </form>
-    <footer>
-        <div class="row mt-4 border-top pt-3">
-            <div class="col-md-6">
-                <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
-            </div>
-    </footer>
+    </form><br>
+
     <script>
         function toggleDiscountField() {
             const discountField = document.getElementById('discount_field');

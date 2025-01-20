@@ -140,7 +140,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
     <div class="container">
         <div class="privacy-policy-container">
             <h2>Privacy Policy</h2>
-            <p>At [Your Company Name], we value the privacy of our customers and are committed to protecting your personal information. This privacy policy explains how we collect, use, and safeguard your data when you interact with our website and services.</p>
+            <p>At Fragrance Haven, we value the privacy of our customers and are committed to protecting your personal information. This privacy policy explains how we collect, use, and safeguard your data when you interact with our website and services.</p>
 
             <h4>1. Information We Collect</h4>
             <p>We collect the following types of information to improve our services and provide a better experience for you:</p>
@@ -148,7 +148,6 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                 <li>Personal identification information (e.g., name, email address, phone number)</li>
                 <li>Transaction data (e.g., order history, payment details)</li>
                 <li>Device information (e.g., IP address, browser type, device type)</li>
-                <li>Cookies and usage data (e.g., browsing behavior on the website)</li>
             </ul>
 
             <h4>2. How We Use Your Information</h4>
@@ -181,16 +180,13 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                 <li>Opt-out of receiving marketing communications</li>
             </ul>
 
-            <h4>6. Cookies</h4>
-            <p>We use cookies to enhance your experience on our website. Cookies are small files stored on your device that help us remember your preferences and improve website performance. You can manage cookie settings through your browser.</p>
-
             <h4>7. Changes to This Privacy Policy</h4>
             <p>We may update this privacy policy from time to time. Any changes will be posted on this page, and the updated policy will be effective as of the date of posting.</p>
 
             <h4>8. Contact Us</h4>
             <p>If you have any questions or concerns about this privacy policy, please contact us at:</p>
             <p><b>Email:</b> [fragrancehaven@gmail.com]</p>
-            <p><b>Phone:</b> [+95945-197415]</p>
+            <p><b>Phone:</b> [+959450197415]</p>
         </div>
     </div>
 

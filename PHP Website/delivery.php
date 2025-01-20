@@ -126,7 +126,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                 <div class="card-body">
                     <h4 class="card-title text-center" style="font-size: 1.5rem; color:rgb(12, 70, 132);">How Delivery Works</h4>
                     <p style="font-size: 1.1rem; color: #555;">
-                        Once your order is placed, we process it and dispatch it as soon as possible. You will receive a tracking number once your order is on its way.
+                        Once your order is placed, we process it and dispatch it as soon as possible. You can track the order by checking order status from your order history.
                     </p>
                     <p style="font-size: 1.1rem; color: #555;">
                         If you have any questions or concerns about delivery, feel free to <a href="contact_us.php" class="text-decoration-none" style="color: #007bff;">contact us</a>!

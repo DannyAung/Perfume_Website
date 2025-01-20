@@ -96,8 +96,9 @@ $conn->close();
         }
 
         .login-container input {
-            width: 100%;
-            padding: 0.75rem;
+            width: 100%;  
+            height: 30px;       
+            padding: 0.40rem;
             margin-bottom: 1rem;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -105,7 +106,7 @@ $conn->close();
         }
 
         .login-container button {
-            width: 426px;
+            width: 515px;
             padding: 0.75rem;
             background-color: #007bff;
             color: #fff;

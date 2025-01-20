@@ -44,10 +44,13 @@ if ($result->num_rows === 1) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fragrance Haven</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+     <!-- Bootstrap CSS -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
 </head>
 <style>
     .card {
@@ -60,7 +63,7 @@ if ($result->num_rows === 1) {
 </style>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
         <div class="container-fluid">
             <!-- Logo and Brand -->
             <a class="navbar-brand d-flex align-items-center" href="user_index.php">
@@ -138,68 +141,79 @@ if ($result->num_rows === 1) {
 
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Welcome, <?php echo htmlspecialchars($user['user_name']); ?>!</h5>
+                  
+                        <div class="card-body text-center">
+                            <?php if (!empty($user['user_image'])): ?>
+                                <img src="uploads/profile_images/<?php echo htmlspecialchars($user['user_image']); ?>" alt="Profile Picture" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                            <?php else: ?>
+                                <img src="uploads/profile_images/default.png" alt="Default Profile Picture" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                            <?php endif; ?>
+                            <h5 class="card-title mt-3">Welcome, <?php echo htmlspecialchars($user['user_name']); ?>!</h5>
+                        </div>
+                   
+
                     <p class="card-text">
                         <strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?><br>
                         <strong>Address:</strong> <?php echo htmlspecialchars($user['address']); ?><br>
+
                         <strong>Phone Number:</strong> <?php echo htmlspecialchars($user['phone_number']); ?><br>
                         <strong>Member Since:</strong> <?php echo htmlspecialchars($user['created_at']); ?>
                     </p>
                     <a href="edit_profile.php" class="btn btn-primary">Edit Profile</a>
-                    <a href="user_index.php" class="btn btn-primary">Go to Home</a>
+                   
                 </div>
             </div>
         </div><br>
         <footer class="bg-dark text-white py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="mb-3">About Us</h5>
-                    <p class="text-muted">Fragrance Haven is your ultimate destination for high-quality perfumes that elevate your senses. Explore our wide range of fragrances designed to suit every occasion and personality.</p>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <h5 class="mb-3">About Us</h5>
+                        <p class="text-muted">Fragrance Haven is your ultimate destination for high-quality perfumes that elevate your senses. Explore our wide range of fragrances designed to suit every occasion and personality.</p>
+                    </div>
+
+                    <div class="col-md-2 mb-4">
+                        <h5 class="mb-1">Quick Links</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="user_index.php" class="text-white text-decoration-none">Home</a></li>
+                            <li><a href="women_category.php" class="text-white text-decoration-none">Women’s Collection</a></li>
+                            <li><a href="men_category.php" class="text-white text-decoration-none">Men’s Collection</a></li>
+                            <li><a href="unisex_category.php" class="text-white text-decoration-none">Unisex Collection</a></li>
+                            <li><a href="about_us.php" class="text-white text-decoration-none">About Us</a></li>
+                            <li><a href="contact_us.php" class="text-white text-decoration-none">Contact Us</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-2 mb-4">
+                        <h5 class="mb-1">Customer Care</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="privacy_policy.php" class="text-white text-decoration-none">Privacy Policy</a></li>
+                            <li><a href="term_and_conditions.php" class="text-white text-decoration-none">Terms and Conditions</a></li>
+                            <li><a href="faq.php" class="text-white text-decoration-none">FAQ</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-3 mb-4">
+                        <h5 class="mb-4">Contact Info</h5>
+                        <p class="text-muted"><i class="fas fa-map-marker-alt me-2"></i> Pyi Yeik Thar Street, Kamayut, Yangon, Myanmar</p>
+                        <p class="text-muted"><i class="fas fa-phone-alt me-2"></i> +959450197415</p>
+                        <p class="text-muted"><i class="fas fa-envelope me-2"></i> support@fragrancehaven.com</p>
+                    </div>
                 </div>
 
-                <div class="col-md-2 mb-4">
-                    <h5 class="mb-1">Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="user_index.php" class="text-white text-decoration-none">Home</a></li>
-                        <li><a href="women_category.php" class="text-white text-decoration-none">Women’s Collection</a></li>
-                        <li><a href="men_category.php" class="text-white text-decoration-none">Men’s Collection</a></li>
-                        <li><a href="unisex_category.php" class="text-white text-decoration-none">Unisex Collection</a></li>
-                        <li><a href="about_us.php" class="text-white text-decoration-none">About Us</a></li>
-                        <li><a href="contact_us.php" class="text-white text-decoration-none">Contact Us</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-md-2 mb-4">
-                    <h5 class="mb-1">Customer Care</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="privacy_policy.php" class="text-white text-decoration-none">Privacy Policy</a></li>
-                        <li><a href="term_and_conditions.php" class="text-white text-decoration-none">Terms and Conditions</a></li>
-                        <li><a href="faq.php" class="text-white text-decoration-none">FAQ</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-md-3 mb-4">
-                    <h5 class="mb-4">Contact Info</h5>
-                    <p class="text-muted"><i class="fas fa-map-marker-alt me-2"></i> Pyi Yeik Thar Street, Kamayut, Yangon, Myanmar</p>
-                    <p class="text-muted"><i class="fas fa-phone-alt me-2"></i> +959450197415</p>
-                    <p class="text-muted"><i class="fas fa-envelope me-2"></i> support@fragrancehaven.com</p>
+                <div class="row mt-4 border-top pt-3">
+                    <div class="col-md-6">
+                        <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="https://www.instagram.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="https://www.facebook.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="https://twitter.com/" class="text-white text-decoration-none" target="_blank"><i class="fab fa-twitter fa-lg"></i></a>
+                    </div>
                 </div>
             </div>
+        </footer>
 
-            <div class="row mt-4 border-top pt-3">
-                <div class="col-md-6">
-                    <p class="text-muted">&copy; 2025 Fragrance Haven. All rights reserved.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="https://www.instagram.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-instagram fa-lg"></i></a>
-                    <a href="https://www.facebook.com/" class="text-white me-3 text-decoration-none" target="_blank"><i class="fab fa-facebook fa-lg"></i></a>
-                    <a href="https://twitter.com/" class="text-white text-decoration-none" target="_blank"><i class="fab fa-twitter fa-lg"></i></a>
-                </div>
-            </div>
-        </div>
-    </footer>
-    
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
