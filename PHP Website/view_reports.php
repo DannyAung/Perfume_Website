@@ -260,7 +260,7 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
                 </div>
             </div>
 
-            <!-- Daily Sales Line Chart -->
+           
 
             <!-- Yearly Sales Bar Chart -->
             <div class="col-md-6">

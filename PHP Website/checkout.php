@@ -12,6 +12,9 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
+if (!isset($_SESSION['applied_coupon_code'])) {
+    $_SESSION['applied_coupon_code'] = null; // Default value (null or empty string)
+}
 
 // Database connection
 $host = 'localhost';
@@ -107,8 +110,6 @@ if (isset($_POST['shipping_method']) && !empty($_POST['shipping_method'])) {
 // Calculate final total price
 $final_total_price = $final_price + $shipping_fee;
 
-
-
 // Handle the checkout process
 if (isset($_POST['checkout'])) {
     $name = $_POST['name'];
@@ -164,7 +165,6 @@ if (isset($_POST['checkout'])) {
 
         // Redirect to receipt page
         header("Location: receipt.php?order_id=" . $order_id);
-        exit();
     } else {
         die("Error processing order: " . $order_stmt->error);
     }
@@ -427,41 +427,65 @@ session_regenerate_id(true);
                 }
             </script>
 
-           <!-- Shipping Method -->
-<div class="mb-3">
-    <label for="shipping_method" class="form-label">Shipping Method</label>
-    <select class="form-control" id="shipping_method" name="shipping_method" onchange="updateTotalPrice()" required>
-        <option value="" disabled selected>Select Shipping Method</option>
-        <?php
-        foreach ($shipping_methods as $method => $fee) {
-            echo "<option value='" . htmlspecialchars($method) . "' data-fee='" . $fee . "'>"
-                . htmlspecialchars($method) . " - $" . $fee . "</option>";
-        }
-        ?>
-    </select>
-</div>
+            <!-- Shipping Method -->
+            <div class="mb-3">
+                <label for="shipping_method" class="form-label">Shipping Method</label>
+                <select class="form-control" id="shipping_method" name="shipping_method" onchange="updateTotalPrice()" required>
+                    <option value="" disabled selected>Select Shipping Method</option>
+                    <?php
+                    foreach ($shipping_methods as $method => $fee) {
+                        echo "<option value='" . htmlspecialchars($method) . "' data-fee='" . $fee . "'>"
+                            . htmlspecialchars($method) . " - $" . $fee . "</option>";
+                    }
+                    ?>
+                </select>
+            </div>
 
-<div class="total-price">
-    <p id="total-amount">Subtotal: $<?php echo number_format($total_price, 2); ?></p> <!-- Display Subtotal -->
+            <?php
+            if (!$_SESSION['applied_coupon_code']) {
+            ?>
+                <div class="total-price">
+                    <p id="total-amount">Subtotal: $<?php echo number_format($total_price, 2); ?></p> <!-- Display Subtotal -->
 
-    <?php if ($discount_percentage > 0): ?>
-        <p id="coupon-discount">Coupon Applied: -$<?php echo number_format($discount_amount, 2); ?></p> <!-- Display Coupon Discount -->
-    <?php else: ?>
-        <p id="coupon-discount"></p> <!-- Hide coupon discount if no coupon is applied -->
-    <?php endif; ?>
+                    <p id="shipping-fee">Shipping Fee: $<?php echo number_format($shipping_fee, 2); ?></p> <!-- Display Shipping Fee -->
 
-    <p id="shipping-fee">Shipping Fee: $<?php echo number_format($shipping_fee, 2); ?></p> <!-- Display Shipping Fee -->
+                    <hr>
 
-    <hr>
+                    <p id="final-total">
+                        <strong>Total Amount: $<?php
+                                                // Final total calculation after applying the discount and adding the shipping fee
+                                                $final_total_price = $total_price - $discount_amount + $shipping_fee;
+                                                echo number_format($final_total_price, 2);
+                                                ?></strong>
+                    </p> <!-- Display Final Total Amount -->
+                </div>
+            <?php
+            } else {
+            ?>
+                <div class="total-price">
+                    <p id="total-amount">Subtotal: $<?php echo number_format($total_price, 2); ?></p> <!-- Display Subtotal -->
 
-    <p id="final-total">
-        <strong>Total Amount: $<?php
-            // Final total calculation after applying the discount and adding the shipping fee
-            $final_total_price = $total_price - $discount_amount + $shipping_fee;
-            echo number_format($final_total_price, 2);
-        ?></strong>
-    </p> <!-- Display Final Total Amount -->
-</div>
+                    <?php if ($discount_percentage > 0): ?>
+                        <p id="coupon-discount">Coupon Applied: -$<?php echo number_format($discount_amount, 2); ?></p> <!-- Display Coupon Discount -->
+                    <?php else: ?>
+                        <p id="coupon-discount"></p> <!-- Hide coupon discount if no coupon is applied -->
+                    <?php endif; ?>
+
+                    <p id="shipping-fee">Shipping Fee: $<?php echo number_format($shipping_fee, 2); ?></p> <!-- Display Shipping Fee -->
+
+                    <hr>
+
+                    <p id="final-total">
+                        <strong>Total Amount: $<?php
+                                                // Final total calculation after applying the discount and adding the shipping fee
+                                                $final_total_price = $total_price - $discount_amount + $shipping_fee;
+                                                echo number_format($final_total_price, 2);
+                                                ?></strong>
+                    </p> <!-- Display Final Total Amount -->
+                </div>
+            <?php
+            }
+            ?>
 
             <button type="submit" name="checkout" class="btn btn-success btn-lg w-100">Confirm and Checkout</button>
         </form>
@@ -469,55 +493,55 @@ session_regenerate_id(true);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-    // Get the current shipping fee from PHP variable
-    let shippingFee = <?php echo json_encode($shipping_fee); ?>;
-    const baseTotalPrice = <?php echo $total_price; ?>; // Base total price without shipping or discount
-    const discountPercentage = <?php echo $discount_percentage; ?>; // Discount percentage (0 if no coupon)
+    <script>
+        // Get the current shipping fee from PHP variable
+        let shippingFee = <?php echo json_encode($shipping_fee); ?>;
+        const baseTotalPrice = <?php echo $total_price; ?>; // Base total price without shipping or discount
+        const discountPercentage = <?php echo $discount_percentage; ?>; // Discount percentage (0 if no coupon)
 
-    // Function to update total price dynamically
-    function updateTotalPrice() {
-        const shippingMethodSelect = document.getElementById('shipping_method');
+        // Function to update total price dynamically
+        function updateTotalPrice() {
+            const shippingMethodSelect = document.getElementById('shipping_method');
 
-        // Check if a shipping method is selected
-        if (shippingMethodSelect && shippingMethodSelect.selectedIndex >= 0) {
-            const selectedOption = shippingMethodSelect.options[shippingMethodSelect.selectedIndex];
-            shippingFee = parseFloat(selectedOption.getAttribute('data-fee')) || 0; // Get shipping fee from selected option or default to 0
-        } else {
-            shippingFee = 0; // If no shipping method is selected, set fee to 0
-        }
+            // Check if a shipping method is selected
+            if (shippingMethodSelect && shippingMethodSelect.selectedIndex >= 0) {
+                const selectedOption = shippingMethodSelect.options[shippingMethodSelect.selectedIndex];
+                shippingFee = parseFloat(selectedOption.getAttribute('data-fee')) || 0; // Get shipping fee from selected option or default to 0
+            } else {
+                shippingFee = 0; // If no shipping method is selected, set fee to 0
+            }
 
-        // Calculate discount amount (if any)
-        const discountAmount = baseTotalPrice * (discountPercentage / 100);
-
-        // Calculate final price after discount
-        const finalPrice = baseTotalPrice - discountAmount;
-
-        // Calculate the final total price (after discount and including shipping fee)
-        const finalTotalPrice = finalPrice + shippingFee;
-
-        // Update the displayed prices dynamically
-        document.getElementById('total-amount').innerText = "Subtotal: $" + baseTotalPrice.toFixed(2);
-        document.getElementById('shipping-fee').innerText = "Shipping Fee: $" + shippingFee.toFixed(2);
-
-        // Display coupon discount only if a coupon is applied
-        if (discountPercentage > 0) {
+            // Calculate discount amount (if any)
             const discountAmount = baseTotalPrice * (discountPercentage / 100);
-            document.getElementById('coupon-discount').innerText = "Coupon Applied: -$" + discountAmount.toFixed(2);
-        } else {
-            document.getElementById('coupon-discount').innerText = ""; // Clear coupon discount if no coupon is applied
+
+            // Calculate final price after discount
+            const finalPrice = baseTotalPrice - discountAmount;
+
+            // Calculate the final total price (after discount and including shipping fee)
+            const finalTotalPrice = finalPrice + shippingFee;
+
+            // Update the displayed prices dynamically
+            document.getElementById('total-amount').innerText = "Subtotal: $" + baseTotalPrice.toFixed(2);
+            document.getElementById('shipping-fee').innerText = "Shipping Fee: $" + shippingFee.toFixed(2);
+
+            // Display coupon discount only if a coupon is applied
+            if (discountPercentage > 0) {
+                const discountAmount = baseTotalPrice * (discountPercentage / 100);
+                document.getElementById('coupon-discount').innerText = "Coupon Applied: -$" + discountAmount.toFixed(2);
+            } else {
+                document.getElementById('coupon-discount').innerText = ""; // Clear coupon discount if no coupon is applied
+            }
+
+            // Update the final total price
+            document.getElementById('final-total').innerText = "Total Amount: $" + finalTotalPrice.toFixed(2);
         }
 
-        // Update the final total price
-        document.getElementById('final-total').innerText = "Total Amount: $" + finalTotalPrice.toFixed(2);
-    }
+        // Trigger the update when the page loads (to apply the discount and shipping immediately)
+        window.onload = updateTotalPrice;
 
-    // Trigger the update when the page loads (to apply the discount and shipping immediately)
-    window.onload = updateTotalPrice;
-
-    // Add an event listener to the shipping method dropdown to update the total price when the shipping method changes
-    document.getElementById('shipping_method').addEventListener('change', updateTotalPrice);
-</script>
+        // Add an event listener to the shipping method dropdown to update the total price when the shipping method changes
+        document.getElementById('shipping_method').addEventListener('change', updateTotalPrice);
+    </script>
 
 
 

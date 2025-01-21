@@ -107,8 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fragrance Haven</title>
-     <!-- Bootstrap CSS -->
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -236,63 +236,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                                     unset($_SESSION['success']); ?></div>
                             <?php endif; ?>
                             <form action="update_profile.php" method="POST" enctype="multipart/form-data">
-    <!-- User Name -->
-    <div class="mb-4">
-        <label for="user_name" class="form-label">Name</label>
-        <input type="text" class="form-control" id="user_name" name="user_name" value="<?php echo htmlspecialchars($user['user_name']); ?>" required>
-    </div>
+                                <!-- User Name -->
+                                <div class="mb-4">
+                                    <label for="user_name" class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="user_name" name="user_name" value="<?php echo htmlspecialchars($user['user_name']); ?>" required>
+                                </div>
 
-    <!-- Email -->
-    <div class="mb-4">
-        <label for="email" class="form-label">Email</label>
-        <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
-    </div>
+                                <!-- Email -->
+                                <div class="mb-4">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                                </div>
 
-    <!-- Address -->
-    <div class="mb-4">
-        <label for="address" class="form-label">Address</label>
-        <input type="text" class="form-control" id="address" name="address" value="<?php echo htmlspecialchars($user['address']); ?>" required>
-    </div>
+                                <!-- Address -->
+                                <div class="mb-4">
+                                    <label for="address" class="form-label">Address</label>
+                                    <input type="text" class="form-control" id="address" name="address" value="<?php echo htmlspecialchars($user['address']); ?>" required>
+                                </div>
 
-    <!-- Phone Number -->
-    <div class="mb-4">
-        <label for="phone_number" class="form-label">Phone Number</label>
-        <input type="text" class="form-control" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($user['phone_number']); ?>" required>
-    </div>
+                                <!-- Phone Number -->
+                                <div class="mb-4">
+                                    <label for="phone_number" class="form-label">Phone Number</label>
+                                    <input type="text" class="form-control" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($user['phone_number']); ?>" required>
+                                </div>
 
-    <!-- Profile Picture Upload -->
-    <div class="mb-4">
-        <label for="user_image" class="form-label">Upload Profile Picture</label>
-        <input type="file" name="user_image" id="user_image" class="form-control" accept="image/*">
-    </div>
+                                <!-- Profile Picture Upload -->
+                                <div class="mb-4">
+                                    <label for="user_image" class="form-label">Upload Profile Picture</label>
+                                    <input type="file" name="user_image" id="user_image" class="form-control" accept="image/*">
+                                </div>
 
-    <!-- Current Password -->
-    <div class="mb-4">
-        <label for="password" class="form-label">Current Password</label>
-        <input type="password" class="form-control" id="password" name="password" required>
-    </div>
+                                <!-- Current Password -->
+                                <div class="mb-4">
+                                    <label for="password" class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
 
-    <!-- New Password -->
-    <div class="mb-4">
-        <label for="new_password" class="form-label">New Password</label>
-        <input type="password" class="form-control" id="new_password" name="new_password">
-    </div>
+                                <!-- New Password -->
+                                <div class="mb-4">
+                                    <label for="new_password" class="form-label">New Password</label>
+                                    <input type="password" class="form-control" id="new_password" name="new_password">
+                                </div>
 
-    <!-- Confirm New Password -->
-    <div class="mb-4">
-        <label for="confirm_password" class="form-label">Confirm New Password</label>
-        <input type="password" class="form-control" id="confirm_password" name="confirm_password">
-    </div>
+                                <!-- Confirm New Password -->
+                                <div class="mb-4">
+                                    <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                                </div>
 
-    <button type="submit" class="btn btn-primary">Update Profile</button>
-</form>
+                                <button type="submit" class="btn btn-primary">Update Profile</button>
+                            </form>
 
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div><br>
         <footer class="bg-dark text-white py-5">
             <div class="container">
                 <div class="row">
