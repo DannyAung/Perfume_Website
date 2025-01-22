@@ -107,8 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
     <style>
         body {
             background-color: #f8f9fa;
@@ -116,8 +116,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .navbar {
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
         .container {
             max-width: 900px;
@@ -143,9 +143,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 12px;
         }
 
-     .btn-primary{
-        font-size: 1.0rem;
-     }
+        .btn-primary {
+            font-size: 1.0rem;
+        }
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
@@ -187,47 +188,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-<?php include 'admin_navbar.php'; ?>
-<?php include 'offcanvas_sidebar.php'; ?>
+    <?php include 'admin_navbar.php'; ?>
+    <?php include 'offcanvas_sidebar.php'; ?>
 
     <form action="add_product.php" method="POST" enctype="multipart/form-data">
-        <div class="container mt-5">
-            <h2 class="text-center mb-4">Add Product</h2>
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Add Product</h2>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="product_name" class="form-label">Product Name</label>
-                    <input type="text" class="form-control" id="product_name" name="product_name" placeholder="Enter product name" required>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="price" class="form-label">Price ($)</label>
-                    <input type="number" step="0.01" class="form-control" id="price" name="price" placeholder="Enter price" required>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter product description" required></textarea>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="stock_quantity" class="form-label">Stock Quantity</label>
-                    <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" placeholder="Enter stock quantity" required>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="category" class="form-label">Category</label>
-                    <select class="form-select" id="category" name="category" required>
-                        <option value="">Select a category</option>
-                        <option value="Men">Men</option>
-                        <option value="Women">Women</option>
-                        <option value="Unisex">Unisex</option>
-                    </select>
-                </div>
+        <!-- Product Details -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="product_name" class="form-label">Product Name</label>
+                <input type="text" class="form-control" id="product_name" name="product_name" placeholder="Enter product name" required>
             </div>
             <div class="col-md-6 mb-3">
+                <label for="price" class="form-label">Price ($)</label>
+                <input type="number" step="0.01" class="form-control" id="price" name="price" placeholder="Enter price" required>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="row">
+            <div class="col-md-12 mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="4" placeholder="Enter product description" required></textarea>
+            </div>
+        </div>
+
+        <!-- Stock & Category -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="stock_quantity" class="form-label">Stock Quantity</label>
+                <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" placeholder="Enter stock quantity" required>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label for="category" class="form-label">Category</label>
+                <select class="form-select" id="category" name="category" required>
+                    <option value="">Select a category</option>
+                    <option value="Men">Men</option>
+                    <option value="Women">Women</option>
+                    <option value="Unisex">Unisex</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
                 <label for="subcategory" class="form-label">SubCategory</label>
                 <select class="form-control" id="subcategory" name="subcategory" required>
                     <option value="">Select subcategory</option>
@@ -237,97 +242,110 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <option value="Featured">Featured</option>
                 </select>
             </div>
+        <!-- Size Field -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="size" class="form-label">Size</label>
+                <input type="text" class="form-control" id="size" name="size" placeholder="Enter size (e.g., 100ml, 120ml)">
+            </div>
+        </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="discount_available" class="form-label">Discount Available</label>
-                    <select class="form-select" id="discount_available" name="discount_available" onchange="toggleDiscountField()">
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3" id="discount_field" style="display: none;">
-                    <label for="discount_percentage" class="form-label">Discount Percentage</label>
-                    <input type="number" class="form-control" id="discount_percentage" name="discount_percentage" placeholder="Enter discount percentage" oninput="calculateDiscount()">
+        <!-- Discount Field -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="discount_available" class="form-label">Discount Available</label>
+                <select class="form-select" id="discount_available" name="discount_available" onchange="toggleDiscountField()">
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select>
+            </div>
+
+            <div class="col-md-6 mb-3" id="discount_field" style="display: none;">
+                <label for="discount_percentage" class="form-label">Discount Percentage</label>
+                <input type="number" class="form-control" id="discount_percentage" name="discount_percentage" placeholder="Enter discount percentage" oninput="calculateDiscount()">
+            </div>
+        </div>
+
+        <!-- Discounted Price -->
+        <div class="row" id="discounted_price_field" style="display: none;">
+            <div class="col-md-12 mb-3">
+                <label for="discounted_price" class="form-label">Discounted Price ($)</label>
+                <input type="text" class="form-control" id="discounted_price" name="discounted_price" readonly>
+            </div>
+        </div>
+
+        <!-- Image Uploads -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Main Image</label>
+                <div class="file-upload">
+                    <input type="file" id="mainImage" name="image" accept="image/*" onchange="previewImage(event, 'mainImagePreview')" required>
+                    <span>Click or drag to upload an image</span>
+                    <img id="mainImagePreview" src="#" alt="Main Image Preview" style="display:none;">
                 </div>
             </div>
 
-            <div class="row" id="discounted_price_field" style="display: none;">
-                <div class="col-md-12 mb-3">
-                    <label for="discounted_price" class="form-label">Discounted Price ($)</label>
-                    <input type="text" class="form-control" id="discounted_price" name="discounted_price" readonly>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Extra Image 1</label>
+                <div class="file-upload">
+                    <input type="file" id="extraImage1" name="extra_image_1" accept="image/*" onchange="previewImage(event, 'extraImage1Preview')" required>
+                    <span>Click or drag to upload an image</span>
+                    <img id="extraImage1Preview" src="#" alt="Extra Image 1 Preview" style="display:none;">
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Main Image</label>
-                    <div class="file-upload">
-                        <input type="file" id="mainImage" name="image" accept="image/*" onchange="previewImage(event, 'mainImagePreview')" required>
-                        <span>Click or drag to upload an image</span>
-                        <img id="mainImagePreview" src="#" alt="Main Image Preview">
-                    </div>
-                </div>
-
-
-
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Extra Image 1</label>
-                    <div class="file-upload">
-                        <input type="file" id="extraImage1" name="image" accept="image/*" onchange="previewImage(event, 'extraImage1Preview')" required>
-                        <span>Click or drag to upload an image</span>
-                        <img id="extraImage1Preview" src="#" alt="Extra Image 1 Preview">
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Extra Image 2</label>
-                    <div class="file-upload">
-                        <input type="file" id="extraImage2" name="image" accept="image/*" onchange="previewImage(event, 'extraImage2Preview')" required>
-                        <span>Click or drag to upload an image</span>
-                        <img id="extraImage2Preview" src="#" alt="Extra Image 2 Preview">
-                    </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Extra Image 2</label>
+                <div class="file-upload">
+                    <input type="file" id="extraImage2" name="extra_image_2" accept="image/*" onchange="previewImage(event, 'extraImage2Preview')" required>
+                    <span>Click or drag to upload an image</span>
+                    <img id="extraImage2Preview" src="#" alt="Extra Image 2 Preview" style="display:none;">
                 </div>
             </div>
-            <div class="add-button text-center">
-                <button type="submit" class="btn btn-primary btn-lg">Add Product</button>
-            </div>
-</div>
-    </form><br>
+        </div>
 
-    <script>
-        function toggleDiscountField() {
-            const discountField = document.getElementById('discount_field');
-            const discountedPriceField = document.getElementById('discounted_price_field');
-            const discountAvailable = document.getElementById('discount_available').value;
+        <!-- Submit Button -->
+        <div class="add-button text-center">
+            <button type="submit" class="btn btn-primary btn-lg">Add Product</button>
+        </div>
+    </div>
+</form><br>
 
-            if (discountAvailable === 'Yes') {
-                discountField.style.display = 'block';
-                discountedPriceField.style.display = 'block';
-            } else {
-                discountField.style.display = 'none';
-                discountedPriceField.style.display = 'none';
-            }
+<script>
+    function toggleDiscountField() {
+        const discountField = document.getElementById('discount_field');
+        const discountedPriceField = document.getElementById('discounted_price_field');
+        const discountAvailable = document.getElementById('discount_available').value;
+
+        if (discountAvailable === 'Yes') {
+            discountField.style.display = 'block';
+            discountedPriceField.style.display = 'block';
+        } else {
+            discountField.style.display = 'none';
+            discountedPriceField.style.display = 'none';
         }
+    }
 
-        function calculateDiscount() {
-            const price = parseFloat(document.getElementById('price').value);
-            const discountPercentage = parseFloat(document.getElementById('discount_percentage').value);
-            if (!isNaN(price) && !isNaN(discountPercentage)) {
-                const discountedPrice = price - (price * (discountPercentage / 100));
-                document.getElementById('discounted_price').value = discountedPrice.toFixed(2);
-            }
+    function calculateDiscount() {
+        const price = parseFloat(document.getElementById('price').value);
+        const discountPercentage = parseFloat(document.getElementById('discount_percentage').value);
+        if (!isNaN(price) && !isNaN(discountPercentage)) {
+            const discountedPrice = price - (price * (discountPercentage / 100));
+            document.getElementById('discounted_price').value = discountedPrice.toFixed(2);
         }
+    }
 
-        function previewImage(event, previewId) {
-            const reader = new FileReader();
-            reader.onload = function() {
-                const output = document.getElementById(previewId);
-                output.src = reader.result;
-                output.style.display = 'block';
-            };
-            reader.readAsDataURL(event.target.files[0]);
-        }
-    </script>
+    function previewImage(event, previewId) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            const output = document.getElementById(previewId);
+            output.src = reader.result;
+            output.style.display = 'block';
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    }
+</script>
+
 </body>
 
 </html>

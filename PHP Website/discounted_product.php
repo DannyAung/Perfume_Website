@@ -196,7 +196,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                             $discount_query .= " AND discount_percentage > 0"; // Only include discounted products
 
                             // Execute the query
-                            $result = mysqli_query($conn, $discount_query);                
+                            $result = mysqli_query($conn, $discount_query);
 
                             // Apply Price Filter
                             if (isset($_GET['min_price']) && isset($_GET['max_price']) && is_numeric($_GET['min_price']) && is_numeric($_GET['max_price'])) {
@@ -245,7 +245,8 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                                         <div class="image-container position-relative overflow-hidden">
                                             <!-- Discount Badge -->
                                             <?php if ($discount_percentage > 0): ?>
-                                                <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end" style="font-size: 0.9rem;">
+                                                <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end"
+                                                    style="font-size: 0.9rem; z-index: 10;"> <!-- Added z-index here -->
                                                     <?php echo $discount_percentage; ?>% OFF
                                                 </div>
                                             <?php endif; ?>
@@ -309,8 +310,8 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                 });
             });
         </script>
- <?php include 'footer.php'; ?>
- 
+        <?php include 'footer.php'; ?>
+
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>

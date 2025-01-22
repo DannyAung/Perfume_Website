@@ -352,7 +352,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <div class="image-container position-relative overflow-hidden">
                                         <!-- Discount Badge -->
                                         <?php if ($discount_percentage > 0): ?>
-                                            <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end" style="font-size: 0.9rem;">
+                                            <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end"
+                                                style="font-size: 0.9rem; z-index: 10;"> <!-- Added z-index here -->
                                                 <?php echo $discount_percentage; ?>% OFF
                                             </div>
                                         <?php endif; ?>
@@ -443,7 +444,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="text-left" style="width: 50%; margin-left:50px;">
                     <h3><b>Popular</b></h3>
-                   <p class="text-muted mt-1">Experience the essence of our popular scent</p>
+                    <p class="text-muted mt-1">Experience the essence of our popular scent</p>
                     <a href="popular_product.php" class="btn btn-primary mt-1">See More</a>
                 </div>
             </div>

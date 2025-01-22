@@ -63,6 +63,8 @@ if (isset($_POST['delete_product'])) {
     }
 
     $stmt->close();
+    header("Location:manage_products.php");
+    exit;
 }
 
 
