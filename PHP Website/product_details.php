@@ -41,6 +41,60 @@ if ($product_id) {
 } else {
     echo "Invalid product ID.";
 }
+
+// Check if the product is in the user's wishlist
+$in_wishlist = false;
+if ($is_logged_in) {
+    $query = "SELECT 1 FROM wishlist WHERE user_id = :user_id AND product_id = :product_id";
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(':user_id', $_SESSION['user_id'], PDO::PARAM_INT);
+    $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $in_wishlist = $stmt->rowCount() > 0;
+}
+// Handle adding to wishlist
+if (isset($_POST['add_to_wishlist'])) {
+    if (isset($_POST['product_id'])) {
+        $product_id = intval($_POST['product_id']);
+        $user_id = $_SESSION['user_id'];
+
+        // Add the item to the wishlist
+        $query = "INSERT INTO wishlist (user_id, product_id) VALUES (:user_id, :product_id)";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+
+        if ($stmt->execute()) {
+            // Redirect to the same page to refresh the wishlist state
+            header("Location: " . $_SERVER['REQUEST_URI']);
+            exit;
+        } else {
+            echo "Error adding item to wishlist.";
+        }
+    }
+}
+
+// Handle removing from wishlist
+if (isset($_POST['remove_from_wishlist'])) {
+    if (isset($_POST['product_id'])) {
+        $product_id = intval($_POST['product_id']);
+        $user_id = $_SESSION['user_id'];
+
+        // Remove the item from the wishlist
+        $query = "DELETE FROM wishlist WHERE user_id = :user_id AND product_id = :product_id";
+        $stmt = $conn->prepare($query);
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+
+        if ($stmt->execute()) {
+            // Redirect to the same page to refresh the wishlist state
+            header("Location: " . $_SERVER['REQUEST_URI']);
+            exit;
+        } else {
+            echo "Error removing item from wishlist.";
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -269,28 +323,16 @@ if ($product_id) {
                                 </button>
                             </form>
 
-                            <!-- Wishlist -->
-                            <form method="POST" action="favorite.php">
+                            <!-- Wishlist Button -->
+                            <form method="POST" action="product_details.php?product_id=<?php echo $product_id; ?>">
                                 <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product_id); ?>">
-                                <?php
-                                $query = "SELECT 1 FROM wishlist WHERE user_id = :user_id AND product_id = :product_id";
-                                $stmt = $conn->prepare($query);
-                                $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-                                $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
-
-                                if (!$stmt->execute()) {
-                                    print_r($stmt->errorInfo());
-                                }
-
-                                $in_wishlist = $stmt->rowCount() > 0;
-                                ?>
-                                <?php if (!$in_wishlist): ?>
-                                    <button type="submit" name="add_to_wishlist" class="btn btn-outline-primary" title="Add to Wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                <?php else: ?>
+                                <?php if ($in_wishlist): ?>
                                     <button type="submit" name="remove_from_wishlist" class="btn btn-outline-danger" title="Remove from Wishlist">
                                         <i class="bi bi-heart-fill text-danger"></i>
+                                    </button>
+                                <?php else: ?>
+                                    <button type="submit" name="add_to_wishlist" class="btn btn-outline-primary" title="Add to Wishlist">
+                                        <i class="bi bi-heart"></i>
                                     </button>
                                 <?php endif; ?>
                             </form>
@@ -448,33 +490,33 @@ if ($product_id) {
                         </div>
                     </div>
                 </div>
-</div>
                 </div>
+        </div>
 
 
-                <script>
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const thumbnails = document.querySelectorAll('.thumbnail-img');
-                        const mainImage = document.getElementById('main-image');
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const thumbnails = document.querySelectorAll('.thumbnail-img');
+                const mainImage = document.getElementById('main-image');
 
-                        thumbnails.forEach((thumbnail, index) => {
-                            thumbnail.addEventListener('click', () => {
-                                // Update the main image's source
-                                mainImage.src = thumbnail.src;
+                thumbnails.forEach((thumbnail, index) => {
+                    thumbnail.addEventListener('click', () => {
+                        // Update the main image's source
+                        mainImage.src = thumbnail.src;
 
-                                // Add an active class to the clicked thumbnail
-                                thumbnails.forEach(thumb => thumb.style.border = '1px solid #ddd');
-                                thumbnail.style.border = '2px solid #007bff';
-                            });
-                        });
+                        // Add an active class to the clicked thumbnail
+                        thumbnails.forEach(thumb => thumb.style.border = '1px solid #ddd');
+                        thumbnail.style.border = '2px solid #007bff';
                     });
-                </script>
- <?php include 'footer.php'; ?>
+                });
+            });
+        </script>
+        <?php include 'footer.php'; ?>
 
-                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-                <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

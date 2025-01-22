@@ -444,7 +444,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="text-left" style="width: 50%; margin-left:50px;">
                     <h3><b>Popular</b></h3>
                    <p class="text-muted mt-1">Experience the essence of our popular scent</p>
-                    <a href="latest_product.php" class="btn btn-primary mt-1">See More</a>
+                    <a href="popular_product.php" class="btn btn-primary mt-1">See More</a>
                 </div>
             </div>
 
@@ -453,7 +453,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <h3><b>New Arrival</b></h3>
                     <p class="text-muted mt-2">Experience the essence of our new arrival scent</p>
 
-                    <a href="popular_product.php" class="btn btn-primary mt-1">See More</a>
+                    <a href="latest_product.php" class="btn btn-primary mt-1">See More</a>
                 </div>
 
                 <div class="video-advertisement mb-5 text-center">

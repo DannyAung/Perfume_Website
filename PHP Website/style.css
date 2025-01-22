@@ -624,7 +624,7 @@ footer .fab:hover {
 .thumbnail-gallery {
     display: flex;
     flex-direction: column;
-    max-height: 400px;
+    max-height: 800px;
     overflow-y: auto;
 }
 
