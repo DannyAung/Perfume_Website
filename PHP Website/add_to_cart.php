@@ -5,6 +5,14 @@ if (!isset($_SESSION['user_id'])) {
     echo "You must be registered or logged in to add items to your cart.";
     exit;
 }
+if (isset($_POST['check_out'])) {
+    // Set a session variable to indicate checkout has started
+    $_SESSION['checkout_started'] = true;
+
+    // Optionally, redirect to another page after setting the session
+    header("Location: checkout.php"); // Redirect to the checkout page (if needed)
+    exit;
+}
 
 $user_id = $_SESSION['user_id'];
 
@@ -480,7 +488,7 @@ if (isset($_POST['remove_all'])) {
                     <form method='post' class='w-20'>
                         <button type='submit' name='remove_all' class='btn btn-danger w-100'>Remove All Items</button>
                     </form>
-                    <form method='post' action='checkout.php' class='w-20'>
+                    <form method='post' action='$_SERVER[PHP_SELF]' class='w-20'>
                         <button type='submit' name='check_out' class='btn btn-success w-100'>Proceed to Checkout</button>
                     </form>
                   </div>";

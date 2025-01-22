@@ -189,7 +189,7 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
                             <p><strong>Shipping Fee:</strong> $<?php echo number_format($order['shipping_fee'], 2); ?></p>
                             <?php if ($order['discount_percentage'] > 0): ?>
                                 <p><strong class="coupon-discount">Coupon Discount:</strong> <?php echo number_format($order['discount_percentage'], 2); ?>%</p>
-                                <p><strong>Coupon Code:</strong> <?php echo htmlspecialchars($order['coupon_code']); ?></p>
+                                <p><strong>Coupon Code:</strong> <?php echo $order['coupon_code']; ?></p>
                             <?php endif; ?>
                         </div>
                     </div>
