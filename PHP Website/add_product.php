@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = htmlspecialchars($_POST['description']);
     $price = floatval($_POST['price']);
     $stock_quantity = intval($_POST['stock_quantity']);
-    $category = htmlspecialchars($_POST['category']);
+    $category = htmlspecialchars($_POST['category'] ?? ''); // Ensure category is captured
     $subcategory = htmlspecialchars($_POST['subcategory'] ?? '');
     $size = htmlspecialchars($_POST['size'] ?? null); // Optional size
     $discount_available = $_POST['discount_available'];

@@ -20,11 +20,6 @@ $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-// Query to get total sales
-$total_sales_query = "SELECT SUM(total_price) AS total_sales FROM orders";
-$total_sales_result = mysqli_query($conn, $total_sales_query);
-$total_sales_row = mysqli_fetch_assoc($total_sales_result);
-$total_sales = $total_sales_row['total_sales'] ?? 0;
 
 // Query to get order statistics for today
 $order_stats_today_query = "SELECT 
@@ -232,67 +227,13 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
 </head>
 
 <body>
-<?php include 'admin_navbar.php'; ?>
-
+    <?php include 'admin_navbar.php'; ?>
     <?php include 'offcanvas_sidebar.php'; ?>
-
 
     <div class="container my-5">
         <h1 class="text-center mb-4">Admin Dashboards</h1>
 
         <div class="row g-4 mt-4">
-            <!-- Total Sales by Month Line Chart -->
-
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title text-center mb-4">Total Sales by Day</h5>
-                        <canvas id="dailySalesLineChart"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title text-center mb-4">Total Sales by Month</h5>
-                        <canvas id="salesLineChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-           
-
-            <!-- Yearly Sales Bar Chart -->
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title text-center mb-4">Total Sales by Year</h5>
-                        <canvas id="yearlySalesBarChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- Active Users Bar Chart -->
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title text-center mb-4"><i class="bi bi-person-circle"></i> Active Users</h5>
-                        <canvas id="activeUsersChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div><br>
-
-        <div class="row g-4">
-            <div class="col-md-3">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title text-center mb-4"><i class="bi bi-gift"></i> Top 5 Products</h5>
-                        <canvas id="topProductsDonutChart"></canvas>
-                    </div>
-                </div>
-            </div>
             <!-- Order Statistics -->
             <div class="col-md-3">
                 <div class="card text-center shadow-sm">
@@ -304,6 +245,7 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
                     </div>
                 </div>
             </div>
+
             <!-- Coupon Usage -->
             <div class="col-md-3">
                 <div class="card text-center shadow-sm">
@@ -318,69 +260,86 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
                 </div>
             </div>
 
-            <!-- Total Sales -->
+            <!-- Top 5 Products -->
             <div class="col-md-3">
-                <div class="card text-center shadow-sm">
+                <div class="card shadow-sm">
                     <div class="card-body">
-                        <h5 class="card-title mb-2"><i class="bi bi-cash"></i>All Total Sales</h5>
-                        <p class="card-text mb-3">$<?php echo number_format($total_sales, 2); ?></p>
+                        <h5 class="card-title text-center mb-4"><i class="bi bi-gift"></i> Top 5 Products</h5>
+                        <canvas id="topProductsDonutChart"></canvas>
                     </div>
                 </div>
             </div>
-        </div><br>
 
-        <div class="row g-4">
-            <div class="col-md-7">
+            <!-- Active Users -->
+            <div class="col-md-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-4"><i class="bi bi-person-circle"></i> Active Users</h5>
+                        <canvas id="activeUsersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Total Sales -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-4">Daily Total Sales</h5>
+                        <canvas id="dailySalesLineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Total Sales -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-4">Monthly Total Sales</h5>
+                        <canvas id="salesLineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yearly Total Sales -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-4">Yearly Total Sales</h5>
+                        <canvas id="yearlySalesBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top 10 Loyal Customers -->
+            <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title text-center mb-4"><i class="bi bi-person-bounding-box"></i> Top 10 Loyal Customers</h5>
-                        <canvas id="loyalCustomersChart" class="small-chart" style="height: 300px;"></canvas> <!-- Adjust height if needed -->
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Customer Name</th>
+                                    <th scope="col">Order Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($loyal_customers_names as $index => $name) { ?>
+                                    <tr>
+                                        <td><?php echo $name; ?></td>
+                                        <td><?php echo $loyal_customers_orders[$index]; ?></td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+
+        
         </div>
+    </div>
 
-    </div>
-    </div>
     <script>
-        // Bar Chart for Top 10 Loyal Customers
-        var loyalCtx = document.getElementById('loyalCustomersChart').getContext('2d');
-        var loyalCustomersChart = new Chart(loyalCtx, {
-            type: 'bar',
-            data: {
-                labels: <?php echo $loyal_customers_names_json; ?>,
-                datasets: [{
-                    label: 'Order Count',
-                    data: <?php echo $loyal_customers_orders_json; ?>,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Customers'
-                        },
-                        ticks: {
-                            maxRotation: 90,
-                            minRotation: 45
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Order Count'
-                        }
-                    }
-                }
-            }
-        });
-
         // Donut Chart for Top 5 Products
         var donutCtx = document.getElementById('topProductsDonutChart').getContext('2d');
         var topProductsDonutChart = new Chart(donutCtx, {
@@ -416,6 +375,45 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
                 }
             }
         });
+
+        // Bar Chart for Active Users
+        var ctx = document.getElementById('activeUsersChart').getContext('2d');
+        var activeUsersChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: <?php echo $login_dates_json; ?>,
+                datasets: [{
+                    label: 'Active Users',
+                    data: <?php echo $active_users_json; ?>,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month'
+                        },
+                        ticks: {
+                            maxRotation: 90,
+                            minRotation: 45
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Active Users'
+                        }
+                    }
+                }
+            }
+        });
+
         // Line Chart for Total Sales by Day
         var dailySalesCtx = document.getElementById('dailySalesLineChart').getContext('2d');
         var dailySalesLineChart = new Chart(dailySalesCtx, {
@@ -444,44 +442,6 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
                         title: {
                             display: true,
                             text: 'Day'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Sales ($)'
-                        },
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-        // Bar Chart for Total Sales by Year
-        var yearlySalesCtx = document.getElementById('yearlySalesBarChart').getContext('2d');
-        var yearlySalesBarChart = new Chart(yearlySalesCtx, {
-            type: 'bar',
-            data: {
-                labels: <?php echo $yearly_sales_years_json; ?>,
-                datasets: [{
-                    label: 'Total Sales ($)',
-                    data: <?php echo $yearly_sales_totals_json; ?>,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: true
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Year'
                         }
                     },
                     y: {
@@ -536,39 +496,40 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
             }
         });
 
-        // Bar Chart for Active Users
-        var ctx = document.getElementById('activeUsersChart').getContext('2d');
-        var activeUsersChart = new Chart(ctx, {
+        // Bar Chart for Total Sales by Year
+        var yearlySalesCtx = document.getElementById('yearlySalesBarChart').getContext('2d');
+        var yearlySalesBarChart = new Chart(yearlySalesCtx, {
             type: 'bar',
             data: {
-                labels: <?php echo $login_dates_json; ?>,
+                labels: <?php echo $yearly_sales_years_json; ?>,
                 datasets: [{
-                    label: 'Active Users',
-                    data: <?php echo $active_users_json; ?>,
+                    label: 'Total Sales ($)',
+                    data: <?php echo $yearly_sales_totals_json; ?>,
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
                 scales: {
                     x: {
                         title: {
                             display: true,
-                            text: 'Month'
-                        },
-                        ticks: {
-                            maxRotation: 90,
-                            minRotation: 45
+                            text: 'Year'
                         }
                     },
                     y: {
-                        beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Active Users'
-                        }
+                            text: 'Sales ($)'
+                        },
+                        beginAtZero: true
                     }
                 }
             }
@@ -577,4 +538,5 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
 
     <!-- Include Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    </div>
+</body>
+</html>

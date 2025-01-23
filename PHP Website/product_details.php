@@ -162,6 +162,12 @@ if (isset($_POST['remove_from_wishlist'])) {
     .card {
         box-shadow: none;
     }
+    .related-product-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
 </style>
 
 
@@ -467,11 +473,11 @@ if (isset($_POST['remove_from_wishlist'])) {
                             <?php if ($related_products): ?>
                                 <?php foreach ($related_products as $related_product): ?>
                                     <div class="col-md-3 mb-3">
-                                        <div class="card">
+                                        <div class="card related-product-card">
                                             <img src="products/<?php echo htmlspecialchars($related_product['image']); ?>" class="card-img-top"
                                                 alt="<?php echo htmlspecialchars($related_product['product_name']); ?>"
                                                 style="height: 170px; object-fit: cover;">
-                                            <div class="card-body">
+                                            <div class="card-body d-flex flex-column">
                                                 <h5 class="card-title"><?php echo htmlspecialchars($related_product['product_name']); ?></h5>
                                                 <?php if ($related_product['subcategory'] === 'discount' && isset($related_product['discounted_price']) && $related_product['discounted_price'] < $related_product['price']): ?>
                                                     <p class="text-muted"><del>$<?php echo number_format($related_product['price'], 2); ?></del></p>
@@ -479,7 +485,7 @@ if (isset($_POST['remove_from_wishlist'])) {
                                                 <?php else: ?>
                                                     <p class="card-text">$<?php echo number_format($related_product['price'], 2); ?></p>
                                                 <?php endif; ?>
-                                                <a href="product_details.php?product_id=<?php echo $related_product['product_id']; ?>" class="btn btn-primary">View Details</a>
+                                                <a href="product_details.php?product_id=<?php echo $related_product['product_id']; ?>" class="btn btn-primary mt-auto">View Details</a>
                                             </div>
                                         </div>
                                     </div>
