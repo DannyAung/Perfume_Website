@@ -129,12 +129,10 @@ if ($is_logged_in) {
 
         <div class="container-fluid">
             <div class="row">
-                <!-- Sidebar for Filters -->
+            
                 <div class="col-md-3">
                     <div class="border p-5 filter-sidebar sticky-sidebar">
-                        <h5 class="mb-3">Filter</h5>
-
-                        <!-- Price Range Filter -->
+                        <h5 class="mb-3">Filter</h5>                    
                         <form method="GET" action="women_category.php">
                             <div class="mb-3">
                                 <label for="priceRange" class="form-label">Price Range</label>
@@ -143,8 +141,7 @@ if ($is_logged_in) {
                                     <input type="number" class="form-control" name="max_price" placeholder="Max" min="0" value="<?php echo isset($_GET['max_price']) ? htmlspecialchars($_GET['max_price']) : ''; ?>">
                                 </div>
                             </div>
-
-                            <!-- Discount Filter -->
+                        
                             <div class="mb-3">
                                 <label class="form-label">Discount</label>
                                 <select class="form-select" name="discount">
@@ -187,27 +184,20 @@ if ($is_logged_in) {
                     <div class="container py-5">
                         <div class="row row-cols-1 row-cols-md-4 g-4">
                             <?php
-                            $category = isset($_GET['category']) ? $_GET['category'] : 'Women'; // Default to 'Men' if no category is selected
-                            $women_query = "SELECT * FROM products WHERE 1=1";
-                            // Apply Category Filter
+                            $category = isset($_GET['category']) ? $_GET['category'] : 'Women';                        
                             if ($category !== 'All') {
                                 $women_query .= " AND category = '$category'";
-                            }
-
-                            // Apply Price Filter
+                            }                     
                             if (isset($_GET['min_price']) && isset($_GET['max_price']) && is_numeric($_GET['min_price']) && is_numeric($_GET['max_price'])) {
                                 $min_price = intval($_GET['min_price']);
                                 $max_price = intval($_GET['max_price']);
                                 $women_query .= " AND price BETWEEN $min_price AND $max_price";
                             }
-
-                            // Apply Discount Filter
+                        
                             if (isset($_GET['discount']) && is_numeric($_GET['discount'])) {
                                 $discount = intval($_GET['discount']);
                                 $women_query .= " AND discount_percentage >= $discount";
-                            }
-
-                            // Apply In-Stock Filter
+                            }                         
                             if (isset($_GET['in_stock'])) {
                                 $women_query .= " AND stock_quantity > 0";
                             }

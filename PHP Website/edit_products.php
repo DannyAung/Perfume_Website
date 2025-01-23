@@ -203,6 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <option value="Men" <?= $product['category'] == 'Men' ? 'selected' : '' ?>>Men</option>
                         <option value="Women" <?= $product['category'] == 'Women' ? 'selected' : '' ?>>Women</option>
                         <option value="Unisex" <?= $product['category'] == 'Unisex' ? 'selected' : '' ?>>Unisex</option>
+                        <option value="<?= htmlspecialchars($product['category']) ?>" <?= !in_array($product['category'], ['Men', 'Women', 'Unisex']) ? 'selected' : '' ?>><?= htmlspecialchars($product['category']) ?></option>
                     </select>
                 </div>
                 <div class="col-md-6 mb-4">
@@ -212,6 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <option value="Latest" <?= $product['subcategory'] == 'Latest' ? 'selected' : '' ?>>Latest</option>
                         <option value="Popular" <?= $product['subcategory'] == 'Popular' ? 'selected' : '' ?>>Popular</option>
                         <option value="Featured" <?= $product['subcategory'] == 'Featured' ? 'selected' : '' ?>>Featured</option>
+                        <option value="<?= htmlspecialchars($product['subcategory']) ?>" <?= !in_array($product['subcategory'], ['Discount', 'Latest', 'Popular', 'Featured']) ? 'selected' : '' ?>><?= htmlspecialchars($product['subcategory']) ?></option>
                     </select>
                 </div>
             </div>
