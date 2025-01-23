@@ -48,9 +48,27 @@ if (isset($_GET['delete_coupon'])) {
     }
 }
 
-// Fetch all coupons from the database
-$query = "SELECT * FROM coupons";
-$result = mysqli_query($conn, $query);
+// Search functionality
+$search_query = '';
+if (isset($_GET['search'])) {
+    $search_query = htmlspecialchars($_GET['search']);
+    $query = "SELECT * FROM coupons WHERE 
+              coupon_code LIKE ? OR 
+              discount_percentage LIKE ? OR 
+              valid_from LIKE ? OR 
+              valid_to LIKE ? OR 
+              minimum_purchase_amount LIKE ?";
+    $stmt = $conn->prepare($query);
+    $search_param = '%' . $search_query . '%';
+    $stmt->bind_param("sssss", $search_param, $search_param, $search_param, $search_param, $search_param);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close();
+} else {
+    // Fetch all coupons from the database
+    $query = "SELECT * FROM coupons";
+    $result = mysqli_query($conn, $query);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -105,6 +123,12 @@ $result = mysqli_query($conn, $query);
     <!-- Main Content -->
     <div class="container mt-4">
     <h1 class="text-center">Manage Coupon</h1>
+
+        <!-- Search Form -->
+        <form action="manage_coupon.php" method="GET" class="d-flex mb-4">
+            <input class="form-control me-2" type="search" name="search" placeholder="Search coupons" aria-label="Search" value="<?= htmlspecialchars($search_query); ?>">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
 
         <!-- Coupons List -->
         <div class="card">

@@ -1,6 +1,20 @@
 <?php
-require_once "db_connection.php";
+// Start session
 session_start();
+
+if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
+    header('Location: admin_login.php');
+    exit;
+}
+
+// Database connection
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$dbname = 'ecom_website';
+$port = 3306;
+
+$conn = mysqli_connect($host, $username, $password, $dbname, $port);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Sanitize input
@@ -69,32 +83,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $sql = "INSERT INTO products 
                 (product_name, image, extra_image_1, extra_image_2, description, price, stock_quantity, category, subcategory, size, discount_available, discount_percentage, discounted_price) 
-                VALUES (:product_name, :image, :extra_image_1, :extra_image_2, :description, :price, :stock_quantity, :category, :subcategory, :size, :discount_available, :discount_percentage, :discounted_price)";
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
         $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':product_name' => $product_name,
-            ':image' => $image_result['path'], // Store relative path
-            ':extra_image_1' => $extra_image_1_result['path'],
-            ':extra_image_2' => $extra_image_2_result['path'],
-            ':description' => $description,
-            ':price' => $price,
-            ':stock_quantity' => $stock_quantity,
-            ':category' => $category,
-            ':subcategory' => $subcategory,
-            ':size' => $size,
-            ':discount_available' => $discount_available,
-            ':discount_percentage' => $discount_percentage,
-            ':discounted_price' => $discounted_price,
-        ]);
+        $stmt->bind_param('sssssdiisssdi', 
+            $product_name, 
+            $image_result['path'], // Store relative path
+            $extra_image_1_result['path'],
+            $extra_image_2_result['path'],
+            $description,
+            $price,
+            $stock_quantity,
+            $category,
+            $subcategory,
+            $size,
+            $discount_available,
+            $discount_percentage,
+            $discounted_price
+        );
+
+        $stmt->execute();
 
         $_SESSION['success'] = 'Product added successfully!';
         header('Location: manage_products.php');
         exit;
-    } catch (PDOException $e) {
+    } catch (mysqli_sql_exception $e) {
         echo '<p class="text-danger">Error adding product: ' . htmlspecialchars($e->getMessage()) . '</p>';
     }
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">

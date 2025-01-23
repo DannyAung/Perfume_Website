@@ -17,15 +17,33 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-
-// Fetch all reviews
-$reviews_query = "SELECT r.review_id, r.user_id, r.product_id, r.review_text, r.rating, r.created_at, r.updated_at, 
-                         u.user_name AS user_name, p.product_name AS product_name
-                  FROM reviews r
-                  LEFT JOIN users u ON r.user_id = u.user_id
-                  LEFT JOIN products p ON r.product_id = p.product_id
-                  ORDER BY r.created_at DESC";
-$reviews_result = $conn->query($reviews_query);
+// Search functionality
+$search_query = '';
+if (isset($_GET['search'])) {
+    $search_query = htmlspecialchars($_GET['search']);
+    $reviews_query = "SELECT r.review_id, r.user_id, r.product_id, r.review_text, r.rating, r.created_at, r.updated_at, 
+                             u.user_name AS user_name, p.product_name AS product_name
+                      FROM reviews r
+                      LEFT JOIN users u ON r.user_id = u.user_id
+                      LEFT JOIN products p ON r.product_id = p.product_id
+                      WHERE u.user_name LIKE ? OR p.product_name LIKE ? OR r.review_text LIKE ?
+                      ORDER BY r.created_at DESC";
+    $stmt = $conn->prepare($reviews_query);
+    $search_param = '%' . $search_query . '%';
+    $stmt->bind_param("sss", $search_param, $search_param, $search_param);
+    $stmt->execute();
+    $reviews_result = $stmt->get_result();
+    $stmt->close();
+} else {
+    // Fetch all reviews
+    $reviews_query = "SELECT r.review_id, r.user_id, r.product_id, r.review_text, r.rating, r.created_at, r.updated_at, 
+                             u.user_name AS user_name, p.product_name AS product_name
+                      FROM reviews r
+                      LEFT JOIN users u ON r.user_id = u.user_id
+                      LEFT JOIN products p ON r.product_id = p.product_id
+                      ORDER BY r.created_at DESC";
+    $reviews_result = $conn->query($reviews_query);
+}
 
 // Handle review deletion
 if (isset($_POST['delete_review'])) {
@@ -108,6 +126,12 @@ if (isset($_POST['delete_review'])) {
         <?php if (isset($message)): ?>
             <div class="alert alert-info"><?php echo $message; ?></div>
         <?php endif; ?>
+
+        <!-- Search Form -->
+        <form action="manage_reviews.php" method="GET" class="d-flex mb-4">
+            <input class="form-control me-2" type="search" name="search" placeholder="Search reviews" aria-label="Search" value="<?= htmlspecialchars($search_query); ?>">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
 
         <div class="table-responsive">
             <table class="table table-bordered table-hover table-striped">

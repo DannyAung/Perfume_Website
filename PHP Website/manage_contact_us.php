@@ -16,9 +16,27 @@ $conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-// Fetch all contact messages from the database
-$query = "SELECT * FROM contact_messages ORDER BY created_at DESC";
-$result = mysqli_query($conn, $query);
+
+// Search functionality
+$search_query = '';
+if (isset($_GET['search'])) {
+    $search_query = htmlspecialchars($_GET['search']);
+    $query = "SELECT * FROM contact_messages WHERE 
+              name LIKE ? OR 
+              email LIKE ? OR 
+              message LIKE ? OR 
+              created_at LIKE ?";
+    $stmt = $conn->prepare($query);
+    $search_param = '%' . $search_query . '%';
+    $stmt->bind_param("ssss", $search_param, $search_param, $search_param, $search_param);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close();
+} else {
+    // Fetch all contact messages from the database
+    $query = "SELECT * FROM contact_messages ORDER BY created_at DESC";
+    $result = mysqli_query($conn, $query);
+}
 
 ?>
 
@@ -68,51 +86,59 @@ $result = mysqli_query($conn, $query);
 
     <?php include 'offcanvas_sidebar.php'; ?>
 
-    <div class="container py-5">
-        <h1 class="text-center mb-4">Manage Contact Messages</h1>
+   
 
-        <!-- Display any success or error messages -->
-        <?php
-        if (isset($_SESSION['success'])) {
-            echo '<div class="alert alert-success">' . htmlspecialchars($_SESSION['success']) . '</div>';
-            unset($_SESSION['success']);
-        }
-        if (isset($_SESSION['error'])) {
-            echo '<div class="alert alert-danger">' . htmlspecialchars($_SESSION['error']) . '</div>';
-            unset($_SESSION['error']);
-        }
-        ?>
+        <div class="container py-5">
+            <h1 class="text-center mb-4">Manage Contact Messages</h1>
+ <!-- Search Form -->
+ <div class="container mt-5">
+        <form action="manage_contact_us.php" method="GET" class="d-flex mb-4">
+            <input class="form-control me-2" type="search" name="search" placeholder="Search messages" aria-label="Search" value="<?= htmlspecialchars($search_query); ?>">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+            <!-- Display any success or error messages -->
+            <?php
+            if (isset($_SESSION['success'])) {
+                echo '<div class="alert alert-success">' . htmlspecialchars($_SESSION['success']) . '</div>';
+                unset($_SESSION['success']);
+            }
+            if (isset($_SESSION['error'])) {
+                echo '<div class="alert alert-danger">' . htmlspecialchars($_SESSION['error']) . '</div>';
+                unset($_SESSION['error']);
+            }
+            ?>
 
-        <table class="table table-striped table-bordered ">
-            <thead class=table-warning>
-                <tr>
-                    <th>No</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Message</th>
-                    <th>Date</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Display each contact message
-                $index = 1;
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo '<tr>';
-                    echo '<td>' . $index++ . '</td>';
-                    echo '<td>' . htmlspecialchars($row['name']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['email']) . '</td>';
-                    echo '<td>' . nl2br(htmlspecialchars($row['message'])) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['created_at']) . '</td>';
-                    echo '<td>';
-                    echo ' <a href="delete_contact.php?id=' . $row['id'] . '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure you want to delete this message?\')">Delete</a>';
-                    echo '</td>';
-                    echo '</tr>';
-                }
-                ?>
-            </tbody>
-        </table>
+            <table class="table table-striped table-bordered ">
+                <thead class=table-warning>
+                    <tr>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Display each contact message
+                    $index = 1;
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo '<tr>';
+                        echo '<td>' . $index++ . '</td>';
+                        echo '<td>' . htmlspecialchars($row['name']) . '</td>';
+                        echo '<td>' . htmlspecialchars($row['email']) . '</td>';
+                        echo '<td>' . nl2br(htmlspecialchars($row['message'])) . '</td>';
+                        echo '<td>' . htmlspecialchars($row['created_at']) . '</td>';
+                        echo '<td>';
+                        echo ' <a href="delete_contact.php?id=' . $row['id'] . '" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure you want to delete this message?\')">Delete</a>';
+                        echo '</td>';
+                        echo '</tr>';
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>

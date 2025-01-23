@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
 // Fetch products
-$sql = "SELECT product_name, price, image FROM products"; // Ensure table columns are correct
+$sql = "SELECT product_name, price, image, product_id FROM products"; // Ensure table columns are correct
 $result = mysqli_query($conn, $sql);
 if (!$result) {
     die("Error in query: " . mysqli_error($conn));
@@ -63,6 +63,19 @@ $discounted_query = "SELECT * FROM products WHERE subcategory = 'discount' ORDER
 $discounted_result = mysqli_query($conn, $discounted_query);
 if (!$discounted_result) {
     die("Error fetching discounted products: " . mysqli_error($conn));
+}
+
+// Fetch cart items for the logged-in user
+$cart_items = [];
+if ($is_logged_in) {
+    $cart_query = "SELECT product_id FROM cart_items WHERE user_id = ? AND ordered_status = 'not_ordered'";
+    $cart_stmt = $conn->prepare($cart_query);
+    $cart_stmt->bind_param("i", $_SESSION['user_id']);
+    $cart_stmt->execute();
+    $cart_result = $cart_stmt->get_result();
+    while ($row = $cart_result->fetch_assoc()) {
+        $cart_items[] = $row['product_id'];
+    }
 }
 
 // Handle product insertion (if POST request)
@@ -378,8 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                     <input type="hidden" name="product_name" value="<?php echo $product_name; ?>">
                                                     <input type="hidden" name="product_price" value="<?php echo $product_discounted_price; ?>">
                                                     <input type="hidden" name="product_image" value="<?php echo $image; ?>">
-
-                                                    <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
+                                                    <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm" <?php echo in_array($discounted_product['product_id'], $cart_items) ? 'disabled' : ''; ?>>
                                                         <i class="fa fa-cart-plus"></i>
                                                     </button>
                                                     <a href="product_details.php?product_id=<?php echo $discounted_product['product_id']; ?>" class="btn btn-light btn-sm">

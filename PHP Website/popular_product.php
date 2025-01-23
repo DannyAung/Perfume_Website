@@ -106,7 +106,6 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             <div class="container">
                 <ol class="breadcrumb mb-0">
                     <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
-                    <li class="breadcrumb-item"><a href="men_category.php">Category</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Popular items</li>
                 </ol>
             </div>

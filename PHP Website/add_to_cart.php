@@ -82,21 +82,28 @@ if (isset($_POST['add_to_cart'])) {
 if (isset($_POST['increase_quantity'])) {
     $cart_item_id = $_POST['cart_item_id'];
 
-    // Fetch current quantity
-    $sql = "SELECT quantity FROM cart_items WHERE cart_item_id = ? AND user_id = ?";
+    // Fetch current quantity and stock quantity
+    $sql = "SELECT ci.quantity, p.stock_quantity FROM cart_items ci JOIN products p ON ci.product_id = p.product_id WHERE ci.cart_item_id = ? AND ci.user_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $cart_item_id, $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
         $cart_item = $result->fetch_assoc();
-        $new_quantity = $cart_item['quantity'] + 1;
+        $current_quantity = $cart_item['quantity'];
+        $stock_quantity = $cart_item['stock_quantity'];
 
-        // Update quantity
-        $sql = "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?";
-        $update_stmt = $conn->prepare($sql);
-        $update_stmt->bind_param("ii", $new_quantity, $cart_item_id);
-        $update_stmt->execute();
+        if ($current_quantity < $stock_quantity) {
+            $new_quantity = $current_quantity + 1;
+
+            // Update quantity
+            $sql = "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?";
+            $update_stmt = $conn->prepare($sql);
+            $update_stmt->bind_param("ii", $new_quantity, $cart_item_id);
+            $update_stmt->execute();
+        } else {
+            echo "<script>alert('Error: Cannot increase quantity. Only $stock_quantity items in stock.');</script>";
+        }
     }
 
     // Redirect to avoid repeated submission

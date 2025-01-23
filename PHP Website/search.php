@@ -74,6 +74,19 @@ $search_result = mysqli_stmt_get_result($stmt);
 
 // Check if user is logged in
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
+
+// Fetch cart items for the logged-in user
+$cart_items = [];
+if ($is_logged_in) {
+    $cart_query = "SELECT product_id FROM cart_items WHERE user_id = ? AND ordered_status = 'not_ordered'";
+    $cart_stmt = $conn->prepare($cart_query);
+    $cart_stmt->bind_param("i", $_SESSION['user_id']);
+    $cart_stmt->execute();
+    $cart_result = $cart_stmt->get_result();
+    while ($row = $cart_result->fetch_assoc()) {
+        $cart_items[] = $row['product_id'];
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -261,7 +274,12 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                                                 <?php echo $discount_percentage; ?>% OFF
                                             </div>
                                         <?php endif; ?>
-
+                                        <?php if ($discount_percentage > 0): ?>
+                                            <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end"
+                                                style="font-size: 0.9rem; z-index: 10;"> <!-- Added z-index here -->
+                                                <?php echo $discount_percentage; ?>% OFF
+                                            </div>
+                                        <?php endif; ?>
                                         <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
                                             alt="<?php echo $product_name; ?>"
                                             style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
@@ -282,11 +300,11 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                                             style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
                                             <?php if (!$is_sold_out): ?>
                                                 <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
-                                                    <input type="hidden" name="product_id" value="<?php echo $popular_product['product_id']; ?>">
-                                                    <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm">
+                                                    <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
+                                                    <button type="submit" name="add_to_cart" class="btn btn-outline-light btn-sm" <?php echo in_array($product['product_id'], $cart_items) ? 'disabled' : ''; ?>>
                                                         <i class="fa fa-cart-plus"></i>
                                                     </button>
-                                                    <a href="product_details.php?product_id=<?php echo $popular_product['product_id']; ?>" class="btn btn-light btn-sm">
+                                                    <a href="product_details.php?product_id=<?php echo $product['product_id']; ?>" class="btn btn-light btn-sm">
                                                         <i class="fa fa-info-circle"></i>
                                                     </a>
                                                 </form>

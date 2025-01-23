@@ -17,18 +17,48 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-$sql = "
-    SELECT o.order_id, o.user_id, o.total_price, o.name AS customer_name, o.address, o.phone, o.email, 
-        o.payment_method, o.status, o.created_at, u.user_name, 
-        oi.product_id, p.product_name, p.image, oi.quantity
-    FROM orders o
-    JOIN users u ON o.user_id = u.user_id
-    JOIN order_items oi ON o.order_id = oi.order_id
-    JOIN products p ON oi.product_id = p.product_id
-    ORDER BY o.order_id ASC
-";
+// Search functionality
+$search_query = '';
+if (isset($_GET['search'])) {
+    $search_query = htmlspecialchars($_GET['search']);
+    $sql = "
+        SELECT o.order_id, o.user_id, o.total_price, o.name AS customer_name, o.address, o.phone, o.email, 
+            o.payment_method, o.status, o.created_at, u.user_name, 
+            oi.product_id, p.product_name, p.image, oi.quantity
+        FROM orders o
+        JOIN users u ON o.user_id = u.user_id
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN products p ON oi.product_id = p.product_id
+        WHERE u.user_name LIKE ? OR 
+              o.order_id LIKE ? OR 
+              o.name LIKE ? OR 
+              o.address LIKE ? OR 
+              o.phone LIKE ? OR 
+              o.email LIKE ? OR 
+              o.payment_method LIKE ? OR 
+              o.status LIKE ?
+        ORDER BY o.order_id ASC
+    ";
+    $stmt = $conn->prepare($sql);
+    $search_param = '%' . $search_query . '%';
+    $stmt->bind_param("ssssssss", $search_param, $search_param, $search_param, $search_param, $search_param, $search_param, $search_param, $search_param);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close();
+} else {
+    $sql = "
+        SELECT o.order_id, o.user_id, o.total_price, o.name AS customer_name, o.address, o.phone, o.email, 
+            o.payment_method, o.status, o.created_at, u.user_name, 
+            oi.product_id, p.product_name, p.image, oi.quantity
+        FROM orders o
+        JOIN users u ON o.user_id = u.user_id
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN products p ON oi.product_id = p.product_id
+        ORDER BY o.order_id ASC
+    ";
 
-$result = mysqli_query($conn, $sql);
+    $result = mysqli_query($conn, $sql);
+}
 
 if (isset($_POST['update_status'])) {
     $order_id = $_POST['order_id'];
@@ -177,9 +207,14 @@ if (isset($_POST['update_status'])) {
 <?php include 'offcanvas_sidebar.php'; ?>
 
 
-    <div class="container">
         <h1 class="text-center">Manage Orders</h1>
 
+    <!-- Search Form -->
+    <div class="container mt-5">
+        <form action="manage_orders.php" method="GET" class="d-flex mb-4">
+            <input class="form-control me-2" type="search" name="search" placeholder="Search orders" aria-label="Search" value="<?= htmlspecialchars($search_query); ?>">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
         <table class="table table-striped table-hover order-table">
             <thead>
                 <tr>

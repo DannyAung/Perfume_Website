@@ -19,6 +19,27 @@ $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
+
+// Search functionality
+$search_query = '';
+if (isset($_GET['search'])) {
+    $search_query = htmlspecialchars($_GET['search']);
+    $query = "SELECT * FROM shipping WHERE 
+              shipping_method LIKE ? OR 
+              shipping_fee LIKE ? OR 
+              delivery_time LIKE ?";
+    $stmt = $conn->prepare($query);
+    $search_param = '%' . $search_query . '%';
+    $stmt->bind_param("sss", $search_param, $search_param, $search_param);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close();
+} else {
+    // Fetch all shipping methods
+    $query = "SELECT * FROM shipping";
+    $result = mysqli_query($conn, $query);
+}
+
 // Add Shipping Method (Create)
 if (isset($_POST['add_shipping'])) {
     $shipping_method = $_POST['shipping_method'];
@@ -72,10 +93,6 @@ if (isset($_GET['delete_shipping'])) {
     header("Location: manage_shipping.php");
     exit;
 }
-
-// Fetch all shipping methods
-$query = "SELECT * FROM shipping";
-$result = mysqli_query($conn, $query);
 ?>
 
 <!DOCTYPE html>
@@ -102,6 +119,12 @@ $result = mysqli_query($conn, $query);
     <?php include 'offcanvas_sidebar.php'; ?>
     <div class="container py-5">
         <h1 class="mb-4 text-center">Manage Shipping Methods</h1>
+
+        <!-- Search Form -->
+        <form action="manage_shipping.php" method="GET" class="d-flex mb-4">
+            <input class="form-control me-2" type="search" name="search" placeholder="Search shipping methods" aria-label="Search" value="<?= htmlspecialchars($search_query); ?>">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
 
         <!-- Add New Shipping Method -->
         <div class="card mb-4">

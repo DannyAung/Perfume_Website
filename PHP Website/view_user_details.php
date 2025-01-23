@@ -54,6 +54,13 @@ mysqli_close($conn);
     .navbar {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+    .user-profile-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 20px;
+    }
 </style>
 
 <body>
@@ -65,7 +72,13 @@ mysqli_close($conn);
         <h1 class="text-center mb-4">User Details</h1>
         <?php if (!empty($user)): ?>
             <div class="card mx-auto" style="max-width: 600px;">
-                <div class="card-body">
+                <div class="card-body text-center">
+                    <!-- Display user image or default image if none -->
+                    <?php if (!empty($user['user_image'])): ?>
+                                <img src="uploads/profile_images/<?php echo htmlspecialchars($user['user_image']); ?>" alt="Profile Picture" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                            <?php else: ?>
+                                <img src="uploads/profile_images/default.png" alt="Default Profile Picture" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                    <?php endif; ?>
                     <h5 class="card-title">User Information</h5>
                     <p class="card-text"><strong>User ID:</strong> <?= htmlspecialchars($user['user_id']); ?></p>
                     <p class="card-text"><strong>Name:</strong> <?= htmlspecialchars($user['user_name']); ?></p>

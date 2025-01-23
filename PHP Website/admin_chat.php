@@ -22,8 +22,15 @@ try {
 }
 
 // Fetch all users who have sent messages
-$stmt = $pdo->prepare("SELECT DISTINCT user_id, MAX(sent_at) AS last_message_time FROM chats GROUP BY user_id ORDER BY last_message_time DESC");
-$stmt->execute();
+$search_query = '';
+if (isset($_GET['search'])) {
+    $search_query = $_GET['search'];
+    $stmt = $pdo->prepare("SELECT DISTINCT user_id, MAX(sent_at) AS last_message_time FROM chats WHERE user_id LIKE :search_query GROUP BY user_id ORDER BY last_message_time DESC");
+    $stmt->execute([':search_query' => '%' . $search_query . '%']);
+} else {
+    $stmt = $pdo->prepare("SELECT DISTINCT user_id, MAX(sent_at) AS last_message_time FROM chats GROUP BY user_id ORDER BY last_message_time DESC");
+    $stmt->execute();
+}
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if (isset($_GET['user_id'])) {
@@ -69,6 +76,12 @@ if (isset($_GET['user_id'])) {
 
     <div class="container mt-5">
         <h2>Customer Messages</h2>
+        <form method="GET" action="admin_chat.php" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Search by User ID" value="<?php echo htmlspecialchars($search_query); ?>">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
         <table class="table table-striped">
             <thead class=table-warning>
                 <tr>
