@@ -40,13 +40,14 @@ if (isset($_POST['add_to_cart'])) {
     $result = $stmt->get_result();
 
     if ($result->num_rows == 0) {
-        echo "Error: Product does not exist.";
+        echo "<script>alert('Error: Product does not exist.');</script>";
         exit;
     }
 
+    $product = $result->fetch_assoc();
+    $stock_quantity = $product['stock_quantity'];
     $quantity = isset($_POST['quantity']) && is_numeric($_POST['quantity']) && $_POST['quantity'] > 0 ? $_POST['quantity'] : 1; // Default to 1 if invalid
 
-    // Check if the item is already in the cart
     $sql = "SELECT * FROM cart_items WHERE user_id = ? AND product_id = ? AND ordered_status = 'not_ordered'";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $user_id, $product_id);
@@ -54,31 +55,37 @@ if (isset($_POST['add_to_cart'])) {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // Update the quantity if the item is already in the cart
+
         $cart_item = $result->fetch_assoc();
         $new_quantity = $cart_item['quantity'] + $quantity;
+
+        if ($new_quantity > $stock_quantity) {
+            echo "<script>alert('Error: Cannot add more than available stock.');</script>";
+            exit;
+        }
 
         $sql = "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?";
         $update_stmt = $conn->prepare($sql);
         $update_stmt->bind_param("ii", $new_quantity, $cart_item['cart_item_id']);
         $update_stmt->execute();
     } else {
-        // Insert the product into the cart if not already added
+        if ($quantity > $stock_quantity) {
+            echo "<script>alert('Error: Cannot add more than available stock.');</script>";
+            exit;
+        }
+
         $sql = "INSERT INTO cart_items (user_id, product_id, quantity, ordered_status) VALUES (?, ?, ?, 'not_ordered')";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iii", $user_id, $product_id, $quantity);
         $stmt->execute();
-        echo "Product added to your cart!";
     }
 
-    // Redirect back to the previous page (or default page)
     $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'user_index.php';
-    header("Location: " . $referer);
+    echo "<script>window.location.href = '$referer';</script>";
     exit;
 }
 
 
-// Increase Quantity Logic
 if (isset($_POST['increase_quantity'])) {
     $cart_item_id = $_POST['cart_item_id'];
 
@@ -170,7 +177,6 @@ if (isset($_POST['remove_all'])) {
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-
         h1 {
             text-align: center;
             padding: 30px;
@@ -350,74 +356,10 @@ if (isset($_POST['remove_all'])) {
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
-    <div class="container-fluid">
-        <!-- Logo and Brand -->
-        <a class="navbar-brand d-flex align-items-center" href="user_index.php">
-            <img src="./images/perfume_logo.png" alt="Logo" style="width:50px; height:auto;">
-            <b class="ms-2" style="font-family: 'Roboto', sans-serif; font-weight: 300; color: #333;">FRAGRANCE HAVEN</b>
-        </a>
+    <?php include 'navbar.php'; ?>
 
-        <!-- Toggler for Small Screens -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <!-- Collapsible Navbar Content -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
-
-                <!-- Modern Search Bar in the Center -->
-                <div class="search-bar-container mx-lg-auto my- my-lg-0 w-100 w-lg-auto">
-                    <form method="GET" action="search.php" class="search-form d-flex">
-                        <input type="text" class="form-control border-end-0 search-input" name="query" placeholder="Search for a product..." aria-label="Search" required>
-                        <button class="btn btn-primary search-btn border-start-1 rounded-end-2 px-4  shadow-lg" type="submit">
-                            <i class="bi bi-search"></i> <!-- FontAwesome or Bootstrap Icons -->
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Display Username or Guest -->
-                <span class="navbar-text mx-lg-3 my-2 my-lg-0 text-center">
-                    Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
-                </span>
-
-                <!-- Account Dropdown for Logged-In Users -->
-                <?php if ($is_logged_in): ?>
-                    <div class="dropdown mx-lg-3 my-2 my-lg-0">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            Account
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                            <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
-                            <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
-                            <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
-                        </ul>
-                    </div>
-                <?php endif; ?>
-
-            
-                <!-- Login and Cart Buttons -->
-                <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
-                <?php if (!$is_logged_in): ?>
-                    <a href="user_login.php" class="btn login-btn me-3">Login/Register</a>
-                    <?php endif; ?>
-                    <!-- Favorite Link -->
-                <a class="nav-link d-flex align-items-center justify-content-center mx-lg-3 my-2 my-lg-0" href="favorite.php">
-                    <i class="bi bi-heart fs-5"></i> <!-- Larger Icon -->
-                </a>
-                    <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
-                        <img src="./images/cart-icon.jpg" alt="Cart" style="width:24px; height:24px; margin-right:2px;">
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</nav>
-
-
- <!-- Breadcrumb Navigation -->
- <nav aria-label="breadcrumb" class="py-3 bg-light">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="py-3 bg-light">
         <div class="container">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
@@ -425,55 +367,55 @@ if (isset($_POST['remove_all'])) {
             </ol>
         </div>
 
-   </nav>
-   
-   <div class="cart-page container my-2">
-    <!-- Cart Header -->
-    <div class="cart-header text-center mb-2">
-        <h1>Your Shopping Cart</h1>
-    </div>
+    </nav>
 
-    <div class="cart-container">
-        <?php
-        $sql = "SELECT ci.cart_item_id, ci.quantity, p.product_name, p.price, p.discounted_price, p.image, p.size
+    <div class="cart-page container my-2">
+        <!-- Cart Header -->
+        <div class="cart-header text-center mb-2">
+            <h1>Your Shopping Cart</h1>
+        </div>
+
+        <div class="cart-container">
+            <?php
+            $sql = "SELECT ci.cart_item_id, ci.quantity, p.product_name, p.price, p.discounted_price, p.image, p.size
                 FROM cart_items ci
                 JOIN products p ON ci.product_id = p.product_id
                 WHERE ci.user_id = ? AND ci.ordered_status = 'not_ordered'";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $user_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-        if ($result->num_rows > 0) {
-            $total_price = 0;
-            while ($item = $result->fetch_assoc()) {
-                $regular_price = $item['price'];
-                $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : 0;
-                $item_price = $discounted_price > 0 ? $discounted_price : $regular_price;
-                $item_total = $item_price * $item['quantity'];
-                $total_price += $item_total;
+            if ($result->num_rows > 0) {
+                $total_price = 0;
+                while ($item = $result->fetch_assoc()) {
+                    $regular_price = $item['price'];
+                    $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : 0;
+                    $item_price = $discounted_price > 0 ? $discounted_price : $regular_price;
+                    $item_total = $item_price * $item['quantity'];
+                    $total_price += $item_total;
 
-                $product_name = htmlspecialchars($item['product_name']);
-                $product_image = htmlspecialchars($item['image']);
-                $product_size = htmlspecialchars($item['size']); // Fetch the size
-                $image_path = "products/" . $product_image;
+                    $product_name = htmlspecialchars($item['product_name']);
+                    $product_image = htmlspecialchars($item['image']);
+                    $product_size = htmlspecialchars($item['size']); // Fetch the size
+                    $image_path = "products/" . $product_image;
 
-                // Render cart item with a modern layout
-                echo "<div class='cart-item d-flex align-items-center p-3 mb-4 bg-light rounded shadow-sm'>
+                    // Render cart item with a modern layout
+                    echo "<div class='cart-item d-flex align-items-center p-3 mb-4 bg-light rounded shadow-sm'>
                     <img src='" . $image_path . "' alt='" . $product_name . "' class='product-image img-thumbnail me-4' style='width: 100px; height: 100px; object-fit: cover;'>
                     <div class='product-details flex-grow-1'>
                         <h4>" . $product_name . "</h4>
                         <p class='text-muted'>Size: " . $product_size . "</p>";
 
-                // Display price with discount if applicable
-                if ($discounted_price > 0) {
-                    echo "<p class='regular-price text-muted'><del>$" . number_format($regular_price, 2) . "</del></p>";
-                    echo "<p class='discounted-price text-success fw-bold'>$" . number_format($discounted_price, 2) . "</p>";
-                } else {
-                    echo "<p class='price fw-bold'>$" . number_format($regular_price, 2) . "</p>";
-                }
+                    // Display price with discount if applicable
+                    if ($discounted_price > 0) {
+                        echo "<p class='regular-price text-muted'><del>$" . number_format($regular_price, 2) . "</del></p>";
+                        echo "<p class='discounted-price text-success fw-bold'>$" . number_format($discounted_price, 2) . "</p>";
+                    } else {
+                        echo "<p class='price fw-bold'>$" . number_format($regular_price, 2) . "</p>";
+                    }
 
-                echo "<p>Quantity: " . $item['quantity'] . "</p>
+                    echo "<p>Quantity: " . $item['quantity'] . "</p>
                     </div>
                     <div class='quantity-controls ms-3'>
                         <form method='post'>
@@ -483,15 +425,15 @@ if (isset($_POST['remove_all'])) {
                         </form>
                     </div>
                 </div>";
-            }
+                }
 
-            // Display total price at the bottom
-            echo "<div class='total-price p-3 bg-white text-center text-black fw-bold rounded'>
+                // Display total price at the bottom
+                echo "<div class='total-price p-3 bg-white text-center text-black fw-bold rounded'>
                     Total Price: $" . number_format($total_price, 2) . "
                   </div>";
 
-            // Button Container (remove all, proceed to checkout)
-            echo "<div class='button-container d-flex justify-content-center mt-4'>
+                // Button Container (remove all, proceed to checkout)
+                echo "<div class='button-container d-flex justify-content-center mt-4'>
                     <form method='post' class='w-20'>
                         <button type='submit' name='remove_all' class='btn btn-danger w-100'>Remove All Items</button>
                     </form>
@@ -499,16 +441,16 @@ if (isset($_POST['remove_all'])) {
                         <button type='submit' name='check_out' class='btn btn-success w-100'>Proceed to Checkout</button>
                     </form>
                   </div>";
-        } else {
-            echo "<div class='empty-cart text-center py-5'>
+            } else {
+                echo "<div class='empty-cart text-center py-5'>
                     <p class='text-muted'>Your cart is empty.</p>
                     <a href='user_index.php' class='btn btn-primary mt-3'>Continue Shopping</a>
                   </div>";
-        }
-        ?>
+            }
+            ?>
+        </div>
     </div>
-</div>
-<?php include 'footer.php'; ?>
+    <?php include 'footer.php'; ?>
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

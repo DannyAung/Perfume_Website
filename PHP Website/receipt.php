@@ -240,7 +240,7 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
             <!-- Total Summary -->
             <div class="total-summary mt-4">
                 <h3><strong>Total Summary</strong></h3>
-                <p><strong>Total Price (Before Discount):</strong> $<?php echo number_format($total_price_with_discount, 2); ?></p>
+                <p><strong>Total Price:</strong> $<?php echo number_format($total_price_with_discount, 2); ?></p>
                 <?php if ($order['discount_percentage'] > 0): ?>
                     <p><strong>Coupon Discount:</strong> -$<?php echo number_format($discount_amount, 2); ?></p>
                 <?php endif; ?>

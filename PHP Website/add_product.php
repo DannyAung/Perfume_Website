@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
         $stmt->execute();
     
-        $_SESSION['success'] = 'Product added successfully!';
+       
        header('Location: manage_products.php');
        exit;
     } catch (mysqli_sql_exception $e) {

@@ -1,32 +1,29 @@
 <?php
-session_start();  // Start session at the top
+session_start();  
 
 require_once "db_connection.php";
 
-// Handle login logic
+
 if (isset($_POST['login']) && $_SERVER['REQUEST_METHOD'] == "POST") {
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
 
-    // Check if email and password are provided
+    
     if (!empty($email) && !empty($password)) {
         try {
-            // Query to get user information
             $sql = "SELECT user_id, user_name, password FROM users WHERE email = ?";
             $stmt = $conn->prepare($sql);
             $stmt->execute([$email]);
             $info = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($info) {
-                // Password verification
                 $password_hash = $info['password'];
                 if (password_verify($password, $password_hash)) {
-                    // Success: Set session variables
-                    $_SESSION['user_id'] = $info['user_id'];  // Ensure user_id is correctly set
+                   
+                    $_SESSION['user_id'] = $info['user_id'];  
                     $_SESSION['user_name'] = $info['user_name'];
-                    $_SESSION['user_logged_in'] = true;  // Mark the user as logged in
+                    $_SESSION['user_logged_in'] = true;  
 
-                    // Redirect to product page
                     header("Location: user_index.php");
                     exit;
                 } else {
@@ -61,12 +58,11 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        /* Gradient Background */
+        
         body {
 
             font-family: 'Poppins', sans-serif;
@@ -77,7 +73,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             margin: 0;
         }
 
-        /* Container for Animation and Form */
+     
         .login-container {
             display: flex;
             align-items: center;
@@ -91,16 +87,16 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             max-width: 1000px;
             animation: fadeIn 0.5s ease-in-out;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            /* Optional: Adds a subtle border */
+            
         }
 
-        /* Login Card Styling */
+      
         .login-card {
             flex: 1;
             margin-left: 20px;
             animation: fadeIn 0.5s ease-in-out;
             backdrop-filter: blur(5px);
-            /* Optional: Adds a subtle blur to the card itself */
+           
         }
 
         @keyframes fadeIn {
@@ -115,8 +111,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             }
         }
 
-        /* Animation Column */
-        .animation-column {
+              .animation-column {
             flex: 1;
             display: flex;
             justify-content: center;
@@ -125,7 +120,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
         }
 
 
-        /* Input Field Styling */
+      
         .form-control {
             border-radius: 10px;
             border: 1px solid #ddd;
@@ -138,7 +133,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
         }
 
-        /* Button Styling */
+       
         .btn-login {
             background: linear-gradient(45deg, #007bff, #0056b3);
             color: white;
@@ -153,12 +148,12 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             transform: translateY(-2px);
         }
 
-        /* Centered Text */
+    
         .text-center {
             margin-bottom: 20px;
         }
 
-        /* Mobile Responsiveness */
+     
         @media (max-width: 576px) {
             .login-container {
                 flex-direction: column;
@@ -171,16 +166,15 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 
             .animation-column {
                 display: none;
-                /* Hide animation on small screens */
+               
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Login Form Container -->
     <div class="login-container">
-        <!-- Animation Column -->
+
         <div class="animation-column">
             <img src="images/login1.png" alt="Login Animation" style="width: 100%; height: auto;">
         </div>
@@ -217,7 +211,6 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                 <a href="forgot_password.php">Forgot your password?</a>
             </p>
 
-            <!-- Register Link -->
             <p class="mt-3 btn-signup">
                 <a href="user_register.php">Create new account</a>
             </p>

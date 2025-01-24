@@ -1,10 +1,10 @@
 <?php
-// Start session
+
 if (!isset($_SESSION)) {
     session_start();
 }
 
-// Database connection
+
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -17,7 +17,7 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Initialize search query and filters
+
 $query = isset($_GET['query']) ? $_GET['query'] : '';
 $min_price = isset($_GET['min_price']) ? floatval($_GET['min_price']) : 0;
 $max_price = isset($_GET['max_price']) ? floatval($_GET['max_price']) : 0;
@@ -25,57 +25,55 @@ $discount = isset($_GET['discount']) ? intval($_GET['discount']) : 0;
 $category = isset($_GET['category']) ? $_GET['category'] : 'All';
 $in_stock = isset($_GET['in_stock']) ? 1 : 0;
 
-// Base SQL query with the search condition
-$sql = "SELECT * FROM products WHERE (product_name LIKE ? OR description LIKE ?)";
+
+$sql = "SELECT * FROM products WHERE (product_name LIKE ? OR description LIKE ? OR category LIKE ?)";
 $params = [];
-$types = "ss";
+$types = "sss";
 
-// Add the search term to the query
+
 $params[] = '%' . $query . '%';
 $params[] = '%' . $query . '%';
+$params[] = '%' . $query . '%';
 
-// Add additional filters
+
 if ($min_price > 0) {
     $sql .= " AND price >= ?";
     $params[] = $min_price;
-    $types .= "d"; // Float
+    $types .= "d";
 }
 
 if ($max_price > 0) {
     $sql .= " AND price <= ?";
     $params[] = $max_price;
-    $types .= "d"; // Float
+    $types .= "d";
 }
 
 if ($discount > 0) {
     $sql .= " AND discount_percentage >= ?";
     $params[] = $discount;
-    $types .= "i"; // Integer
+    $types .= "i";
 }
 
 if ($category != 'All') {
     $sql .= " AND category = ?";
     $params[] = $category;
-    $types .= "s"; // String
+    $types .= "s";
 }
 
 if ($in_stock) {
     $sql .= " AND stock_quantity > 0";
 }
 
-// Add sorting
 $sql .= " ORDER BY created_at DESC";
 
-// Prepare and execute the query
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, $types, ...$params);
 mysqli_stmt_execute($stmt);
 $search_result = mysqli_stmt_get_result($stmt);
 
-// Check if user is logged in
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-// Fetch cart items for the logged-in user
+
 $cart_items = [];
 if ($is_logged_in) {
     $cart_query = "SELECT product_id FROM cart_items WHERE user_id = ? AND ordered_status = 'not_ordered'";
@@ -106,73 +104,10 @@ if ($is_logged_in) {
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
-        <div class="container-fluid">
-            <!-- Logo and Brand -->
-            <a class="navbar-brand d-flex align-items-center" href="user_index.php">
-                <img src="./images/perfume_logo.png" alt="Logo" style="width:50px; height:auto;">
-                <b class="ms-2" style="font-family: 'Roboto', sans-serif; font-weight: 300; color: #333;">FRAGRANCE HAVEN</b>
-            </a>
 
-            <!-- Toggler for Small Screens -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <!-- Collapsible Navbar Content -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
-
-                    <!-- Modern Search Bar in the Center -->
-                    <div class="search-bar-container mx-lg-auto my- my-lg-0 w-100 w-lg-auto">
-                        <form method="GET" action="search.php" class="search-form d-flex">
-                            <input type="text" class="form-control border-end-0 search-input" name="query" placeholder="Search for a product..." aria-label="Search" required>
-                            <button class="btn btn-primary search-btn border-start-1 rounded-end-2 px-4  shadow-lg" type="submit">
-                                <i class="bi bi-search"></i> <!-- FontAwesome or Bootstrap Icons -->
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Display Username or Guest -->
-                    <span class="navbar-text mx-lg-3 my-2 my-lg-0 text-center">
-                        Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
-                    </span>
-
-                    <!-- Account Dropdown for Logged-In Users -->
-                    <?php if ($is_logged_in): ?>
-                        <div class="dropdown mx-lg-3 my-2 my-lg-0">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Account
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                                <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
-                                <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
-                                <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
+    <?php include 'navbar.php'; ?>
 
 
-                    <!-- Login and Cart Buttons -->
-                    <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
-                        <?php if (!$is_logged_in): ?>
-                            <a href="user_login.php" class="btn login-btn me-3 ">Login/Register</a>
-                        <?php endif; ?>
-                        <!-- Favorite Link -->
-                        <a class="nav-link d-flex align-items-center justify-content-center mx-lg-3 my-2 my-lg-0" href="favorite.php">
-                            <i class="bi bi-heart fs-5"></i> <!-- Larger Icon -->
-                        </a>
-                        <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
-                            <img src="./images/cart-icon.jpg" alt="Cart" style="width:24px; height:24px; margin-right:2px;">
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb" class="py-3 bg-light">
         <div class="container">
             <ol class="breadcrumb mb-0">
@@ -184,14 +119,13 @@ if ($is_logged_in) {
 
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar for Filters -->
             <div class="col-md-3">
                 <div class="border p-5 filter-sidebar sticky-sidebar">
                     <h5 class="mb-3">Filter</h5>
                     <form method="GET" action="search.php">
                         <input type="hidden" name="query" value="<?php echo htmlspecialchars($query); ?>">
 
-                        <!-- Price Range Filter -->
+
                         <div class="mb-3">
                             <label for="priceRange" class="form-label">Price Range</label>
                             <div class="d-flex gap-2">
@@ -200,7 +134,7 @@ if ($is_logged_in) {
                             </div>
                         </div>
 
-                        <!-- Discount Filter -->
+
                         <div class="mb-3">
                             <label class="form-label">Discount</label>
                             <select class="form-select" name="discount">
@@ -212,7 +146,7 @@ if ($is_logged_in) {
                             </select>
                         </div>
 
-                        <!-- Category Filter -->
+
                         <div class="mb-3">
                             <label class="form-label">Category</label>
                             <select class="form-select" name="category">
@@ -223,7 +157,6 @@ if ($is_logged_in) {
                             </select>
                         </div>
 
-                        <!-- Availability Filter -->
                         <div class="mb-3">
                             <label class="form-label">Availability</label>
                             <div class="form-check">
@@ -252,7 +185,6 @@ if ($is_logged_in) {
                             $stock_quantity = $product['stock_quantity'];
                             $is_sold_out = $stock_quantity == 0;
 
-                            // Check if the image is available or use a default image
                             $image = isset($product['image']) && !empty($product['image'])
                                 ? 'products/' . htmlspecialchars($product['image'])
                                 : 'images/default-image.jpg';
@@ -261,7 +193,6 @@ if ($is_logged_in) {
                             $product_price = $product['price'];
                             $discount_percentage = $product['discount_percentage'];
 
-                            // Calculate the discounted price
                             $discounted_price = ($discount_percentage > 0)
                                 ? $product_price - ($product_price * ($discount_percentage / 100))
                                 : $product_price;
@@ -276,7 +207,7 @@ if ($is_logged_in) {
                                         <?php endif; ?>
                                         <?php if ($discount_percentage > 0): ?>
                                             <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end"
-                                                style="font-size: 0.9rem; z-index: 10;"> <!-- Added z-index here -->
+                                                style="font-size: 0.9rem; z-index: 10;">
                                                 <?php echo $discount_percentage; ?>% OFF
                                             </div>
                                         <?php endif; ?>
@@ -284,7 +215,6 @@ if ($is_logged_in) {
                                             alt="<?php echo $product_name; ?>"
                                             style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
 
-                                        <!-- Sold Out Badge -->
                                         <?php if ($is_sold_out): ?>
                                             <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex justify-content-center align-items-center"
                                                 style="background: rgba(52, 51, 51, 0.7);">
@@ -294,8 +224,6 @@ if ($is_logged_in) {
                                                 </div>
                                             </div>
                                         <?php endif; ?>
-
-                                        <!-- Hover Overlay -->
                                         <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
                                             style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
                                             <?php if (!$is_sold_out): ?>
@@ -311,7 +239,6 @@ if ($is_logged_in) {
                                             <?php endif; ?>
                                         </div>
                                     </div>
-
                                     <div class="card-body d-flex flex-column">
                                         <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
                                         <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>

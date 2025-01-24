@@ -129,71 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body style="background-color:rgb(249, 249, 249);">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
-        <div class="container-fluid">
-            <!-- Logo and Brand -->
-            <a class="navbar-brand d-flex align-items-center" href="user_index.php">
-                <img src="./images/perfume_logo.png" alt="Logo" style="width:50px; height:auto;">
-                <b class="ms-2" style="font-family: 'Roboto', sans-serif; font-weight: 300; color: #333;">FRAGRANCE HAVEN</b>
-            </a>
-
-            <!-- Toggler for Small Screens -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <!-- Collapsible Navbar Content -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
-
-                    <!-- Modern Search Bar in the Center -->
-                    <div class="search-bar-container mx-lg-auto my- my-lg-0 w-100 w-lg-auto">
-                        <form method="GET" action="search.php" class="search-form d-flex">
-                            <input type="text" class="form-control border-end-0 search-input" name="query" placeholder="Search for a product..." aria-label="Search" required>
-                            <button class="btn btn-primary search-btn border-start-1 rounded-end-2 px-4  shadow-lg" type="submit">
-                                <i class="bi bi-search"></i> <!-- FontAwesome or Bootstrap Icons -->
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Display Username or Guest -->
-                    <span class="navbar-text mx-lg-3 my-2 my-lg-0 text-center">
-                        Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
-                    </span>
-
-                    <!-- Account Dropdown for Logged-In Users -->
-                    <?php if ($is_logged_in): ?>
-                        <div class="dropdown mx-lg-3 my-2 my-lg-0">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Account
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                                <li><a class="dropdown-item" href="user_orders.php">Orders</a></li>
-                                <li><a class="dropdown-item" href="user_profile.php">View Profile</a></li>
-                                <li><a class="dropdown-item" href="user_logout.php">Logout</a></li>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
-
-
-                    <!-- Login and Cart Buttons -->
-                    <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
-                        <?php if (!$is_logged_in): ?>
-                            <a href="user_login.php" class="btn login-btn me-3 ">Login/Register</a>
-                        <?php endif; ?>
-                        <!-- Favorite Link -->
-                        <a class="nav-link d-flex align-items-center justify-content-center mx-lg-3 my-2 my-lg-0" href="favorite.php">
-                            <i class="bi bi-heart fs-5"></i> <!-- Larger Icon -->
-                        </a>
-                        <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
-                            <img src="./images/cart-icon.jpg" alt="Cart" style="width:24px; height:24px; margin-right:2px;">
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
+<?php include 'navbar.php'; ?>
     <!-- New Navigation Links Section -->
     <div class="home py-1">
         <div class="container">
@@ -258,11 +194,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <span class="visually-hidden">Next</span>
         </button>
     </div>
-    <!-- Category Section -->
+
+   
+    <div class="container my-5">
+        <h2 class="text-center mb-4" style="font-family: 'Cinzel', serif; font-weight: 600; font-size: 2rem; color: #333;">
+            <b>Exclusive Coupons Just for You!</b>
+        </h2>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+        
+            <div class="col">
+                <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
+                    <img src="./images/BOGO_coupon.png" class="card-img-top" alt="BOGO Coupon">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #34495e;">BOGO Coupon</h5>
+                        <p class="card-text text-muted">Save 50% With Minimum Purchase $1000. Use code: <b>BOGO</b></p>
+                    </div>
+                </div>
+            </div>
+          
+            <div class="col">
+                <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
+                    <img src="./images/SAVE20_coupon.png" class="card-img-top" alt="SAVE20 Coupon">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #34495e;">SAVE20 Coupon</h5>
+                        <p class="card-text text-muted">Save 20% With Minimum Purchase $400. Use code: <b>SAVE20</b></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
     <div class="container my-5">
         <h2 class="text-center mb-7 mt-7" style="font-family: 'Roboto', sans-serif; font-weight: 600; color: #2c3e50;">Browse by Category</h2>
         <div class="row row-cols-1 row-cols-md-3 g-4">
-            <!-- Men Category -->
+        
             <div class="col">
                 <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
                     <div class="position-relative">
