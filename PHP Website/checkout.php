@@ -1,11 +1,23 @@
 <?php
 session_start();
 
-// Enable error reporting
+
+$host = 'localhost';
+$username_db = 'root';
+$password_db = '';
+$dbname = 'ecom_website';
+$port = 3306;
+
+$conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
     echo "You must be logged in to check out.";
     exit;
@@ -17,23 +29,12 @@ if (isset($_SESSION['checkout_started'])) {
     unset($_SESSION['applied_coupon_code']);
     unset($_SESSION['coupon_data']);
     if (!isset($_SESSION['applied_coupon_code'])) {
-        $_SESSION['applied_coupon_code'] = null; // Default value (null or empty string)
+        $_SESSION['applied_coupon_code'] = null;
         $_SESSION['discount_percentage'] = null;
     }
     unset($_SESSION['checkout_started']);
 }
 
-// Database connection
-$host = 'localhost';
-$username_db = 'root';
-$password_db = '';
-$dbname = 'ecom_website';
-$port = 3306;
-
-$conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
 
 // Retrieve cart items
 $sql = "SELECT ci.cart_item_id, ci.quantity, p.product_id, p.product_name, p.price, p.discounted_price, p.image, p.size
@@ -46,7 +47,7 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Calculate total price of cart items
+// Calculate total price 
 $total_price = 0;
 while ($item = $result->fetch_assoc()) {
     $regular_price = $item['price'];
@@ -57,43 +58,49 @@ while ($item = $result->fetch_assoc()) {
     $cart_items[] = $item;
 }
 
-// Get discount percentage from the session, default to 0 if no coupon applied
 $discount_percentage = $_SESSION['discount_percentage'] ?? 0;
 
-// Calculate discount amount and final price
+
 $discount_amount = $total_price * ($discount_percentage / 100);
 $final_price = $total_price - $discount_amount;
 
-// Apply shipping fee
+
+$final_total_price = $final_price + $shipping_fee;
+$discount_amount = 0;
+$final_total_price = $total_price;
+
+
+$shipping_sql = "SELECT shipping_method, shipping_fee FROM shipping";
+$shipping_result = $conn->query($shipping_sql);
+
+$shipping_methods = [];
+if ($shipping_result->num_rows > 0) {
+    while ($row = $shipping_result->fetch_assoc()) {
+        $shipping_methods[$row['shipping_method']] = $row['shipping_fee'];
+    }
+}
+
+
 $shipping_fee = 0;
 if (isset($_POST['shipping_method']) && !empty($_POST['shipping_method'])) {
     $shipping_method = $_POST['shipping_method'];
-    $shipping_fee = $shipping_methods[$shipping_method] ?? 0; // Default to 0 if not found
+    // Fetch the shipping fee
+    $shipping_fee = $shipping_methods[$shipping_method] ?? 0;
 }
-
-// Add shipping fee to the final price
-$final_total_price = $final_price + $shipping_fee;
-$discount_amount = 0;
-$final_total_price = $total_price; // Initial total price
 
 // Check if a coupon is applied
 if (isset($_SESSION['applied_coupon_code'])) {
     $discount_percentage = $_SESSION['discount_percentage'];
-    $discount_amount = ($discount_percentage / 100) * $total_price; // Calculate discount
-
-    // Apply discount to total price
+    $discount_amount = ($discount_percentage / 100) * $total_price;
     $final_total_price = $total_price - $discount_amount;
 }
 
-// Now, add shipping fee only after applying the coupon
 $final_total_price += $shipping_fee;
 
 
-// Handle coupon application
 if (isset($_POST['apply_coupon'])) {
-    $manual_coupon_code = trim($_POST['coupon_code']); // Get the submitted coupon code
-
-    // Validate the coupon from the `coupons` table
+    //retrieve coupon code
+    $manual_coupon_code = trim($_POST['coupon_code']);
     $coupon_sql = "SELECT coupon_id, discount_percentage, minimum_purchase_amount, valid_from, valid_to 
                    FROM coupons 
                    WHERE coupon_code = ? AND valid_from <= NOW() AND valid_to >= NOW()";
@@ -106,45 +113,23 @@ if (isset($_POST['apply_coupon'])) {
         $coupon_data = $coupon_result->fetch_assoc();
         $_SESSION['coupon_yes'] = true;
 
-        // Check if the order total meets the minimum purchase amount
+        // Check minimum purchase amount
         if ($total_price >= $coupon_data['minimum_purchase_amount']) {
-            // Store coupon details in the session only when applied
+            // Store coupon 
             $_SESSION['discount_percentage'] = $coupon_data['discount_percentage'];
             $_SESSION['applied_coupon_code'] = $manual_coupon_code;
             $_SESSION['coupon_data'] = $manual_coupon_code;
-
             $_SESSION['coupon_id'] = $coupon_data['coupon_id'];
             echo "<script>alert('Coupon applied successfully!');</script>";
         } else {
             echo "<script>alert('This coupon requires a minimum purchase of $" . $coupon_data['minimum_purchase_amount'] . ".');</script>";
         }
     } else {
-        // Invalid coupon if not found or expired
+
         echo "<script>alert('Invalid or expired coupon code!');</script>";
     }
 }
 
-
-// Fetch shipping methods and fees from the database
-$shipping_sql = "SELECT shipping_method, shipping_fee FROM shipping";
-$shipping_result = $conn->query($shipping_sql);
-
-$shipping_methods = [];
-if ($shipping_result->num_rows > 0) {
-    while ($row = $shipping_result->fetch_assoc()) {
-        $shipping_methods[$row['shipping_method']] = $row['shipping_fee'];
-    }
-}
-
-// Apply shipping fee
-$shipping_fee = 0;
-if (isset($_POST['shipping_method']) && !empty($_POST['shipping_method'])) {
-    $shipping_method = $_POST['shipping_method'];
-    // Fetch the shipping fee from the $shipping_methods array
-    $shipping_fee = $shipping_methods[$shipping_method] ?? 0; // Default to 0 if the method is not found
-}
-
-// Handle the checkout process
 if (isset($_POST['checkout'])) {
     $name = $_POST['name'];
     $address = $_POST['address'];
@@ -158,7 +143,7 @@ if (isset($_POST['checkout'])) {
     $discount_percentage = $_SESSION['discount_percentage'] ?? 0;
     $coupon_id = $_SESSION['coupon_id'] ?? null;
     if ($_SESSION['coupon_yes']) {
-        // Insert order into the orders table, including the coupon details
+
         $order_sql = "INSERT INTO orders (user_id, total_price, name, address, phone, email, payment_method, shipping_method, shipping_fee, discount_percentage, coupon_code, coupon_id) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $order_stmt = $conn->prepare($order_sql);
@@ -167,7 +152,7 @@ if (isset($_POST['checkout'])) {
         if ($order_stmt->execute()) {
             $order_id = $conn->insert_id;
 
-            // Insert order items into the order_items table
+            // Insert order items 
             foreach ($cart_items as $item) {
                 $product_id = $item['product_id'];
                 $quantity = $item['quantity'];
@@ -179,31 +164,28 @@ if (isset($_POST['checkout'])) {
                 $order_item_stmt->bind_param("iisids", $order_id, $product_id, $item['product_name'], $quantity, $price, $item['size']);
                 $order_item_stmt->execute();
 
-                // Update stock quantity
                 $update_stock_sql = "UPDATE products SET stock_quantity = stock_quantity - ? WHERE product_id = ?";
                 $update_stock_stmt = $conn->prepare($update_stock_sql);
                 $update_stock_stmt->bind_param("ii", $quantity, $product_id);
                 $update_stock_stmt->execute();
             }
-
-            // Update cart items status to 'ordered' after the checkout process
             $update_cart_sql = "UPDATE cart_items SET ordered_status = 'ordered' WHERE user_id = ?";
             $update_cart_stmt = $conn->prepare($update_cart_sql);
             $update_cart_stmt->bind_param("i", $user_id);
             $update_cart_stmt->execute();
 
-            // Clear coupon session variables after the order is placed
+
             unset($_SESSION['discount_percentage']);
             unset($_SESSION['applied_coupon_code']);
             unset($_SESSION['coupon_id']);
 
-            // Redirect to receipt page
+
             header("Location: receipt.php?order_id=" . $order_id);
         } else {
             die("Error processing order: " . $order_stmt->error);
         }
     } else {
-        // Insert order into the orders table, including the coupon details
+
         $order_sql = "INSERT INTO orders (user_id, total_price, name, address, phone, email, payment_method, shipping_method, shipping_fee, discount_percentage, coupon_code, coupon_id) 
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $order_stmt = $conn->prepare($order_sql);
@@ -212,11 +194,10 @@ if (isset($_POST['checkout'])) {
         if ($order_stmt->execute()) {
             $order_id = $conn->insert_id;
 
-            // Insert order items into the order_items table
             foreach ($cart_items as $item) {
                 $product_id = $item['product_id'];
                 $quantity = $item['quantity'];
-                $price = $item['discounted_price'] > 0 ? $item['discounted_price'] : $item['price']; // Use the discounted price if available
+                $price = $item['discounted_price'] > 0 ? $item['discounted_price'] : $item['price'];
 
                 $order_item_sql = "INSERT INTO order_items (order_id, product_id, product_name, quantity, price, size) 
                       VALUES (?, ?, ?, ?, ?, ?)";
@@ -224,25 +205,25 @@ if (isset($_POST['checkout'])) {
                 $order_item_stmt->bind_param("iisids", $order_id, $product_id, $item['product_name'], $quantity, $price, $item['size']);
                 $order_item_stmt->execute();
 
-                // Update stock quantity
+
                 $update_stock_sql = "UPDATE products SET stock_quantity = stock_quantity - ? WHERE product_id = ?";
                 $update_stock_stmt = $conn->prepare($update_stock_sql);
                 $update_stock_stmt->bind_param("ii", $quantity, $product_id);
                 $update_stock_stmt->execute();
             }
 
-            // Update cart items status to 'ordered' after the checkout process
+
             $update_cart_sql = "UPDATE cart_items SET ordered_status = 'ordered' WHERE user_id = ?";
             $update_cart_stmt = $conn->prepare($update_cart_sql);
             $update_cart_stmt->bind_param("i", $user_id);
             $update_cart_stmt->execute();
 
-            // Clear coupon session variables after the order is placed
+
             unset($_SESSION['discount_percentage']);
             unset($_SESSION['applied_coupon_code']);
             unset($_SESSION['coupon_id']);
 
-            // Redirect to receipt page
+
             header("Location: receipt.php?order_id=" . $order_id);
         } else {
             die("Error processing order: " . $order_stmt->error);
@@ -250,16 +231,15 @@ if (isset($_POST['checkout'])) {
     }
 }
 
-// Before using $applied_coupon_code, check if it's set in the session
+//check if it's set in the session
 $applied_coupon_code = isset($_SESSION['applied_coupon_code']) ? $_SESSION['applied_coupon_code'] : "";
 
-// Using htmlspecialchars safely to avoid deprecated behavior
+
 $applied_coupon_code_html = htmlspecialchars($applied_coupon_code, ENT_QUOTES, 'UTF-8');
 
-// Check if discount_percentage is set in the session, else default to 0
+
 $discount_percentage = isset($_SESSION['discount_percentage']) ? $_SESSION['discount_percentage'] : 0;
 
-// Regenerate session ID to prevent session hijacking and ensure the session data is reset
 session_regenerate_id(true);
 ?>
 

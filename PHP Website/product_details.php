@@ -6,11 +6,10 @@ require_once 'db_connection.php';  // Ensure the connection file is correct
 
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-// Get the product_id from the URL
+
 $product_id = isset($_GET['product_id']) ? $_GET['product_id'] : null;
 
 if ($product_id) {
-    // Query to fetch the product based on the product_id
     $sql = "SELECT * FROM products WHERE product_id = :product_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
@@ -18,7 +17,6 @@ if ($product_id) {
     $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($product) {
-        // Displaying product details
         $product_name = htmlspecialchars($product['product_name']);
         $price = number_format($product['price'], 2);
         $discounted_price = number_format($product['discounted_price'], 2);
@@ -30,7 +28,6 @@ if ($product_id) {
         echo "Product not found.";
     }
 
-    // Query to fetch reviews for the product
     $reviews_sql = "SELECT r.review_text, r.rating, r.created_at, u.user_name FROM reviews r
                     JOIN users u ON r.user_id = u.user_id
                     WHERE r.product_id = :product_id ORDER BY r.created_at DESC";
@@ -42,7 +39,7 @@ if ($product_id) {
     echo "Invalid product ID.";
 }
 
-// Check if the product is in the user's wishlist
+
 $in_wishlist = false;
 if ($is_logged_in) {
     $query = "SELECT 1 FROM wishlist WHERE user_id = :user_id AND product_id = :product_id";
@@ -52,20 +49,20 @@ if ($is_logged_in) {
     $stmt->execute();
     $in_wishlist = $stmt->rowCount() > 0;
 }
-// Handle adding to wishlist
+
 if (isset($_POST['add_to_wishlist'])) {
     if (isset($_POST['product_id'])) {
         $product_id = intval($_POST['product_id']);
         $user_id = $_SESSION['user_id'];
 
-        // Add the item to the wishlist
+
         $query = "INSERT INTO wishlist (user_id, product_id) VALUES (:user_id, :product_id)";
         $stmt = $conn->prepare($query);
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
 
         if ($stmt->execute()) {
-            // Redirect to the same page to refresh the wishlist state
+
             header("Location: " . $_SERVER['REQUEST_URI']);
             exit;
         } else {
@@ -74,20 +71,17 @@ if (isset($_POST['add_to_wishlist'])) {
     }
 }
 
-// Handle removing from wishlist
+
 if (isset($_POST['remove_from_wishlist'])) {
     if (isset($_POST['product_id'])) {
         $product_id = intval($_POST['product_id']);
         $user_id = $_SESSION['user_id'];
-
-        // Remove the item from the wishlist
         $query = "DELETE FROM wishlist WHERE user_id = :user_id AND product_id = :product_id";
         $stmt = $conn->prepare($query);
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
 
         if ($stmt->execute()) {
-            // Redirect to the same page to refresh the wishlist state
             header("Location: " . $_SERVER['REQUEST_URI']);
             exit;
         } else {
@@ -162,6 +156,7 @@ if (isset($_POST['remove_from_wishlist'])) {
     .card {
         box-shadow: none;
     }
+
     .related-product-card {
         height: 100%;
         display: flex;
@@ -173,7 +168,7 @@ if (isset($_POST['remove_from_wishlist'])) {
 
 
 <body>
-<?php include 'navbar.php'; ?>
+    <?php include 'navbar.php'; ?>
     <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb" class="py-3 bg-light">
         <div class="container">
@@ -249,14 +244,14 @@ if (isset($_POST['remove_from_wishlist'])) {
                             </p>
                         <?php endif; ?>
 
-                        <!-- Stock Information -->
+
                         <p class="text-secondary" style="font-family: 'Roboto', sans-serif; font-size: 14px;">
                             <strong>Stock:</strong> <?php echo intval($product['stock_quantity']); ?> available
                         </p>
 
                         <!-- Add to Cart and Wishlist -->
                         <div class="d-flex align-items-center mt-4">
-                            <!-- Add to Cart -->
+
                             <form method="POST" action="add_to_cart.php" class="d-flex align-items-center me-3">
                                 <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
                                 <input type="number" name="quantity" value="1" min="1" class="form-control me-3" style="width: 100px;">
@@ -265,7 +260,7 @@ if (isset($_POST['remove_from_wishlist'])) {
                                 </button>
                             </form>
 
-                            <!-- Wishlist Button -->
+
                             <form method="POST" action="product_details.php?product_id=<?php echo $product_id; ?>">
                                 <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product_id); ?>">
                                 <?php if ($in_wishlist): ?>
@@ -280,9 +275,8 @@ if (isset($_POST['remove_from_wishlist'])) {
                             </form>
                         </div>
                     </div>
-                    <!-- Product Description and Customer Reviews with Small Buttons (Tabs) -->
+
                     <div class="mt-4">
-                        <!-- Tab Buttons -->
                         <ul class="nav nav-tabs" id="productTabs" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link active btn-sm" id="tabDescription" data-bs-toggle="tab" href="#collapseDescription" role="tab" aria-controls="collapseDescription" aria-selected="true">Description</a>
@@ -292,9 +286,9 @@ if (isset($_POST['remove_from_wishlist'])) {
                             </li>
                         </ul>
 
-                        <!-- Tab Content -->
+
                         <div class="tab-content mt-3">
-                            <!-- Description Tab -->
+
                             <div class="tab-pane show active" id="collapseDescription" role="tabpanel" aria-labelledby="tabDescription">
                                 <div class="card card-body">
                                     <p class="description-text">
@@ -339,7 +333,7 @@ if (isset($_POST['remove_from_wishlist'])) {
                     </div>
 
                     <script>
-                        // JavaScript to toggle collapse
+                      
                         document.getElementById('btnDescription').addEventListener('click', function() {
                             var description = document.getElementById('collapseDescription');
                             var reviews = document.getElementById('collapseReviews');
@@ -347,7 +341,7 @@ if (isset($_POST['remove_from_wishlist'])) {
                                 description.classList.remove('show');
                             } else {
                                 description.classList.add('show');
-                                reviews.classList.remove('show'); // Close reviews if description opens
+                                reviews.classList.remove('show'); 
                             }
                         });
 
@@ -358,12 +352,10 @@ if (isset($_POST['remove_from_wishlist'])) {
                                 reviews.classList.remove('show');
                             } else {
                                 reviews.classList.add('show');
-                                description.classList.remove('show'); // Close description if reviews open
+                                description.classList.remove('show'); 
                             }
                         });
                     </script>
-
-
                 <?php endif; ?>
 
                 <div class="row mt-5">
@@ -423,11 +415,9 @@ if (isset($_POST['remove_from_wishlist'])) {
                 const mainImage = document.getElementById('main-image');
 
                 thumbnails.forEach((thumbnail, index) => {
-                    thumbnail.addEventListener('click', () => {
-                        // Update the main image's source
+                    thumbnail.addEventListener('click', () => {                      
                         mainImage.src = thumbnail.src;
-
-                        // Add an active class to the clicked thumbnail
+                    
                         thumbnails.forEach(thumb => thumb.style.border = '1px solid #ddd');
                         thumbnail.style.border = '2px solid #007bff';
                     });

@@ -19,33 +19,49 @@ if (!$conn) {
 
 // Handle Add Coupon request
 if (isset($_POST['add_coupon'])) {
-    $coupon_code = $_POST['coupon_code'];
-    $discount_percentage = $_POST['discount_percentage'];
-    $valid_from = $_POST['valid_from'];
-    $valid_to = $_POST['valid_to'];
-    $minimum_purchase_amount = $_POST['minimum_purchase_amount'];
+    $coupon_code = htmlspecialchars($_POST['coupon_code']);
+    $discount_percentage = htmlspecialchars($_POST['discount_percentage']);
+    $valid_from = htmlspecialchars($_POST['valid_from']);
+    $valid_to = htmlspecialchars($_POST['valid_to']);
+    $minimum_purchase_amount = htmlspecialchars($_POST['minimum_purchase_amount']);
+
+    // Handle Image Upload
+    $coupon_image = '';
+    if (isset($_FILES['coupon_image']) && $_FILES['coupon_image']['error'] === UPLOAD_ERR_OK) {
+        $target_dir = "uploads/coupons/";
+        $coupon_image = $target_dir . basename($_FILES['coupon_image']['name']);
+        if (!move_uploaded_file($_FILES['coupon_image']['tmp_name'], $coupon_image)) {
+            $_SESSION['error'] = 'Failed to upload image.'; // Handle upload error
+        }
+    }
 
     // Insert coupon into the database
-    $query = "INSERT INTO coupons (coupon_code, discount_percentage, valid_from, valid_to, minimum_purchase_amount) 
-              VALUES ('$coupon_code', '$discount_percentage', '$valid_from', '$valid_to', '$minimum_purchase_amount')";
-    if (mysqli_query($conn, $query)) {
+    $query = "INSERT INTO coupons (coupon_code, discount_percentage, valid_from, valid_to, minimum_purchase_amount, coupon_image) 
+              VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("sdssds", $coupon_code, $discount_percentage, $valid_from, $valid_to, $minimum_purchase_amount, $coupon_image);
+    if ($stmt->execute()) {
         $_SESSION['message'] = 'Coupon added successfully!';
     } else {
-        $_SESSION['error'] = 'Error adding coupon: ' . mysqli_error($conn);
+        $_SESSION['error'] = 'Error adding coupon: ' . $conn->error;
     }
+    $stmt->close();
 }
 
 // Handle Delete Coupon request
 if (isset($_GET['delete_coupon'])) {
-    $coupon_id = $_GET['delete_coupon'];
-    
+    $coupon_id = intval($_GET['delete_coupon']);
+
     // Delete coupon from database
-    $query = "DELETE FROM coupons WHERE coupon_id = $coupon_id";
-    if (mysqli_query($conn, $query)) {
+    $query = "DELETE FROM coupons WHERE coupon_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $coupon_id);
+    if ($stmt->execute()) {
         $_SESSION['message'] = 'Coupon deleted successfully!';
     } else {
-        $_SESSION['error'] = 'Error deleting coupon: ' . mysqli_error($conn);
+        $_SESSION['error'] = 'Error deleting coupon: ' . $conn->error;
     }
+    $stmt->close();
 }
 
 // Search functionality
@@ -65,70 +81,69 @@ if (isset($_GET['search'])) {
     $result = $stmt->get_result();
     $stmt->close();
 } else {
-    // Fetch all coupons from the database
     $query = "SELECT * FROM coupons";
     $result = mysqli_query($conn, $query);
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Coupons</title>
-     <!-- Bootstrap CSS -->
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Lilita+One&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
             background-color: #f9fafc;
-            color: #333;
         }
-        .navbar {
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+
         .card {
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            background-color: #fff;
-            overflow: hidden;
+            margin-bottom: 20px;
         }
-        .btn-action {
-            margin-right: 5px;
-        }
-        .success-message, .error-message {
+
+        .success-message,
+        .error-message {
             padding: 10px;
             margin-bottom: 20px;
             border-radius: 5px;
         }
+
         .success-message {
             background-color: #d4edda;
             color: #155724;
         }
+
         .error-message {
             background-color: #f8d7da;
             color: #721c24;
         }
-
-
     </style>
 </head>
-<body>
-<?php include 'admin_navbar.php'; ?>
-<?php include 'offcanvas_sidebar.php'; ?>
 
-    <!-- Main Content -->
+<body>
+    <?php include 'admin_navbar.php'; ?>
+    <?php include 'offcanvas_sidebar.php'; ?>
+
     <div class="container mt-4">
-    <h1 class="text-center">Manage Coupon</h1>
+        <h1 class="text-center">Manage Coupons</h1>
 
         <!-- Search Form -->
         <form action="manage_coupon.php" method="GET" class="d-flex mb-4">
-            <input class="form-control me-2" type="search" name="search" placeholder="Search coupons" aria-label="Search" value="<?= htmlspecialchars($search_query); ?>">
+            <input class="form-control me-2" type="search" name="search" placeholder="Search coupons" value="<?= htmlspecialchars($search_query); ?>">
             <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
+
+        <!-- Display session messages -->
+        <?php if (isset($_SESSION['message'])): ?>
+            <div class="success-message"><?php echo $_SESSION['message'];
+                                            unset($_SESSION['message']); ?></div>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="error-message"><?php echo $_SESSION['error'];
+                                        unset($_SESSION['error']); ?></div>
+        <?php endif; ?>
 
         <!-- Coupons List -->
         <div class="card">
@@ -139,6 +154,7 @@ if (isset($_GET['search'])) {
                 <table class="table table-striped">
                     <thead>
                         <tr>
+                            <th>Image</th>
                             <th>Coupon Code</th>
                             <th>Discount (%)</th>
                             <th>Valid From</th>
@@ -150,15 +166,26 @@ if (isset($_GET['search'])) {
                     <tbody>
                         <?php while ($coupon = mysqli_fetch_assoc($result)): ?>
                             <tr>
+                                <td>
+                                    <?php if (!empty($coupon['coupon_image'])): ?>
+
+                                        <img src="<?php echo 'uploads/coupons/' . htmlspecialchars(basename($coupon['coupon_image'])); ?>"
+                                            style="width: 50px; height: 50px; object-fit: cover;">
+                                    <?php else: ?>
+                                        <i class="bi bi-image text-muted"></i>
+                                    <?php endif; ?>
+                                </td>
+
+
                                 <td><?php echo htmlspecialchars($coupon['coupon_code']); ?></td>
                                 <td><?php echo $coupon['discount_percentage']; ?>%</td>
                                 <td><?php echo $coupon['valid_from']; ?></td>
                                 <td><?php echo $coupon['valid_to']; ?></td>
-                                <td><?php echo $coupon['minimum_purchase_amount']; ?></td>
+                                <td>$<?php echo number_format($coupon['minimum_purchase_amount'], 2); ?></td>
                                 <td>
-                                    <a href="edit_coupon.php?coupon_id=<?php echo $coupon['coupon_id']; ?>" class="btn btn-primary btn-sm btn-action">Edit</a>
-                                    <a href="manage_coupon.php?delete_coupon=<?php echo $coupon['coupon_id']; ?>" 
-                                       onclick="return confirm('Are you sure you want to delete this coupon?')" class="btn btn-danger btn-sm btn-action">Delete</a>
+                                    <a href="edit_coupon.php?coupon_id=<?php echo $coupon['coupon_id']; ?>" class="btn btn-primary btn-sm">Edit</a>
+                                    <a href="manage_coupon.php?delete_coupon=<?php echo $coupon['coupon_id']; ?>"
+                                        onclick="return confirm('Are you sure you want to delete this coupon?')" class="btn btn-danger btn-sm">Delete</a>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -166,21 +193,14 @@ if (isset($_GET['search'])) {
                 </table>
             </div>
         </div>
-        <!-- Display session messages -->
-        <?php if (isset($_SESSION['message'])): ?>
-            <div class="success-message"><?php echo $_SESSION['message']; unset($_SESSION['message']); ?></div>
-        <?php endif; ?>
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
-        <?php endif; ?>
 
-        <!-- Add Coupon Form -->
-        <div class="card mb-4">
+      
+        <div class="card">
             <div class="card-header bg-primary text-white">
                 <h4 class="mb-0">Add New Coupon</h4>
             </div>
             <div class="card-body">
-                <form action="manage_coupon.php" method="POST">
+                <form action="manage_coupon.php" method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="coupon_code" class="form-label">Coupon Code:</label>
                         <input type="text" name="coupon_code" class="form-control" required>
@@ -201,11 +221,16 @@ if (isset($_GET['search'])) {
                         <label for="minimum_purchase_amount" class="form-label">Minimum Purchase Amount:</label>
                         <input type="number" name="minimum_purchase_amount" class="form-control" step="0.01" required>
                     </div>
-                    <button type="submit" name="add_coupon" class="btn btn-primary">Add Coupon</button>
+                    <div class="mb-3">
+                        <label for="coupon_image" class="form-label">Coupon Image:</label>
+                        <input type="file" name="coupon_image" class="form-control" accept="image/*">
+                    </div>
+                    <button type="submit" name="add_coupon" class="btn btn-success">Add Coupon</button>
                 </form>
             </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

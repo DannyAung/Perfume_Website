@@ -12,15 +12,14 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Start a session to store admin data after login
+
 session_start();
 
-// Check if the form is submitted
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Query to fetch admin data by email
     $sql = "SELECT * FROM admin WHERE email = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $email);
@@ -28,16 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        $admin = $result->fetch_assoc();
-        // Verify the password
+        $admin = $result->fetch_assoc(); 
         if (password_verify($password, $admin['password'])) {
-            // Store admin data in session
-            $_SESSION['admin_id'] = $admin['admin_id'];
-            $_SESSION['username'] = $admin['username'];
+            $_SESSION['admin_id'] = $admin['admin_id'];         
             $_SESSION['email'] = $admin['email'];
-
-            echo "Login successful! Welcome, " . $admin['username'] . ".";
-            // Redirect to admin dashboard
             $_SESSION['admin_logged_in'] = true;
             header("Location: admin_index.php");
             exit;
@@ -48,11 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "No admin found with this email.";
     }
 
-    // Close statement
+
     $stmt->close();
 }
 
-// Close database connection
 $conn->close();
 ?>
 <!DOCTYPE html>

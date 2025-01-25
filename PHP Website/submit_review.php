@@ -1,14 +1,13 @@
 <?php
-// Database connection
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "ecom_website";
 
-// Create connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -26,7 +25,7 @@ if (empty($review_text) || $rating < 1 || $rating > 5) {
     exit;
 }
 
-// Insert review into the database
+
 $insert_query = "INSERT INTO reviews (user_id, product_id, review_text, rating, created_at) VALUES (?, ?, ?, ?, ?)";
 $stmt = $conn->prepare($insert_query);
 $stmt->bind_param("iisis", $user_id, $product_id, $review_text, $rating, $created_at);
@@ -37,7 +36,7 @@ if ($stmt->execute()) {
     echo "Failed to submit review. Please try again.";
 }
 
-// Redirect back to orders page
+
 header("Location: user_orders.php");
 exit;
 ?>

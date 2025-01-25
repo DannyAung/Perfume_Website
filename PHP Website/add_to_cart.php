@@ -32,7 +32,6 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 if (isset($_POST['add_to_cart'])) {
     $product_id = $_POST['product_id'];
 
-    // Validate if the product exists in the database
     $sql = "SELECT * FROM products WHERE product_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $product_id);
@@ -427,12 +426,12 @@ if (isset($_POST['remove_all'])) {
                 </div>";
                 }
 
-                // Display total price at the bottom
+               
                 echo "<div class='total-price p-3 bg-white text-center text-black fw-bold rounded'>
                     Total Price: $" . number_format($total_price, 2) . "
                   </div>";
 
-                // Button Container (remove all, proceed to checkout)
+            
                 echo "<div class='button-container d-flex justify-content-center mt-4'>
                     <form method='post' class='w-20'>
                         <button type='submit' name='remove_all' class='btn btn-danger w-100'>Remove All Items</button>

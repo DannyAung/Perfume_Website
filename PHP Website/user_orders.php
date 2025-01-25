@@ -1,26 +1,22 @@
 <?php
-// Database connection
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "ecom_website";
 
-// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get user_id (Assuming user is logged in and their id is stored in session)
-session_start();
-$user_id = $_SESSION['user_id']; // Replace with your actual session variable
 
-// Check if user is logged in
+session_start();
+$user_id = $_SESSION['user_id']; 
+
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-// Fetch orders and their items along with user details
+
 $sql = "
     SELECT o.order_id, o.created_at, o.total_price, o.status, 
            oi.order_item_id, oi.product_id, oi.quantity, oi.price,
@@ -39,9 +35,8 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Initialize an array to group items by order_id
-$orders = [];
 
+$orders = [];
 while ($row = $result->fetch_assoc()) {
     $order_id = $row['order_id'];
     if (!isset($orders[$order_id])) {
@@ -59,7 +54,7 @@ while ($row = $result->fetch_assoc()) {
         'image' => $row['image'],
         'quantity' => $row['quantity'],
         'price' => $row['price'],
-        'size' => $row['size'],  // Added 'size' to items
+        'size' => $row['size'], 
         'product_id' => $row['product_id']
     ];
 }
@@ -184,7 +179,7 @@ while ($row = $result->fetch_assoc()) {
                                     </div>
                                 </div>
 
-                                <!-- Add review form for completed orders -->
+                               
                                 <?php if ($order['status'] == 'completed'): ?>
                                     <form action="submit_review.php" method="POST" class="mt-3">
                                         <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">

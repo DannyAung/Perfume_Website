@@ -17,24 +17,21 @@ $port = 3306;
 $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Sanitize input
     $product_name = htmlspecialchars($_POST['product_name']);
     $description = htmlspecialchars($_POST['description']);
     $price = floatval($_POST['price']);
     $stock_quantity = intval($_POST['stock_quantity']);
-   
-    // Ensure the category is selected and is a valid value
-    $category = htmlspecialchars($_POST['category'] ?? ''); // Default to an empty string if not set
-    echo "<p>Category: " . $category . "</p>"; // Debugging line to print the category value
 
+
+    $category = htmlspecialchars($_POST['category'] ?? '');
     $subcategory = htmlspecialchars($_POST['subcategory'] ?? '');
 
-    $size = htmlspecialchars($_POST['size'] ?? null); // Optional size
+    $size = htmlspecialchars($_POST['size'] ?? null);
     $discount_available = $_POST['discount_available'];
     $discount_percentage = $_POST['discount_percentage'];
     $discounted_price = $_POST['discounted_price'];
 
-    // Handle image uploads
+
     $upload_dir = 'products/';
     $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
     $upload_errors = [];
@@ -46,15 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $file_name = preg_replace("/[^a-zA-Z0-9.]/", "_", basename($_FILES[$image_key]['name'])); // Sanitize file name
             $file_type = mime_content_type($file_tmp);
 
-            // Validate file type
+
             if (!in_array($file_type, $allowed_types)) {
                 return ["error" => "$file_name is not a valid image file."];
             }
 
-            // Move file to upload directory
+
             $file_path = $upload_dir . $file_name;
             if (move_uploaded_file($file_tmp, $file_path)) {
-                return ["path" => $file_name];  // Save relative file path
+                return ["path" => $file_name];
             } else {
                 return ["error" => "Failed to upload $file_name."];
             }
@@ -66,7 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $extra_image_1_result = handle_image_upload('extra_image_1', $upload_dir, $allowed_types);
     $extra_image_2_result = handle_image_upload('extra_image_2', $upload_dir, $allowed_types);
 
-    // Check for upload errors
     if (isset($image_result['error'])) {
         $upload_errors[] = $image_result['error'];
     }
@@ -84,38 +80,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Proceed with database insertion if no errors
     try {
         $sql = "INSERT INTO products 
         (product_name, image, extra_image_1, extra_image_2, description, price, stock_quantity, category, subcategory, size, discount_available, discount_percentage, discounted_price) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
+
         $stmt = $conn->prepare($sql);
-        
-        // Ensure the binding is correct and add the category
         $stmt->bind_param(
-            'sssssdissssdi', 
-            $product_name, 
-            $image_result['path'], 
-            $extra_image_1_result['path'], 
-            $extra_image_2_result['path'], 
-            $description, 
-            $price, 
-            $stock_quantity, 
-            $category, // Bind category here
-            $subcategory, 
-            $size, 
-            $discount_available, 
-            $discount_percentage, 
+            'sssssdissssdi',
+            $product_name,
+            $image_result['path'],
+            $extra_image_1_result['path'],
+            $extra_image_2_result['path'],
+            $description,
+            $price,
+            $stock_quantity,
+            $category, 
+            $subcategory,
+            $size,
+            $discount_available,
+            $discount_percentage,
             $discounted_price
         );
-        
-    
+
+
         $stmt->execute();
-    
-       
-       header('Location: manage_products.php');
-       exit;
+        header('Location: manage_products.php');
+        exit;
     } catch (mysqli_sql_exception $e) {
         echo '<p class="text-danger">Error adding product: ' . htmlspecialchars($e->getMessage()) . '</p>';
     }
