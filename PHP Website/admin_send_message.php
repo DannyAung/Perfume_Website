@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-// Check if the admin is logged in
+
 if (!isset($_SESSION['admin_logged_in'])) {
     header('Location: admin_login.php');
     exit;
 }
 
-// Database connection
+
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -21,7 +21,7 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-// Process message submission
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_POST['user_id'];
     $message = trim($_POST['message']);
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':message' => $message,
         ]);
 
-        // Redirect back to the chat page
+
         header("Location: admin_chat_reply.php?user_id=$user_id");
         exit;
     }

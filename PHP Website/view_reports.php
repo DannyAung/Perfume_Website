@@ -1,5 +1,5 @@
 <?php
-// Start session
+
 session_start();
 
 if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
@@ -7,7 +7,7 @@ if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     exit;
 }
 
-// Connect to the database
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -16,12 +16,12 @@ $port = 3306;
 
 $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 
-// Check connection
+
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Query to get order statistics for today
+//order statistics for today
 $order_stats_today_query = "SELECT 
                               COUNT(*) AS total_orders, 
                               SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed_orders,
@@ -34,7 +34,7 @@ $total_orders_today = $order_stats_today['total_orders'];
 $completed_orders_today = $order_stats_today['completed_orders'];
 $cancelled_orders_today = $order_stats_today['cancelled_orders'];
 
-// Query to get order statistics
+//order statistics
 $order_stats_query = "SELECT COUNT(*) AS total_orders, 
                               SUM(CASE WHEN oi.status = 'completed' THEN 1 ELSE 0 END) AS completed_orders,
                               SUM(CASE WHEN oi.status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled_orders
@@ -45,7 +45,7 @@ $total_orders = $order_stats['total_orders'];
 $completed_orders = $order_stats['completed_orders'];
 $cancelled_orders = $order_stats['cancelled_orders'];
 
-// Query to get active users per month
+//active users per month
 $user_activity_query = "SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS active_users 
                         FROM users 
                         WHERE created_at >= CURDATE() - INTERVAL 1 YEAR
@@ -55,7 +55,6 @@ $user_activity_result = mysqli_query($conn, $user_activity_query);
 
 
 
-// Prepare arrays for chart data
 $login_dates = [];
 $active_users_data = [];
 while ($row = mysqli_fetch_assoc($user_activity_result)) {
@@ -65,7 +64,7 @@ while ($row = mysqli_fetch_assoc($user_activity_result)) {
 $login_dates_json = json_encode($login_dates);
 $active_users_json = json_encode($active_users_data);
 
-// Query to get top 5 product performance
+//top 5 product performance
 $product_performance_query = "SELECT p.product_id, p.product_name, SUM(ci.quantity) AS total_sold 
                               FROM cart_items ci
                               JOIN products p ON ci.product_id = p.product_id
@@ -73,14 +72,14 @@ $product_performance_query = "SELECT p.product_id, p.product_name, SUM(ci.quanti
                               ORDER BY total_sold DESC LIMIT 5";
 $product_performance_result = mysqli_query($conn, $product_performance_query);
 
-// Query to get coupon usage
+//coupon usage
 $coupon_usage_query = "SELECT coupon_code, COUNT(*) AS usage_count 
                        FROM orders 
                        WHERE coupon_code IS NOT NULL 
                        GROUP BY coupon_code";
 $coupon_usage_result = mysqli_query($conn, $coupon_usage_query);
 
-// Query to get top 10 loyal customers by order count (or total spent)
+//top 10 loyal customers 
 $loyal_customers_query = "
     SELECT u.user_name, COUNT(o.order_id) AS order_count 
     FROM orders o
@@ -90,7 +89,7 @@ $loyal_customers_query = "
     LIMIT 10";
 $loyal_customers_result = mysqli_query($conn, $loyal_customers_query);
 
-// Prepare arrays for customer names and order count
+
 $loyal_customers_names = [];
 $loyal_customers_orders = [];
 while ($row = mysqli_fetch_assoc($loyal_customers_result)) {
@@ -100,12 +99,11 @@ while ($row = mysqli_fetch_assoc($loyal_customers_result)) {
 $loyal_customers_names_json = json_encode($loyal_customers_names);
 $loyal_customers_orders_json = json_encode($loyal_customers_orders);
 
-// Query to get monthly sales
+//monthly sales
 $monthly_sales_query = "
     SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, 
            SUM(total_price) AS total_sales
     FROM orders
-    WHERE YEAR(created_at) = 2025
     GROUP BY month
     ORDER BY month ASC";
 $monthly_sales_result = mysqli_query($conn, $monthly_sales_query);
@@ -118,7 +116,9 @@ while ($row = mysqli_fetch_assoc($monthly_sales_result)) {
 }
 $monthly_sales_months_json = json_encode($monthly_sales_months);
 $monthly_sales_totals_json = json_encode($monthly_sales_totals);
-// Query: Top 5 products by sales===
+
+
+//Top 5 products by sales===
 $product_performance_query = "SELECT p.product_name, SUM(ci.quantity) AS total_sold
                               FROM cart_items ci
                               JOIN products p ON ci.product_id = p.product_id
@@ -137,7 +137,7 @@ $top_products_json = json_encode($top_products);
 $top_sales_json = json_encode($top_sales);
 
 
-// Query to get total sales by day for the current month
+//total sales by day for the current month
 $daily_sales_query = "
     SELECT DATE(created_at) AS day, SUM(total_price) AS total_sales
     FROM orders
@@ -156,7 +156,7 @@ $daily_sales_dates_json = json_encode($daily_sales_dates);
 $daily_sales_totals_json = json_encode($daily_sales_totals);
 
 
-// Query to get total sales by year
+//total sales by year
 $yearly_sales_query = "
     SELECT YEAR(created_at) AS year, SUM(total_price) AS total_sales
     FROM orders
@@ -173,6 +173,16 @@ while ($row = mysqli_fetch_assoc($yearly_sales_result)) {
 $yearly_sales_years_json = json_encode($yearly_sales_years);
 $yearly_sales_totals_json = json_encode($yearly_sales_totals);
 
+// top payment method
+$top_payment_method_query = "
+    SELECT payment_method, COUNT(*) AS usage_count
+    FROM orders
+    GROUP BY payment_method
+    ORDER BY usage_count DESC
+    LIMIT 1";
+$top_payment_method_result = mysqli_query($conn, $top_payment_method_query);
+$top_payment_method = mysqli_fetch_assoc($top_payment_method_result)['payment_method'];
+
 ?>
 
 <!DOCTYPE html>
@@ -182,9 +192,7 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports - Admin Dashboard</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -234,8 +242,8 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
         <h1 class="text-center mb-4">Admin Dashboards</h1>
 
         <div class="row g-4 mt-4">
-            <!-- Order Statistics -->
-            <div class="col-md-3">
+
+            <div class="col-md-4">
                 <div class="card text-center shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title mb-2"><i class="bi bi-calendar-day"></i> Order Statistics of Today</h5>
@@ -246,8 +254,18 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
                 </div>
             </div>
 
-            <!-- Coupon Usage -->
-            <div class="col-md-3">
+
+            <div class="col-md-4">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-2"><i class="bi bi-credit-card"></i> Top Payment Method</h5>
+                        <p class="card-text mb-3">Payment Method: <?php echo $top_payment_method; ?></p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-4">
                 <div class="card text-center shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title mb-2"><i class="bi bi-tag"></i> Coupon Usage</h5>
@@ -260,18 +278,19 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
                 </div>
             </div>
 
-            <!-- Top 5 Products -->
-            <div class="col-md-3">
+
+            <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title text-center mb-4"><i class="bi bi-gift"></i> Top 5 Products</h5>
-                        <canvas id="topProductsDonutChart"></canvas>
+                        <div style="width: 60%; margin: auto;">
+                            <canvas id="topProductsDonutChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Active Users -->
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title text-center mb-4"><i class="bi bi-person-circle"></i> Active Users</h5>
@@ -280,7 +299,6 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
                 </div>
             </div>
 
-            <!-- Daily Total Sales -->
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body">
@@ -290,7 +308,6 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
                 </div>
             </div>
 
-            <!-- Monthly Total Sales -->
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body">
@@ -300,7 +317,6 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
                 </div>
             </div>
 
-            <!-- Yearly Total Sales -->
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body">
@@ -310,7 +326,7 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
                 </div>
             </div>
 
-            <!-- Top 10 Loyal Customers -->
+
             <div class="col-md-6">
                 <div class="card shadow-sm">
                     <div class="card-body">
@@ -334,8 +350,6 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
                     </div>
                 </div>
             </div>
-
-        
         </div>
     </div>
 
@@ -539,4 +553,5 @@ $yearly_sales_totals_json = json_encode($yearly_sales_totals);
     <!-- Include Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

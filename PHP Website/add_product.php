@@ -1,5 +1,5 @@
 <?php
-// Start session
+
 session_start();
 
 if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
@@ -7,7 +7,7 @@ if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     exit;
 }
 
-// Database connection
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -266,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <!-- Size Field -->
+           
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="size" class="form-label">Size</label>
@@ -274,7 +274,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <!-- Discount Field -->
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="discount_available" class="form-label">Discount Available</label>
@@ -290,7 +289,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <!-- Discounted Price -->
+          
             <div class="row" id="discounted_price_field" style="display: none;">
                 <div class="col-md-12 mb-3">
                     <label for="discounted_price" class="form-label">Discounted Price ($)</label>
@@ -298,7 +297,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <!-- Image Uploads -->
+         
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Main Image</label>
@@ -328,7 +327,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
-            <!-- Submit Button -->
+         
             <div class="add-button text-center">
                 <button type="submit" class="btn btn-primary btn-lg">Add Product</button>
             </div>

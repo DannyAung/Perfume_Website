@@ -56,7 +56,7 @@ if (!$result) {
 }
 
 
-$discounted_query = "SELECT * FROM products WHERE subcategory = 'discount' ORDER BY created_at";
+$discounted_query = "SELECT *, (SELECT AVG(rating) FROM reviews WHERE product_id = products.product_id) AS avg_rating FROM products WHERE subcategory = 'discount' ORDER BY created_at";
 $discounted_result = mysqli_query($conn, $discounted_query);
 if (!$discounted_result) {
     die("Error fetching discounted products: " . mysqli_error($conn));
@@ -371,6 +371,13 @@ while ($row = $result->fetch_assoc()) {
                                                 <?php endif; ?>
                                             </div>
                                         </div>
+                                        <div class="rating">
+                                                <span class="text-warning">
+                                                    <?php for ($i = 0; $i < floor($discounted_product['avg_rating']); $i++): ?>★<?php endfor; ?>
+                                                    <?php for ($i = floor($discounted_product['avg_rating']); $i < 5; $i++): ?>☆<?php endfor; ?>
+                                                </span>
+                                                (<?php echo number_format($discounted_product['avg_rating'], 1); ?>)
+                                            </div>
                                         <div class="card-body d-flex flex-column justify-content-between">
                                             <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
                                             <div class="pricing mb-3">
@@ -381,6 +388,7 @@ while ($row = $result->fetch_assoc()) {
                                                     $<?php echo number_format($product_discounted_price, 2); ?>
                                                 </h6>
                                             </div>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -451,7 +459,7 @@ while ($row = $result->fetch_assoc()) {
                 <div id="featuredProductsCarousel" class="carousel slide" data-bs-ride="false">
                     <div class="carousel-inner">
                         <?php
-                        $featured_query = "SELECT * FROM products WHERE subcategory = 'featured' ORDER BY created_at";
+                        $featured_query = "SELECT *, (SELECT AVG(rating) FROM reviews WHERE product_id = products.product_id) AS avg_rating FROM products WHERE subcategory = 'featured' ORDER BY created_at";
                         $featured_result = mysqli_query($conn, $featured_query);
 
                         $counter = 0;
@@ -509,6 +517,13 @@ while ($row = $result->fetch_assoc()) {
                                     <div class="card-body d-flex flex-column">
                                         <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
                                         <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
+                                        <div class="rating">
+                                            <span class="text-warning">
+                                                <?php for ($i = 0; $i < floor($featured_product['avg_rating']); $i++): ?>★<?php endfor; ?>
+                                                <?php for ($i = floor($featured_product['avg_rating']); $i < 5; $i++): ?>☆<?php endfor; ?>
+                                            </span>
+                                            (<?php echo number_format($featured_product['avg_rating'], 1); ?>)
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -520,7 +535,7 @@ while ($row = $result->fetch_assoc()) {
                         }
                         ?>
                     </div>
-                </div>
+                
 
                 <button class="carousel-control-prev1" type="button" data-bs-target="#featuredProductsCarousel" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -608,6 +623,7 @@ while ($row = $result->fetch_assoc()) {
                 </div>
             </section>
         </div>
+    </div>
     </div>
     <?php include 'footer.php'; ?>
 </body>

@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: user_login.php');
     exit;
 }
 
-// Database connection
+
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -21,7 +21,7 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-// Process the message submission
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
     $message = trim($_POST['message']);
@@ -32,7 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':user_id' => $user_id,
             ':message' => $message,
         ]);
- // Redirect back to the chat section
  header("Location: contact_us.php?page=chatSection");
  exit;
     }

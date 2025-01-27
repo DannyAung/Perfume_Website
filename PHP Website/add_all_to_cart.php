@@ -10,7 +10,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch all wishlist items 
 $query = "
     SELECT w.product_id, p.stock_quantity
     FROM wishlist w

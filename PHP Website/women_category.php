@@ -1,10 +1,10 @@
 <?php
-// Start session
+
 if (!isset($_SESSION)) {
-    session_start(); // Start session if not already started
+    session_start();
 }
 
-// Database connection
+
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -16,10 +16,10 @@ $conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-// Check if user is logged in
+
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-// Fetch cart items for the logged-in user
+
 $cart_items = [];
 if ($is_logged_in) {
     $cart_query = "SELECT product_id FROM cart_items WHERE user_id = ? AND ordered_status = 'not_ordered'";
@@ -46,9 +46,9 @@ if ($is_logged_in) {
 </head>
 
 <body>
-<?php include 'navbar.php'; ?>
+    <?php include 'navbar.php'; ?>
     <div>
-        <!-- Breadcrumb Navigation -->
+
         <nav aria-label="breadcrumb" class="py-3 bg-light">
             <div class="container">
                 <ol class="breadcrumb mb-0">
@@ -65,10 +65,10 @@ if ($is_logged_in) {
 
         <div class="container-fluid">
             <div class="row">
-            
+
                 <div class="col-md-3">
                     <div class="border p-5 filter-sidebar sticky-sidebar">
-                        <h5 class="mb-3">Filter</h5>                    
+                        <h5 class="mb-3">Filter</h5>
                         <form method="GET" action="women_category.php">
                             <div class="mb-3">
                                 <label for="priceRange" class="form-label">Price Range</label>
@@ -77,7 +77,7 @@ if ($is_logged_in) {
                                     <input type="number" class="form-control" name="max_price" placeholder="Max" min="0" value="<?php echo isset($_GET['max_price']) ? htmlspecialchars($_GET['max_price']) : ''; ?>">
                                 </div>
                             </div>
-                        
+
                             <div class="mb-3">
                                 <label class="form-label">Discount</label>
                                 <select class="form-select" name="discount">
@@ -89,7 +89,7 @@ if ($is_logged_in) {
                                 </select>
                             </div>
 
-                            <!-- Category Filter -->
+
                             <div class="mb-3">
                                 <label class="form-label">Category</label>
                                 <select class="form-select" name="category">
@@ -100,7 +100,6 @@ if ($is_logged_in) {
                                 </select>
                             </div>
 
-                            <!-- Availability Filter -->
                             <div class="mb-3">
                                 <label class="form-label">Availability</label>
                                 <div class="form-check">
@@ -108,36 +107,34 @@ if ($is_logged_in) {
                                     <label class="form-check-label" for="inStock">In Stock</label>
                                 </div>
                             </div>
-
-                            <!-- Submit Filter Button -->
                             <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
                         </form>
                     </div>
                 </div>
 
-                <!-- Main Products Section -->
+
                 <div class="col-md-9">
                     <div class="container py-5">
                         <div class="row row-cols-1 row-cols-md-4 g-4">
                             <?php
-                             $category = isset($_GET['category']) ? $_GET['category'] : 'Women'; // Default to 'Men' if no category is selected
-                             $women_query = "SELECT * FROM products WHERE 1=1";
-                             // Apply Category Filter
-                             if ($category !== 'All') {
-                                 $women_query .= " AND category = '$category'";
-                             } else {
-                                 $category;
-                             }                
+                            $category = isset($_GET['category']) ? $_GET['category'] : 'Women'; // Default to 'Men' if no category is selected
+                            $women_query = "SELECT *, (SELECT AVG(rating) FROM reviews WHERE product_id = products.product_id) AS avg_rating FROM products WHERE 1=1";
+
+                            if ($category !== 'All') {
+                                $women_query .= " AND category = '$category'";
+                            } else {
+                                $category;
+                            }
                             if (isset($_GET['min_price']) && isset($_GET['max_price']) && is_numeric($_GET['min_price']) && is_numeric($_GET['max_price'])) {
                                 $min_price = intval($_GET['min_price']);
                                 $max_price = intval($_GET['max_price']);
                                 $women_query .= " AND price BETWEEN $min_price AND $max_price";
                             }
-                        
+
                             if (isset($_GET['discount']) && is_numeric($_GET['discount'])) {
                                 $discount = intval($_GET['discount']);
                                 $women_query .= " AND discount_percentage >= $discount";
-                            }                         
+                            }
                             if (isset($_GET['in_stock'])) {
                                 $women_query .= " AND stock_quantity > 0";
                             }
@@ -145,7 +142,7 @@ if ($is_logged_in) {
                             $women_query .= " ORDER BY created_at";
                             $women_result = mysqli_query($conn, $women_query);
 
-                            // Display Filtered Products
+
                             while ($women_product = mysqli_fetch_assoc($women_result)) {
                                 $stock_quantity = $women_product['stock_quantity'];
                                 $is_sold_out = $stock_quantity == 0;
@@ -158,7 +155,7 @@ if ($is_logged_in) {
                                 $product_price = htmlspecialchars($women_product['price']);
                                 $discount_percentage = isset($women_product['discount_percentage']) ? $women_product['discount_percentage'] : 0;
 
-                                // Calculate the discounted price
+
                                 if ($discount_percentage > 0) {
                                     $discounted_price = $product_price - ($product_price * ($discount_percentage / 100));
                                 } else {
@@ -168,18 +165,17 @@ if ($is_logged_in) {
                                 <div class="col">
                                     <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
                                         <div class="image-container position-relative overflow-hidden">
-                                           <!-- Discount Badge -->
-                                        <?php if ($discount_percentage > 0): ?>
-                                            <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end"
-                                                style="font-size: 0.9rem; z-index: 10;"> <!-- Added z-index here -->
-                                                <?php echo $discount_percentage; ?>% OFF
-                                            </div>
-                                        <?php endif; ?>
+
+                                            <?php if ($discount_percentage > 0): ?>
+                                                <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end"
+                                                    style="font-size: 0.9rem; z-index: 10;"> 
+                                                    <?php echo $discount_percentage; ?>% OFF
+                                                </div>
+                                            <?php endif; ?>
 
                                             <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
                                                 alt="<?php echo $product_name; ?>"
                                                 style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
-                                            <!-- Sold Out Badge -->
                                             <?php if ($is_sold_out): ?>
                                                 <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex justify-content-center align-items-center"
                                                     style="background: rgba(52, 51, 51, 0.7);">
@@ -189,8 +185,6 @@ if ($is_logged_in) {
                                                     </div>
                                                 </div>
                                             <?php endif; ?>
-
-                                            <!-- Hover Overlay -->
                                             <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
                                                 style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
                                                 <?php if (!$is_sold_out): ?>
@@ -208,6 +202,13 @@ if ($is_logged_in) {
                                         </div>
 
                                         <div class="card-body d-flex flex-column">
+                                            <div class="rating mb-2">
+                                                <span class="text-warning">
+                                                    <?php for ($i = 0; $i < floor($women_product['avg_rating']); $i++): ?>★<?php endfor; ?>
+                                                    <?php for ($i = floor($women_product['avg_rating']); $i < 5; $i++): ?>☆<?php endfor; ?>
+                                                </span>
+                                                (<?php echo number_format($women_product['avg_rating'], 1); ?>)
+                                            </div>
                                             <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
                                             <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
                                         </div>

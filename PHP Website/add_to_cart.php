@@ -6,11 +6,11 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 if (isset($_POST['check_out'])) {
-    // Set a session variable to indicate checkout has started
+   
     $_SESSION['checkout_started'] = true;
 
-    // Optionally, redirect to another page after setting the session
-    header("Location: checkout.php"); // Redirect to the checkout page (if needed)
+   
+    header("Location: checkout.php"); 
     exit;
 }
 
@@ -102,7 +102,7 @@ if (isset($_POST['increase_quantity'])) {
         if ($current_quantity < $stock_quantity) {
             $new_quantity = $current_quantity + 1;
 
-            // Update quantity
+        
             $sql = "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?";
             $update_stmt = $conn->prepare($sql);
             $update_stmt->bind_param("ii", $new_quantity, $cart_item_id);
@@ -112,16 +112,16 @@ if (isset($_POST['increase_quantity'])) {
         }
     }
 
-    // Redirect to avoid repeated submission
+ 
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
 
-// Decrease Quantity Logic
+
 if (isset($_POST['decrease_quantity'])) {
     $cart_item_id = $_POST['cart_item_id'];
 
-    // Fetch current quantity
+  
     $sql = "SELECT quantity FROM cart_items WHERE cart_item_id = ? AND user_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $cart_item_id, $user_id);
@@ -130,8 +130,7 @@ if (isset($_POST['decrease_quantity'])) {
     if ($result->num_rows > 0) {
         $cart_item = $result->fetch_assoc();
         if ($cart_item['quantity'] > 1) {
-            $new_quantity = $cart_item['quantity'] - 1;
-            // Update quantity
+            $new_quantity = $cart_item['quantity'] - 1;        
             $sql = "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?";
             $update_stmt = $conn->prepare($sql);
             $update_stmt->bind_param("ii", $new_quantity, $cart_item_id);
@@ -145,7 +144,7 @@ if (isset($_POST['decrease_quantity'])) {
         }
     }
 
-    // Redirect to avoid repeated submission
+   
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
@@ -157,7 +156,7 @@ if (isset($_POST['remove_all'])) {
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
 
-    // Redirect to avoid repeated submission
+   
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
@@ -319,37 +318,34 @@ if (isset($_POST['remove_all'])) {
 
         .btn-danger {
             background-color: #e74c3c;
-            /* Red background for 'Remove All Items' */
             color: white;
         }
 
         .btn-danger:hover {
             background-color: #c0392b;
-            /* Darker red on hover */
+           
         }
 
         .btn-success {
             background-color: #28a745;
-            /* Green background for 'Checkout' */
             color: white;
         }
 
         .btn-success:hover {
             background-color: #218838;
-            /* Darker green on hover */
         }
 
 
         .original-price {
             text-decoration: line-through;
             color: blue;
-            /* Optional: Use a lighter color to de-emphasize the original price */
+         
         }
 
         .discounted-price {
             font-weight: bold;
             color: rgb(222, 31, 24);
-            /* Optional: Use a distinct color (e.g., red) for the discounted price */
+           
         }
     </style>
 </head>
@@ -357,7 +353,7 @@ if (isset($_POST['remove_all'])) {
 <body>
     <?php include 'navbar.php'; ?>
 
-    <!-- Breadcrumb Navigation -->
+
     <nav aria-label="breadcrumb" class="py-3 bg-light">
         <div class="container">
             <ol class="breadcrumb mb-0">
@@ -369,7 +365,7 @@ if (isset($_POST['remove_all'])) {
     </nav>
 
     <div class="cart-page container my-2">
-        <!-- Cart Header -->
+      
         <div class="cart-header text-center mb-2">
             <h1>Your Shopping Cart</h1>
         </div>
@@ -399,14 +395,14 @@ if (isset($_POST['remove_all'])) {
                     $product_size = htmlspecialchars($item['size']); // Fetch the size
                     $image_path = "products/" . $product_image;
 
-                    // Render cart item with a modern layout
+                   
                     echo "<div class='cart-item d-flex align-items-center p-3 mb-4 bg-light rounded shadow-sm'>
                     <img src='" . $image_path . "' alt='" . $product_name . "' class='product-image img-thumbnail me-4' style='width: 100px; height: 100px; object-fit: cover;'>
                     <div class='product-details flex-grow-1'>
                         <h4>" . $product_name . "</h4>
                         <p class='text-muted'>Size: " . $product_size . "</p>";
 
-                    // Display price with discount if applicable
+                  
                     if ($discounted_price > 0) {
                         echo "<p class='regular-price text-muted'><del>$" . number_format($regular_price, 2) . "</del></p>";
                         echo "<p class='discounted-price text-success fw-bold'>$" . number_format($discounted_price, 2) . "</p>";

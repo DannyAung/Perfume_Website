@@ -1,7 +1,7 @@
 <?php
-session_start();  // Start the session to access session variables
+session_start(); 
 
-require_once 'db_connection.php';  // Ensure the connection file is correct
+require_once 'db_connection.php';  
 
 
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
@@ -35,6 +35,14 @@ if ($product_id) {
     $reviews_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
     $reviews_stmt->execute();
     $reviews = $reviews_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+    $avg_rating_sql = "SELECT AVG(rating) as avg_rating FROM reviews WHERE product_id = :product_id";
+    $avg_rating_stmt = $conn->prepare($avg_rating_sql);
+    $avg_rating_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+    $avg_rating_stmt->execute();
+    $avg_rating = $avg_rating_stmt->fetch(PDO::FETCH_ASSOC)['avg_rating'];
+    $avg_rating = $avg_rating ? number_format($avg_rating, 1) : 0;
 } else {
     echo "Invalid product ID.";
 }
@@ -249,9 +257,18 @@ if (isset($_POST['remove_from_wishlist'])) {
                             <strong>Stock:</strong> <?php echo intval($product['stock_quantity']); ?> available
                         </p>
 
-                        <!-- Add to Cart and Wishlist -->
-                        <div class="d-flex align-items-center mt-4">
 
+                        <p class="text-secondary" style="font-family: 'Roboto', sans-serif; font-size: 14px;">
+                            <strong>Rating:</strong>
+                            <span class="text-warning">
+                                <?php for ($i = 0; $i < floor($avg_rating); $i++): ?>★<?php endfor; ?>
+                                <?php for ($i = floor($avg_rating); $i < 5; $i++): ?>☆<?php endfor; ?>
+                            </span>
+                            (<?php echo $avg_rating; ?>)
+                        </p>
+
+
+                        <div class="d-flex align-items-center mt-4">
                             <form method="POST" action="add_to_cart.php" class="d-flex align-items-center me-3">
                                 <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
                                 <input type="number" name="quantity" value="1" min="1" class="form-control me-3" style="width: 100px;">
@@ -288,7 +305,6 @@ if (isset($_POST['remove_from_wishlist'])) {
 
 
                         <div class="tab-content mt-3">
-
                             <div class="tab-pane show active" id="collapseDescription" role="tabpanel" aria-labelledby="tabDescription">
                                 <div class="card card-body">
                                     <p class="description-text">
@@ -333,7 +349,6 @@ if (isset($_POST['remove_from_wishlist'])) {
                     </div>
 
                     <script>
-                      
                         document.getElementById('btnDescription').addEventListener('click', function() {
                             var description = document.getElementById('collapseDescription');
                             var reviews = document.getElementById('collapseReviews');
@@ -341,7 +356,7 @@ if (isset($_POST['remove_from_wishlist'])) {
                                 description.classList.remove('show');
                             } else {
                                 description.classList.add('show');
-                                reviews.classList.remove('show'); 
+                                reviews.classList.remove('show');
                             }
                         });
 
@@ -352,7 +367,7 @@ if (isset($_POST['remove_from_wishlist'])) {
                                 reviews.classList.remove('show');
                             } else {
                                 reviews.classList.add('show');
-                                description.classList.remove('show'); 
+                                description.classList.remove('show');
                             }
                         });
                     </script>
@@ -415,9 +430,9 @@ if (isset($_POST['remove_from_wishlist'])) {
                 const mainImage = document.getElementById('main-image');
 
                 thumbnails.forEach((thumbnail, index) => {
-                    thumbnail.addEventListener('click', () => {                      
+                    thumbnail.addEventListener('click', () => {
                         mainImage.src = thumbnail.src;
-                    
+
                         thumbnails.forEach(thumb => thumb.style.border = '1px solid #ddd');
                         thumbnail.style.border = '2px solid #007bff';
                     });

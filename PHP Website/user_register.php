@@ -2,7 +2,7 @@
 require_once "db_connection.php";
 
 if (!isset($_SESSION)) {
-    session_start(); // to create session if not exist
+    session_start();
 }
 
 function ispasswordstrong($password)
@@ -71,7 +71,7 @@ if (isset($_POST['signup']) && $_SERVER['REQUEST_METHOD'] == "POST") {
         $password_err = "You must agree to the terms and conditions.";
     }
 }
-// Check if user is logged in
+
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 ?>
 <!doctype html>
@@ -130,7 +130,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             color: #777;
         }
 
-        /* Sign-Up Button */
+
         .btn {
             font-size: 1.1rem;
             padding: 6px 0;
@@ -155,31 +155,29 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             background-color: #0056b3;
         }
 
-        /* Alert Messages */
+
         .alert {
             font-size: 0.9rem;
             margin-bottom: 20px;
         }
 
-        /* GIF Container */
+
         .img-container {
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 30px;
             height: 100%;
-            /* Ensure full height alignment */
+
         }
 
         .img-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Make the image cover the container while maintaining aspect ratio */
             border-radius: 15px;
         }
 
-        /* Media Query for Responsiveness */
         @media (max-width: 768px) {
             .form-container {
                 padding: 20px;
@@ -199,7 +197,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 <body>
     <div class="container d-flex justify-content-center align-items-center ">
         <div class="row w-100">
-            <!-- Form Column -->
+
             <div class="col-md-6 col-sm-10 form-container">
                 <h4 class="text-center mb-1">Sign Up</h4>
                 <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
@@ -207,50 +205,48 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                         echo "<p class='alert alert-danger'>$password_err</p>";
                     } ?>
 
-                    <!-- Name Field -->
+
                     <div class="mb-3">
                         <label for="name" class="form-label">Name</label>
                         <input type="text" class="form-control" name="name" required>
                     </div>
 
-                    <!-- Email Field -->
+
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" name="email" required>
                     </div>
 
-                    <!-- Password Field -->
+
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" name="password" required>
                     </div>
 
-                    <!-- Confirm Password Field -->
+
                     <div class="mb-3">
                         <label for="cpassword" class="form-label">Confirm Password</label>
                         <input type="password" class="form-control" name="cpassword" required>
                     </div>
 
-                    <!-- Terms and Conditions -->
+
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" name="terms" id="terms" required>
                         <label class="form-check-label terms-label" for="terms">I agree to the <a href="terms.html" target="_blank">Terms and Conditions</a></label>
                     </div>
 
-                    <!-- Sign-Up Button -->
+
                     <button type="submit" class="btn btn-signup w-100" name="signup">Sign Up</button>
                 </form>
                 <p class="mt-3 text-center">Already a member? <a href="user_login.php">Login here</a>.</p>
             </div>
 
-            <!-- GIF Column -->
             <div class="col-md-6 d-none d-md-flex img-container">
                 <img src="./images/register.jpg" alt="Register GIF">
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 

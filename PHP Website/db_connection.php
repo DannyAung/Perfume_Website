@@ -1,6 +1,5 @@
 <?php
 
-/* The code you provided is a mix of PHP and HTML comments. */
 $server = "localhost";
 $port = 3306;
 $user = "root";

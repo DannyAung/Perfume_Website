@@ -1,11 +1,9 @@
 <?php
 session_start();
 
-// Enable error reporting
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Check if order_id is passed in the URL
 if (!isset($_GET['order_id'])) {
     echo "Invalid request: Order ID is missing.";
     exit;
@@ -13,7 +11,6 @@ if (!isset($_GET['order_id'])) {
 
 $order_id = $_GET['order_id'];
 
-// Database connection
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -25,7 +22,7 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Fetch order details, including coupon and shipping information
+
 $sql = "SELECT o.order_id, o.total_price, o.created_at, o.shipping_method, o.shipping_fee, 
                o.coupon_code, o.discount_percentage, o.coupon_id, u.user_name, u.email, u.phone_number, 
                o.payment_method, s.delivery_time
@@ -38,7 +35,7 @@ $stmt->bind_param("i", $order_id);
 $stmt->execute();
 $order_result = $stmt->get_result();
 
-// Check if the order was found
+
 if ($order_result->num_rows == 0) {
     echo "Order not found for Order ID: " . $order_id;
     exit;
@@ -46,7 +43,7 @@ if ($order_result->num_rows == 0) {
 
 $order = $order_result->fetch_assoc();
 
-// Fetch order items and calculate total price with product discounts
+
 $order_items_sql = "SELECT oi.product_id, oi.product_name, oi.quantity, oi.size, p.price, p.discounted_price
                     FROM order_items oi
                     JOIN products p ON oi.product_id = p.product_id
@@ -56,7 +53,7 @@ $order_items_stmt->bind_param("i", $order_id);
 $order_items_stmt->execute();
 $order_items_result = $order_items_stmt->get_result();
 
-// Check if order items are found
+
 if ($order_items_result->num_rows == 0) {
     echo "No order items found for Order ID: " . $order_id;
     exit;
@@ -73,10 +70,9 @@ while ($item = $order_items_result->fetch_assoc()) {
     $order_items[] = $item;
 }
 
-// Calculate the discount from the coupon (if any)
+
 $discount_amount = ($total_price_with_discount * $order['discount_percentage']) / 100;
 
-// Final total after applying product discount, coupon discount, and shipping fee
 $final_total_price = $total_price_with_discount - $discount_amount + $order['shipping_fee'];
 ?>
 <!DOCTYPE html>
@@ -148,8 +144,7 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
             margin-top: 20px;
         }
 
-        /* Adjust card titles and text */
-        .card-title {
+             .card-title {
             font-size: 1.25rem;
             font-weight: bold;
         }
@@ -175,7 +170,7 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
             <h2 class="text-center mb-4">Order Receipt</h2>
             <h5 class="text-center mb-4">Thank You For Your Purchase!</h5>
 
-            <!-- Order Details -->
+           
             <div class="row mb-4">
                 <div class="col-md-6 mb-4">
                     <div class="card">
@@ -195,7 +190,7 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
                     </div>
                 </div>
 
-                <!-- Customer Details -->
+               
                 <div class="col-md-6 mb-4">
                     <div class="card">
                         <div class="card-body">
@@ -208,7 +203,6 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
                 </div>
             </div>
 
-            <!-- Order Items -->
             <h4 class="mt-4">Order Items</h4>
             <table class="table table-bordered table-striped">
                 <thead>
@@ -237,7 +231,7 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
                 </tbody>
             </table>
 
-            <!-- Total Summary -->
+         
             <div class="total-summary mt-4">
                 <h3><strong>Total Summary</strong></h3>
                 <p><strong>Total Price:</strong> $<?php echo number_format($total_price_with_discount, 2); ?></p>
@@ -248,7 +242,6 @@ $final_total_price = $total_price_with_discount - $discount_amount + $order['shi
                 <h5><strong>Total Amount:</strong> $<?php echo number_format($final_total_price, 2); ?></h5>
             </div>
 
-            <!-- Continue Shopping Button -->
             <div class="btn-container">
                 <a href="user_index.php" class="btn btn-primary">Continue Shopping</a>
             </div>

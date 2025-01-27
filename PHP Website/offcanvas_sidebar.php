@@ -54,6 +54,13 @@
                     <span class="fs-6">Manage Shipping</span>
                 </a>
             </li>
+            
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center p-3 hover-bg" href="manage_payment.php">
+                    <i class="bi bi-coin me-3 fs-5"></i>
+                    <span class="fs-6">Manage Payment</span>
+                </a>
+            </li>
            
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center p-3 hover-bg" href="view_reports.php">

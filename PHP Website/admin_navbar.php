@@ -1,8 +1,6 @@
 
-<!-- Main Content -->
 <div class="container-fluid">
     <nav class="navbar navbar-expand-lg">
-        <!-- Sidebar Toggle Button -->
         <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
             <i class="bi bi-list"></i>
         </button>

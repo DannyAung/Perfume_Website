@@ -1,10 +1,10 @@
 <?php
-// Start session
+
 if (!isset($_SESSION)) {
     session_start();
 }
 
-// Database connection
+
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -17,11 +17,10 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Check if user is logged in
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
-$user_id = $_SESSION['user_id']; // Assuming user_id is stored in session
+$user_id = $_SESSION['user_id']; 
 
-// Fetch user details
+
 $query = "SELECT * FROM users WHERE user_id = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $user_id);
@@ -68,8 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $password = $stored_password_hash;
             }
-
-           
+       
             $update_query = "UPDATE users SET user_name = ?, email = ?, password = ?, address = ?, phone_number = ? WHERE user_id = ?";
             $stmt = $conn->prepare($update_query);
             $stmt->bind_param("sssssi", $user_name, $email, $password, $address, $phone_number, $user_id);

@@ -1,13 +1,12 @@
 <?php
 session_start();
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: user_login.php');
     exit;
 }
 
-// Database connection
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -206,6 +205,7 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
     contactButton.addEventListener('click', () => {
         contactSection.style.display = 'block';
         chatSection.style.display = 'none';
+        mapSection.style.display = 'block';
      
     });
 

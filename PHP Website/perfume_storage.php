@@ -1,5 +1,5 @@
 <?php
-// Check if user is logged in
+
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 ?>
 <!DOCTYPE html>
@@ -117,22 +117,22 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
         <div class="container-fluid">
-            <!-- Logo and Brand -->
+           
             <a class="navbar-brand d-flex align-items-center" href="user_index.php">
                 <img src="./images/perfume_logo.png" alt="Logo" style="width:50px; height:auto;">
                 <b class="ms-2" style="font-family: 'Roboto', sans-serif; font-weight: 300; color: #333;">FRAGRANCE HAVEN</b>
             </a>
 
-            <!-- Toggler for Small Screens -->
+          
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Collapsible Navbar Content -->
+        
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="d-flex flex-column flex-lg-row w-100 align-items-center">
 
-                    <!-- Modern Search Bar in the Center -->
+                   
                     <div class="search-bar-container mx-lg-auto my- my-lg-0 w-100 w-lg-auto">
                         <form method="GET" action="search.php" class="search-form d-flex">
                             <input type="text" class="form-control border-end-0 search-input" name="query" placeholder="Search for a product..." aria-label="Search" required>
@@ -142,12 +142,11 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                         </form>
                     </div>
 
-                    <!-- Display Username or Guest -->
                     <span class="navbar-text mx-lg-3 my-2 my-lg-0 text-center">
                         Welcome, <?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Guest'; ?>!
                     </span>
 
-                    <!-- Account Dropdown for Logged-In Users -->
+                
                     <?php if ($is_logged_in): ?>
                         <div class="dropdown mx-lg-3 my-2 my-lg-0">
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -162,14 +161,14 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                     <?php endif; ?>
 
 
-                    <!-- Login and Cart Buttons -->
+                 
                     <div class="d-flex justify-content-center justify-content-lg-end my-2 my-lg-0">
                         <?php if (!$is_logged_in): ?>
                             <a href="user_login.php" class="btn login-btn me-3 ">Login/Register</a>
                         <?php endif; ?>
-                        <!-- Favorite Link -->
+                       
                         <a class="nav-link d-flex align-items-center justify-content-center mx-lg-3 my-2 my-lg-0" href="favorite.php">
-                            <i class="bi bi-heart fs-5"></i> <!-- Larger Icon -->
+                            <i class="bi bi-heart fs-5"></i> 
                         </a>
                         <a href="add_to_cart.php" class="btn cart-btn" id="cart-button">
                             <img src="./images/cart-icon.jpg" alt="Cart" style="width:24px; height:24px; margin-right:2px;">
@@ -180,19 +179,19 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
         </div>
     </nav>
 
-    <!-- Header -->
+
     <header class="container my-5">
         <div class="section-header">
             <h1>Perfume Storage Guide</h1>
         </div>
     </header>
- <!-- YouTube Video Section -->
+ 
  <div class="container">
         <div class="video-container">
         <iframe src="https://www.youtube.com/embed/T_teZy4Czek" title="How to Find Your Signature Scent" allowfullscreen></iframe>
         </div>
     </div>
-    <!-- Content Section -->
+ 
     <div class="container content">
         <p>Proper storage of your perfumes is crucial to preserving their longevity and scent. Here's a guide on how to store your perfumes to ensure they stay fresh and effective:</p>
 
@@ -218,7 +217,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
             <li>Consider buying perfume storage boxes or cabinets that are designed to keep bottles upright and away from sunlight.</li>
         </ul>
 
-        <!-- Call-to-Action Section -->
+      
         <div class="call-to-action">
             <h2>Protect Your Scent</h2>
             <p>Discover our collection of perfume storage boxes and organizers, perfect for keeping your fragrance collection in top condition.</p>

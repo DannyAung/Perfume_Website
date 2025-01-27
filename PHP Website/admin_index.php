@@ -1,7 +1,7 @@
 <?php
-// Start session
+
 session_start();
-// Connect to the database
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -10,19 +10,19 @@ $port = 3306;
 
 $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 
-// Check connection
+
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Check if admin is logged in
+
 if (!isset($_SESSION['admin_id']) || !$_SESSION['admin_logged_in']) {
     echo "Error: Admin ID not set. Please log in again.";
     header('Location: admin_login.php');
     exit;
 }
 
-// You can access the admin ID like this:
+
 $admin_id = $_SESSION['admin_id'];
 
 
@@ -57,8 +57,6 @@ if (isset($_GET['user_id'])) {
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Lilita+One&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <style>
-
-/*Nav*/
 .custom-navbar-spacing .nav-item {
     margin-right: -15px;
    
@@ -87,7 +85,7 @@ if (isset($_GET['user_id'])) {
     <div class="container my-5">
     <h1 class="text-center mb-4">Welcome, Admin!</h1>
     <div class="row g-4">
-        <!-- Manage Products -->
+      
         <div class="col-md-3">
             <div class="card text-center shadow-sm h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
@@ -98,8 +96,7 @@ if (isset($_GET['user_id'])) {
                 </div>
             </div>
         </div>
-
-        <!-- Manage Orders -->
+  
         <div class="col-md-3">
             <div class="card text-center shadow-sm h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
@@ -111,7 +108,7 @@ if (isset($_GET['user_id'])) {
             </div>
         </div>
 
-        <!-- Manage Coupons -->
+      
         <div class="col-md-3">
             <div class="card text-center shadow-sm h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
@@ -123,7 +120,7 @@ if (isset($_GET['user_id'])) {
             </div>
         </div>
 
-        <!-- Manage Users -->
+      
         <div class="col-md-3">
             <div class="card text-center shadow-sm h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
@@ -135,7 +132,6 @@ if (isset($_GET['user_id'])) {
             </div>
         </div>
 
-        <!-- Manage Reviews -->
         <div class="col-md-3">
             <div class="card text-center shadow-sm h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
@@ -167,7 +163,18 @@ if (isset($_GET['user_id'])) {
                 </div>
             </div>
         </div>
-        <!-- Reports -->
+
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+                    <i class="fas fa-star fa-3x mb-3 text-secondary"></i>
+                    <h5 class="card-title mb-2">Manage Payment</h5>
+                    <p class="card-text mb-3">View or manage payment methods.</p>
+                    <a href="manage_payment.php" class="btn btn-outline-secondary w-100">Go</a>
+                </div>
+            </div>
+        </div>
+      
         <div class="col-md-3">
             <div class="card text-center shadow-sm h-100">
                 <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
@@ -191,12 +198,11 @@ if (isset($_GET['user_id'])) {
         </div>
     </div>
 </div>
-    <!-- Include Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
 <?php
-// Close the database connection
+
 mysqli_close($conn);
 ?>

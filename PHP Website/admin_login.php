@@ -1,5 +1,5 @@
 <?php
-// Database connection
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -14,7 +14,6 @@ if (!$conn) {
 
 
 session_start();
-
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];

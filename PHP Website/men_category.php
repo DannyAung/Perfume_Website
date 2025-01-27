@@ -1,10 +1,10 @@
 <?php
-// Start session
+
 if (!isset($_SESSION)) {
-    session_start(); // Start session if not already started
+    session_start();
 }
 
-// Database connection
+
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -16,10 +16,10 @@ $conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-// Check if user is logged in
+
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-// Fetch cart items for the logged-in user
+
 $cart_items = [];
 if ($is_logged_in) {
     $cart_query = "SELECT product_id FROM cart_items WHERE user_id = ? AND ordered_status = 'not_ordered'";
@@ -46,9 +46,9 @@ if ($is_logged_in) {
 </head>
 
 <body>
-<?php include 'navbar.php'; ?>
+    <?php include 'navbar.php'; ?>
     <div>
-        <!-- Breadcrumb Navigation -->
+
         <nav aria-label="breadcrumb" class="py-3 bg-light">
             <div class="container">
                 <ol class="breadcrumb mb-0">
@@ -66,12 +66,12 @@ if ($is_logged_in) {
 
         <div class="container-fluid">
             <div class="row">
-                <!-- Sidebar for Filters -->
+
                 <div class="col-md-3">
                     <div class="border p-5 filter-sidebar sticky-sidebar">
                         <h5 class="mb-3">Filter</h5>
 
-                        <!-- Price Range Filter -->
+
                         <form method="GET" action="men_category.php">
                             <div class="mb-3">
                                 <label for="priceRange" class="form-label">Price Range</label>
@@ -81,7 +81,7 @@ if ($is_logged_in) {
                                 </div>
                             </div>
 
-                            <!-- Discount Filter -->
+
                             <div class="mb-3">
                                 <label class="form-label">Discount</label>
                                 <select class="form-select" name="discount">
@@ -93,7 +93,7 @@ if ($is_logged_in) {
                                 </select>
                             </div>
 
-                            <!-- Category Filter -->
+
                             <div class="mb-3">
                                 <label class="form-label">Category</label>
                                 <select class="form-select" name="category">
@@ -106,7 +106,7 @@ if ($is_logged_in) {
                                 </select>
                             </div>
 
-                            <!-- Availability Filter -->
+
                             <div class="mb-3">
                                 <label class="form-label">Availability</label>
                                 <div class="form-check">
@@ -115,40 +115,40 @@ if ($is_logged_in) {
                                 </div>
                             </div>
 
-                            <!-- Submit Filter Button -->
+
                             <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
                         </form>
                     </div>
                 </div>
 
-                <!-- Main Products Section -->
+
                 <div class="col-md-9">
                     <div class="container py-5">
                         <div class="row row-cols-1 row-cols-md-4 g-4">
                             <?php
                             $category = isset($_GET['category']) ? $_GET['category'] : 'Men'; // Default to 'Men' if no category is selected
-                            $men_query = "SELECT * FROM products WHERE 1=1";
-                            // Apply Category Filter
+                            $men_query = "SELECT *, (SELECT AVG(rating) FROM reviews WHERE product_id = products.product_id) AS avg_rating FROM products WHERE 1=1";
+
                             if ($category !== 'All') {
                                 $men_query .= " AND category = '$category'";
                             } else {
                                 $category;
                             }
 
-                            // Apply Price Filter
+
                             if (isset($_GET['min_price']) && isset($_GET['max_price']) && is_numeric($_GET['min_price']) && is_numeric($_GET['max_price'])) {
                                 $min_price = intval($_GET['min_price']);
                                 $max_price = intval($_GET['max_price']);
                                 $men_query .= " AND price BETWEEN $min_price AND $max_price";
                             }
 
-                            // Apply Discount Filter
+
                             if (isset($_GET['discount']) && is_numeric($_GET['discount'])) {
                                 $discount = intval($_GET['discount']);
                                 $men_query .= " AND discount_percentage >= $discount";
                             }
 
-                            // Apply In-Stock Filter
+
                             if (isset($_GET['in_stock'])) {
                                 $men_query .= " AND stock_quantity > 0";
                             }
@@ -156,7 +156,7 @@ if ($is_logged_in) {
                             $men_query .= " ORDER BY created_at";
                             $men_result = mysqli_query($conn, $men_query);
 
-                            // Display Filtered Products
+
                             while ($men_product = mysqli_fetch_assoc($men_result)) {
                                 $stock_quantity = $men_product['stock_quantity'];
                                 $is_sold_out = $stock_quantity == 0;
@@ -169,7 +169,7 @@ if ($is_logged_in) {
                                 $product_price = htmlspecialchars($men_product['price']);
                                 $discount_percentage = isset($men_product['discount_percentage']) ? $men_product['discount_percentage'] : 0;
 
-                                // Calculate the discounted price
+
                                 if ($discount_percentage > 0) {
                                     $discounted_price = $product_price - ($product_price * ($discount_percentage / 100));
                                 } else {
@@ -179,17 +179,17 @@ if ($is_logged_in) {
                                 <div class="col">
                                     <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
                                         <div class="image-container position-relative overflow-hidden">
-                                            <!-- Discount Badge -->
-                                        <?php if ($discount_percentage > 0): ?>
-                                            <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end"
-                                                style="font-size: 0.9rem; z-index: 10;"> <!-- Added z-index here -->
-                                                <?php echo $discount_percentage; ?>% OFF
-                                            </div>
-                                        <?php endif; ?>
+
+                                            <?php if ($discount_percentage > 0): ?>
+                                                <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end"
+                                                    style="font-size: 0.9rem; z-index: 10;"> <!-- Added z-index here -->
+                                                    <?php echo $discount_percentage; ?>% OFF
+                                                </div>
+                                            <?php endif; ?>
                                             <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
                                                 alt="<?php echo $product_name; ?>"
                                                 style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
-                                            <!-- Sold Out Badge -->
+
                                             <?php if ($is_sold_out): ?>
                                                 <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex justify-content-center align-items-center"
                                                     style="background: rgba(52, 51, 51, 0.7);">
@@ -199,8 +199,6 @@ if ($is_logged_in) {
                                                     </div>
                                                 </div>
                                             <?php endif; ?>
-
-                                            <!-- Hover Overlay -->
                                             <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
                                                 style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
                                                 <?php if (!$is_sold_out): ?>
@@ -218,6 +216,13 @@ if ($is_logged_in) {
                                         </div>
 
                                         <div class="card-body d-flex flex-column">
+                                            <div class="rating mb-2">
+                                                <span class="text-warning">
+                                                    <?php for ($i = 0; $i < floor($men_product['avg_rating']); $i++): ?>★<?php endfor; ?>
+                                                    <?php for ($i = floor($men_product['avg_rating']); $i < 5; $i++): ?>☆<?php endfor; ?>
+                                                </span>
+                                                (<?php echo number_format($men_product['avg_rating'], 1); ?>)
+                                            </div>
                                             <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
                                             <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
                                         </div>
@@ -245,11 +250,11 @@ if ($is_logged_in) {
                 });
             });
         </script>
-  <?php include 'footer.php'; ?>
+        <?php include 'footer.php'; ?>
 
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>  
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
         <!-- Latest Font Awesome version -->

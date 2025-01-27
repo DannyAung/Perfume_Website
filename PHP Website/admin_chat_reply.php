@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-// Check if the admin is logged in
+
 if (!isset($_SESSION['admin_logged_in'])) {
     header('Location: admin_login.php');
     exit;
 }
 
-// Database connection
+
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -29,7 +29,7 @@ if (!isset($_GET['user_id'])) {
 
 $user_id = $_GET['user_id'];
 
-// Fetch user name from the database if not provided via URL
+// Fetch user name 
 if (!isset($_GET['user_name'])) {
     $userStmt = $pdo->prepare("SELECT user_name FROM users WHERE user_id = :user_id LIMIT 1");
     $userStmt->execute([':user_id' => $user_id]);
@@ -38,12 +38,12 @@ if (!isset($_GET['user_name'])) {
     if ($user) {
         $user_name = $user['user_name'];
     } else {
-        $user_name = "Unknown User"; // Fallback if user is not found
+        $user_name = "Unknown User"; 
     }
 } else {
     $user_name = $_GET['user_name'];
 }
-// Fetch chat messages with the specific user
+
 $stmt = $pdo->prepare("SELECT * FROM chats WHERE user_id = :user_id ORDER BY sent_at ASC");
 $stmt->execute([':user_id' => $user_id]);
 $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -119,7 +119,7 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
             clear: both;
         }
 
-        /* Admin Messages (Right Aligned) */
+      
         .admin-bubble {
             background-color: #007bff;
             color: white;
@@ -127,7 +127,7 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
             text-align: right;
         }
 
-        /* User Messages (Left Aligned) */
+     
         .user-bubble {
             margin-right: 140px;
             color: black;
@@ -144,7 +144,7 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div class="container">
         <div class="chat-container">
-            <!-- Chat GIF Section -->
+           
             <div class="text-center mb-1">
                 <img src="images/chat.gif" alt="Chat GIF" class="img-fluid" style="max-width: 180px;">
             </div>

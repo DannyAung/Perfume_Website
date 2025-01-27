@@ -1,5 +1,5 @@
 <?php
-// Start session
+
 session_start();
 
 if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
@@ -7,7 +7,7 @@ if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     exit;
 }
 
-// Database connection
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -16,12 +16,12 @@ $port = 3306;
 
 $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 
-// Check connection
+
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Search functionality
+
 $search_query = '';
 if (isset($_GET['search'])) {
     $search_query = htmlspecialchars($_GET['search']);
@@ -41,17 +41,17 @@ if (isset($_GET['search'])) {
     $products = $result->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
 } else {
-    // Fetch products
+
     $sql = "SELECT * FROM products";
     $result = mysqli_query($conn, $sql);
     $products = mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
-// Handle product deletion
+
 if (isset($_POST['delete_product'])) {
     $product_id = intval($_POST['product_id']);
 
-    // Delete related records from cart_items table
+    
     $delete_cart_items_query = "DELETE FROM cart_items WHERE product_id = ?";
     $stmt = $conn->prepare($delete_cart_items_query);
     $stmt->bind_param("i", $product_id);
@@ -64,14 +64,14 @@ if (isset($_POST['delete_product'])) {
     $stmt->execute();
     $stmt->close();
 
-    // Delete related records from order_items table
+ 
     $delete_order_items_query = "DELETE FROM order_items WHERE product_id = ?";
     $stmt = $conn->prepare($delete_order_items_query);
     $stmt->bind_param("i", $product_id);
     $stmt->execute();
     $stmt->close();
 
-    // Now delete the product from the products table
+   
     $delete_product_query = "DELETE FROM products WHERE product_id = ?";
     $stmt = $conn->prepare($delete_product_query);
     $stmt->bind_param("i", $product_id);
@@ -202,7 +202,6 @@ if (isset($_POST['delete_product'])) {
 
         .hover-bg:hover {
             background-color: rgba(0, 123, 255, 0.1);
-            /* Light blue hover effect */
             border-radius: 5px;
             transition: background-color 0.3s ease;
         }

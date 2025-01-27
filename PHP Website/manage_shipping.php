@@ -1,5 +1,5 @@
 <?php
-// Start session
+
 session_start();
 
 if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
@@ -7,7 +7,6 @@ if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     exit;
 }
 
-// Database connection
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -15,12 +14,11 @@ $dbname = 'ecom_website';
 $port = 3306;
 
 $conn = mysqli_connect($host, $username, $password, $dbname, $port);
-// Check connection
+
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Search functionality
 $search_query = '';
 if (isset($_GET['search'])) {
     $search_query = htmlspecialchars($_GET['search']);
@@ -35,18 +33,18 @@ if (isset($_GET['search'])) {
     $result = $stmt->get_result();
     $stmt->close();
 } else {
-    // Fetch all shipping methods
+    // Fetch all
     $query = "SELECT * FROM shipping";
     $result = mysqli_query($conn, $query);
 }
 
-// Add Shipping Method (Create)
+
 if (isset($_POST['add_shipping'])) {
     $shipping_method = $_POST['shipping_method'];
     $shipping_fee = $_POST['shipping_fee'];
     $delivery_time = $_POST['delivery_time'];
 
-    // Insert query to add the new shipping method
+  
     $query = "INSERT INTO shipping (shipping_method, shipping_fee, delivery_time) 
               VALUES ('$shipping_method', '$shipping_fee', '$delivery_time')";
     if (mysqli_query($conn, $query)) {
@@ -58,14 +56,14 @@ if (isset($_POST['add_shipping'])) {
     exit;
 }
 
-// Update Shipping Method
+
 if (isset($_POST['update_shipping'])) {
     $shipping_id = $_POST['shipping_id'];
     $shipping_method = $_POST['shipping_method'];
     $shipping_fee = $_POST['shipping_fee'];
     $delivery_time = $_POST['delivery_time'];
 
-    // Update query to modify the shipping method
+ 
     $query = "UPDATE shipping SET shipping_method='$shipping_method', 
                                   shipping_fee='$shipping_fee', 
                                   delivery_time='$delivery_time' 
@@ -79,11 +77,11 @@ if (isset($_POST['update_shipping'])) {
     exit;
 }
 
-// Delete Shipping Method
+
 if (isset($_GET['delete_shipping'])) {
     $shipping_id = $_GET['delete_shipping'];
 
-    // Delete query to remove a shipping method
+ 
     $query = "DELETE FROM shipping WHERE shipping_id='$shipping_id'";
     if (mysqli_query($conn, $query)) {
         echo "<div class='alert alert-success'>Shipping method deleted successfully!</div>";
@@ -120,13 +118,12 @@ if (isset($_GET['delete_shipping'])) {
     <div class="container py-5">
         <h1 class="mb-4 text-center">Manage Shipping Methods</h1>
 
-        <!-- Search Form -->
         <form action="manage_shipping.php" method="GET" class="d-flex mb-4">
             <input class="form-control me-2" type="search" name="search" placeholder="Search shipping methods" aria-label="Search" value="<?= htmlspecialchars($search_query); ?>">
             <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
 
-        <!-- Add New Shipping Method -->
+     
         <div class="card mb-4">
             <div class="card-header">
                 <h2 class="mb-0">Add New Shipping Method</h2>
@@ -153,7 +150,7 @@ if (isset($_GET['delete_shipping'])) {
             </div>
         </div>
 
-        <!-- Shipping Methods List -->
+    
         <div class="card">
             <div class="card-header">
                 <h2 class="mb-0">Existing Shipping Methods</h2>
@@ -194,7 +191,7 @@ if (isset($_GET['delete_shipping'])) {
         </div>
 
         <?php
-        // Edit Shipping Method (Display in form)
+
         if (isset($_GET['edit_shipping'])) {
             $shipping_id = $_GET['edit_shipping'];
             $edit_query = "SELECT * FROM shipping WHERE shipping_id='$shipping_id'";
@@ -232,7 +229,6 @@ if (isset($_GET['delete_shipping'])) {
         ?>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
 </body>
@@ -240,6 +236,5 @@ if (isset($_GET['delete_shipping'])) {
 </html>
 
 <?php
-// Close the database connection
 mysqli_close($conn);
 ?>

@@ -20,11 +20,11 @@ if (!$conn) {
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $contact_id = $_GET['id'];
 
-    // Prepare the DELETE SQL query
+   
     $query = "DELETE FROM contact_messages WHERE id = ?";
     $stmt = mysqli_prepare($conn, $query);
 
-    // Bind the contact ID to the query and execute
+   
     mysqli_stmt_bind_param($stmt, 'i', $contact_id);
     $result = mysqli_stmt_execute($stmt);
 
@@ -34,13 +34,13 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
         $_SESSION['error'] = "Failed to delete the contact message. Please try again.";
     }
 
-    // Close the prepared statement
+    
     mysqli_stmt_close($stmt);
 } else {
     $_SESSION['error'] = "Invalid contact message ID.";
 }
 
-// Redirect back to the manage contact page
+
 header('Location: manage_contact_us.php');
 exit;
 

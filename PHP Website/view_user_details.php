@@ -1,5 +1,4 @@
 <?php
-// Start session
 session_start();
 
 if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
@@ -7,7 +6,6 @@ if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     exit;
 }
 
-// Database connection
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -16,12 +14,11 @@ $port = 3306;
 
 $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 
-// Check connection
+
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Get user ID from query parameter
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $user_id = intval($_GET['id']);
     $sql = "SELECT * FROM users WHERE user_id = ?";
@@ -35,7 +32,6 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     die("Invalid user ID.");
 }
 
-// Close the database connection
 mysqli_close($conn);
 ?>
 
@@ -67,13 +63,12 @@ mysqli_close($conn);
 <?php include 'admin_navbar.php'; ?>
 <?php include 'offcanvas_sidebar.php'; ?>
 
-    <!-- User Details Section -->
+
     <div class="container my-5">
         <h1 class="text-center mb-4">User Details</h1>
         <?php if (!empty($user)): ?>
             <div class="card mx-auto" style="max-width: 600px;">
                 <div class="card-body text-center">
-                    <!-- Display user image or default image if none -->
                     <?php if (!empty($user['user_image'])): ?>
                                 <img src="uploads/profile_images/<?php echo htmlspecialchars($user['user_image']); ?>" alt="Profile Picture" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
                             <?php else: ?>

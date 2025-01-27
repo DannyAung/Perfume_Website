@@ -65,10 +65,6 @@ $discount_amount = $total_price * ($discount_percentage / 100);
 $final_price = $total_price - $discount_amount;
 
 
-$final_total_price = $final_price + $shipping_fee;
-$discount_amount = 0;
-$final_total_price = $total_price;
-
 
 $shipping_sql = "SELECT shipping_method, shipping_fee FROM shipping";
 $shipping_result = $conn->query($shipping_sql);
@@ -86,8 +82,15 @@ if (isset($_POST['shipping_method']) && !empty($_POST['shipping_method'])) {
     $shipping_method = $_POST['shipping_method'];
     // Fetch the shipping fee
     $shipping_fee = $shipping_methods[$shipping_method] ?? 0;
+
 }
 
+
+$final_total_price = $final_price + $shipping_fee;
+$discount_amount = 0;
+$final_total_price = $total_price;
+
+$final_total_price = $final_price + $shipping_fee;
 // Check if a coupon is applied
 if (isset($_SESSION['applied_coupon_code'])) {
     $discount_percentage = $_SESSION['discount_percentage'];
@@ -241,6 +244,9 @@ $applied_coupon_code_html = htmlspecialchars($applied_coupon_code, ENT_QUOTES, '
 $discount_percentage = isset($_SESSION['discount_percentage']) ? $_SESSION['discount_percentage'] : 0;
 
 session_regenerate_id(true);
+
+// Fetch all payment methods from the database
+$result = $conn->query("SELECT payment_method FROM payment ORDER BY created_at ASC");
 ?>
 
 
@@ -404,92 +410,66 @@ session_regenerate_id(true);
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
 
-            <!-- Payment Method -->
-            <div class="mb-3">
-                <label for="payment_method" class="form-label">Payment Method</label>
-                <select class="form-control" id="payment_method" name="payment_method" required onchange="handlePaymentMethodChange()">
-                    <option value="" selected disabled>Select Payment Method</option>
-                    <option value="kpay">K Pay</option>
-                    <option value="credit_card">Credit Card</option>
-                    <option value="cash_on_delivery">Cash on Delivery</option>
-                </select>
-            </div>
+       <!-- Payment Method -->
+<div class="mb-3">
+    <label for="payment_method" class="form-label">Payment Method</label>
+    <select class="form-control" id="payment_method" name="payment_method" required onchange="handlePaymentMethodChange()">
+        <option value="" selected disabled>Select Payment Method</option>
+        <?php if ($result && $result->num_rows > 0): ?>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <option value="<?= htmlspecialchars($row['payment_method']); ?>"><?= htmlspecialchars($row['payment_method']); ?></option>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <option value="" disabled>No payment methods available</option>
+        <?php endif; ?>
+    </select>
+</div>
 
-            <!-- Additional Fields -->
-            <div id="kpay_fields" class="d-none">
-                <div class="mb-3">
-                    <label for="phone_number" class="form-label">Phone Number</label>
-                    <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Enter your phone number" oninput="validatePhoneNumber()">
-                    <div id="phone_number_error" class="text-danger d-none">Invalid Phone Number</div>
-                </div>
-                <div class="mb-3">
-                    <label for="otp" class="form-label">OTP</label>
-                    <input type="text" class="form-control" id="otp" name="otp" placeholder="Enter OTP">
-                </div>
-                <button type="button" id="get_otp_button" class="btn btn-primary d-none" onclick="generateOTP()">Get OTP</button>
-            </div>
+<!-- Phone Number (only for KPay) -->
+<div class="mb-3" id="phone_number_div" style="display:none;">
+    <label for="phone_number" class="form-label">Phone Number (11 digits)</label>
+    <input type="text" class="form-control" id="phone_number" name="phone_number" maxlength="11" pattern="\d{11}">
+</div>
 
-            <div id="credit_card_fields" class="d-none">
-                <div class="mb-3">
-                    <label for="card_number" class="form-label">Card Number</label>
-                    <input type="text" class="form-control" id="card_number" name="card_number" placeholder="Enter your credit card number">
-                </div>
-                <div class="mb-3">
-                    <label for="expiry_date" class="form-label">Expiry Date</label>
-                    <input type="month" class="form-control" id="expiry_date" name="expiry_date">
-                </div>
-                <div class="mb-3">
-                    <label for="cvv" class="form-label">CVV</label>
-                    <input type="text" class="form-control" id="cvv" name="cvv" placeholder="Enter CVV">
-                </div>
-            </div>
+<!-- OTP (only for KPay) -->
+<div class="mb-3" id="otp_div" style="display:none;">
+    <label for="otp" class="form-label">OTP (6 digits)</label>
+    <input type="text" class="form-control" id="otp" name="otp" maxlength="6" pattern="\d{6}">
+</div>
 
-            <div id="cash_on_delivery_fields" class="d-none">
-                <div class="mb-3">
-                    <p>Cash on Delivery selected. No additional information needed.</p>
-                </div>
-            </div>
+<!-- Credit Card Details (only for Credit Card) -->
+<div class="mb-3" id="credit_card_div" style="display:none;">
+    <label for="card_number" class="form-label">Card Number</label>
+    <input type="text" class="form-control" id="card_number" name="card_number" maxlength="19" pattern="\d{16,19}" placeholder="Enter your card number">
+    
+    <label for="exp_date" class="form-label">Expiration Date (MM/YY)</label>
+    <input type="text" class="form-control" id="exp_date" name="exp_date" maxlength="5" pattern="\d{2}/\d{2}" placeholder="MM/YY">
+    
+    <label for="cvv" class="form-label">CVV</label>
+    <input type="text" class="form-control" id="cvv" name="cvv" maxlength="3" pattern="\d{3}" placeholder="Enter CVV">
+</div>
 
-            <!-- JavaScript to Handle Payment Method Change -->
-            <script>
-                function handlePaymentMethodChange() {
-                    const paymentMethod = document.getElementById('payment_method').value;
+<script>
+function handlePaymentMethodChange() {
+    var paymentMethod = document.getElementById('payment_method').value;
+    
+    // Show/Hide fields based on the payment method selected
+    if (paymentMethod === 'KPay') {
+        document.getElementById('phone_number_div').style.display = 'block';
+        document.getElementById('otp_div').style.display = 'block';
+        document.getElementById('credit_card_div').style.display = 'none';
+    } else if (paymentMethod === 'Credit Card') {
+        document.getElementById('phone_number_div').style.display = 'none';
+        document.getElementById('otp_div').style.display = 'none';
+        document.getElementById('credit_card_div').style.display = 'block';
+    } else {
+        document.getElementById('phone_number_div').style.display = 'none';
+        document.getElementById('otp_div').style.display = 'none';
+        document.getElementById('credit_card_div').style.display = 'none';
+    }
+}
+</script>
 
-                    // Hide all additional fields initially
-                    document.getElementById('kpay_fields').classList.add('d-none');
-                    document.getElementById('credit_card_fields').classList.add('d-none');
-                    document.getElementById('cash_on_delivery_fields').classList.add('d-none');
-
-                    // Show fields based on the selected payment method
-                    if (paymentMethod === 'kpay') {
-                        document.getElementById('kpay_fields').classList.remove('d-none');
-                    } else if (paymentMethod === 'credit_card') {
-                        document.getElementById('credit_card_fields').classList.remove('d-none');
-                    } else if (paymentMethod === 'cash_on_delivery') {
-                        document.getElementById('cash_on_delivery_fields').classList.remove('d-none');
-                    }
-                }
-
-                function validatePhoneNumber() {
-                    const phoneNumber = document.getElementById('phone_number').value;
-                    const phoneError = document.getElementById('phone_number_error');
-                    const getOtpButton = document.getElementById('get_otp_button');
-
-                    // Validate phone number (must be exactly 11 digits)
-                    if (/^\d{11}$/.test(phoneNumber)) {
-                        phoneError.classList.add('d-none'); // Hide error message
-                        getOtpButton.classList.remove('d-none'); // Show "Get OTP" button
-                    } else {
-                        phoneError.classList.remove('d-none'); // Show error message
-                        getOtpButton.classList.add('d-none'); // Hide "Get OTP" button
-                    }
-                }
-
-                function generateOTP() {
-                    // This function will handle OTP generation logic (e.g., sending OTP to the server)
-                    alert('OTP has been sent to your phone number.');
-                }
-            </script>
 
             <!-- Shipping Method -->
             <div class="mb-3">

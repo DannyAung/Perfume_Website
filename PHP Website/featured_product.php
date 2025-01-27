@@ -1,10 +1,9 @@
 <?php
-// Start session
+
 if (!isset($_SESSION)) {
-    session_start(); // Start session if not already started
+    session_start(); 
 }
 
-// Database connection
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -18,7 +17,7 @@ if (!$conn) {
 }
 
 
-// Check if user is logged in
+
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 ?>
 <!DOCTYPE html>
@@ -37,7 +36,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 <body>
     <?php include 'navbar.php'; ?>
     <div>
-        <!-- Breadcrumb Navigation -->
+      
         <nav aria-label="breadcrumb" class="py-3 bg-light">
             <div class="container">
                 <ol class="breadcrumb mb-0">
@@ -54,12 +53,12 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 
         <div class="container-fluid">
             <div class="row">
-                <!-- Sidebar for Filters -->
+             
                 <div class="col-md-3">
                     <div class="border p-5 filter-sidebar sticky-sidebar">
                         <h5 class="mb-3">Filter</h5>
 
-                        <!-- Price Range Filter -->
+                        
                         <form method="GET" action="featured_product.php">
                             <div class="mb-3">
                                 <label for="priceRange" class="form-label">Price Range</label>
@@ -69,7 +68,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                                 </div>
                             </div>
 
-                            <!-- Discount Filter -->
+                            
                             <div class="mb-3">
                                 <label class="form-label">Discount</label>
                                 <select class="form-select" name="discount">
@@ -81,7 +80,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                                 </select>
                             </div>
 
-                            <!-- Category Filter -->
+                        
                             <div class="mb-3">
                                 <label class="form-label">Category</label>
                                 <select class="form-select" name="category">
@@ -92,9 +91,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 
 
                                 </select>
-                            </div>
-
-                            <!-- Availability Filter -->
+                            </div>                       
                             <div class="mb-3">
                                 <label class="form-label">Availability</label>
                                 <div class="form-check">
@@ -103,44 +100,43 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                                 </div>
                             </div>
 
-                            <!-- Submit Filter Button -->
                             <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
                         </form>
                     </div>
                 </div>
-                <!-- Main featured Products Section -->
+               
                 <div class="col-md-9">
                     <div class="container py-5">
                         <div class="row row-cols-1 row-cols-md-4 g-4">
-                            <?php
-                            // Set default category to 'All' if not selected
+                            <?php                        
                             $category = isset($_GET['category']) ? $_GET['category'] : 'All';
 
-                            $featured_query = "SELECT * FROM products WHERE subcategory = 'featured'"; // Fetch products where subcategory is 'featured'
-
-                            // Apply the category filter if a specific category is selected
+                            $featured_query = "SELECT *, (SELECT AVG(rating) FROM reviews WHERE product_id = products.product_id) AS avg_rating FROM products WHERE subcategory = 'featured'"; 
                             if ($category !== 'All') {
                                 $featured_query .= " AND category = '$category'";
                             }
-
-                            // Execute the query
-                            $result = mysqli_query($conn, $featured_query);
-
+                        
                             // Apply Price Filter
                             if (isset($_GET['min_price']) && isset($_GET['max_price']) && is_numeric($_GET['min_price']) && is_numeric($_GET['max_price'])) {
                                 $min_price = intval($_GET['min_price']);
                                 $max_price = intval($_GET['max_price']);
                                 $featured_query .= " AND price BETWEEN $min_price AND $max_price";
-                                $result = mysqli_query($conn, $featured_query);
                             }
 
-                            // Apply In-Stock Filter
+                            // Apply Discount Filter
+                            if (isset($_GET['discount']) && is_numeric($_GET['discount'])) {
+                                $discount = intval($_GET['discount']);
+                                $featured_query .= " AND discount_percentage >= $discount";
+                            }
+
+                            // Apply Stock Filter
                             if (isset($_GET['in_stock'])) {
                                 $featured_query .= " AND stock_quantity > 0";
-                                $result = mysqli_query($conn, $featured_query);
                             }
 
-                            // Display featured Products
+                            // Execute the query
+                            $result = mysqli_query($conn, $featured_query);
+                        
                             while ($product = mysqli_fetch_assoc($result)) {
                                 $stock_quantity = $product['stock_quantity'];
                                 $is_sold_out = $stock_quantity == 0;
@@ -151,9 +147,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 
                                 $product_name = htmlspecialchars($product['product_name']);
                                 $product_price = htmlspecialchars($product['price']);
-                                $discount_percentage = isset($product['discount_percentage']) ? $product['discount_percentage'] : 0;
-
-                                // Calculate the discounted price if discount exists
+                                $discount_percentage = isset($product['discount_percentage']) ? $product['discount_percentage'] : 0;                          
                                 if ($discount_percentage > 0) {
                                     $discounted_price = $product_price - ($product_price * ($discount_percentage / 100));
                                 } else {
@@ -162,8 +156,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                             ?>
                                 <div class="col">
                                     <div class="card h-100 text-center shadow-sm border-0 rounded product-card">
-                                        <div class="image-container position-relative overflow-hidden">
-                                            <!-- Discount Badge -->
+                                        <div class="image-container position-relative overflow-hidden">                        
                                             <?php if ($discount_percentage > 0): ?>
                                                 <div class="discount-badge position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded-end" style="font-size: 0.9rem;">
                                                     <?php echo $discount_percentage; ?>% OFF
@@ -172,8 +165,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 
                                             <img src="<?php echo $image; ?>" class="card-img-top img-fluid p-3"
                                                 alt="<?php echo $product_name; ?>"
-                                                style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">
-                                            <!-- Sold Out Badge -->
+                                                style="height: 200px; object-fit: contain; transition: transform 0.3s ease-in-out;">                                          
                                             <?php if ($is_sold_out): ?>
                                                 <div class="position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex justify-content-center align-items-center"
                                                     style="background: rgba(52, 51, 51, 0.7);">
@@ -183,8 +175,7 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                                                     </div>
                                                 </div>
                                             <?php endif; ?>
-
-                                            <!-- Hover Overlay -->
+                                  
                                             <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
                                                 style="background: rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease-in-out;">
                                                 <?php if (!$is_sold_out): ?>
@@ -202,11 +193,19 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                                         </div>
 
                                         <div class="card-body d-flex flex-column">
-                                            <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
-                                            <p class="card-text text-muted">$<?php echo number_format($discounted_price, 2); ?></p>
+                                        <div class="rating mb-2">
+                                            <span class="text-warning">
+                                                <?php for ($i = 0; $i < floor($product['avg_rating']); $i++): ?>★<?php endfor; ?>
+                                                <?php for ($i = floor($product['avg_rating']); $i < 5; $i++): ?>☆<?php endfor; ?>
+                                            </span>
+                                            (<?php echo number_format($product['avg_rating'], 1); ?>)
                                         </div>
+                                        <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
+                                        <p class="card-text text-muted">$<?php echo number_format($discounted_price, 2); ?></p>
                                     </div>
                                 </div>
+                            </div>
+
 
                             <?php } ?>
                         </div>

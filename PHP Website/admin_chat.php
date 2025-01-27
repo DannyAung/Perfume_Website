@@ -1,13 +1,12 @@
 <?php
 session_start();
 
-// Check if the admin is logged in
 if (!isset($_SESSION['admin_logged_in'])) {
     header('Location: admin_login.php');
     exit;
 }
 
-// Database connection
+
 $host = 'localhost';
 $username_db = 'root';
 $password_db = '';
@@ -21,7 +20,7 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-// Fetch all users who have sent messages
+
 $search_query = '';
 if (isset($_GET['search'])) {
     $search_query = $_GET['search'];
@@ -36,13 +35,12 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 if (isset($_GET['user_id'])) {
     $user_id = $_GET['user_id'];
 
-    // Delete all chats for this user
+   
     $stmt = $pdo->prepare("DELETE FROM chats WHERE user_id = :user_id");
     $stmt->execute([
         ':user_id' => $user_id
     ]);
-
-    // Redirect back to the admin chat page with a success message
+ 
     header("Location: admin_chat.php?message=Chat deleted successfully");
     exit;
     
@@ -57,7 +55,7 @@ if (isset($_GET['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Chat</title>
     <title>Admin Dashboard - Manage Users</title>
-    <!-- Bootstrap CSS -->
+ 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
