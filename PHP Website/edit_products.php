@@ -160,6 +160,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         border: none;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     }
+    .navbar {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 </style>
 
 <body>

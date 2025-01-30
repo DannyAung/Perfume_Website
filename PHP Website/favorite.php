@@ -123,6 +123,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-clear {
             background-color: #dc3545;
         }
+        .btn-clear:hover {
+            background-color:rgb(17, 16, 16);
+            color: #fff; /* Change the text color to white */
+        }
 
         .btn-add-all {
             background-color: rgb(22, 81, 208);
@@ -135,6 +139,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline-danger:hover {
+            color:black; 
         }
     </style>
 </head>
@@ -180,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <td class="text-center">
                                             <form method="POST" action="remove_from_wishlist.php">
                                                 <input type="hidden" name="wishlist_id" value="<?php echo $item['wishlist_id']; ?>">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <button type="submit" class="btn  btn-outline-danger">
                                                     <i class="bi bi-trash-fill"></i>
                                                 </button>
                                             </form>

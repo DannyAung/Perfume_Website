@@ -3,11 +3,11 @@ html, body {
     padding: 0;
     width: 100%;
     height: 100%;
-    overflow-x: hidden;  /* Prevent horizontal scrolling on the page */
+    overflow-x: hidden;  
 }
 
 * {
-    box-sizing: border-box;  /* Ensures padding and borders do not cause overflow */
+    box-sizing: border-box;  
 }
 
 /* Responsive Container */
@@ -39,30 +39,28 @@ html, body {
     transform: translateY(-50%);
     z-index: 5;
     background-color: transparent;
-    /* Set background to transparent */
     width: 40px;
     height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
     border: 1px solid white;
-    /* Optional: Add black border around buttons */
 }
 
-/* Left arrow positioning */
+
 .carousel-control-prev1 {
     left: -60px;
-    /* Adjust as needed */
+   
 }
 
-/* Right arrow positioning */
+
 .carousel-control-next1 {
     margin-top:-7px;
     right: -60px;
-    /* Adjust as needed */
+   
 }
 
-/* Customize the arrow icons inside the buttons */
+
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
 
@@ -102,16 +100,16 @@ html, body {
 .login-btn{
     margin-top: 2px;
 }
-/* Enhanced styling for normal price */
+
 .normal-price {
-    font-size: 1.2rem;  /* Font size */
-    font-weight: 500;  /* Normal weight */
+    font-size: 1.2rem;  
+    font-weight: 500;  
 }
 
 .related-resources .card-img-top {
-    width: 100%; /* Ensures the image takes the full width of the card */
-    height: 200px; /* Sets a fixed height for all images */
-    object-fit: cover; /* Ensures images maintain aspect ratio and cover the area without stretching */
+    width: 100%;
+    height: 200px; 
+    object-fit: cover; 
 }
 
 .related-resources {
@@ -142,7 +140,7 @@ html, body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 0, 0, 0.7); /* Red background with some transparency */
+    background-color: rgba(255, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -288,33 +286,28 @@ html, body {
 /* Hover effect for the button */
 .search-btn:hover {
     background-color: #0056b3;
-    /* Darker blue on hover */
     transform: translateX(5px);
-    /* Slight right movement on hover */
+
 }
 
 /* Search input focus effect */
 .search-input:focus {
     outline: none;
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
-    /* Blue focus shadow */
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
     .search-bar-container {
         padding: 0 15px;
-        /* Add some padding on smaller screens */
     }
 
     .search-input {
         width: 100%;
-        /* Make input take up the full width */
     }
 
     .search-btn {
         width: 50px;
-        /* Adjust button width on smaller screens */
         font-size: 20px;
         padding: 12px;
     }
@@ -331,21 +324,21 @@ html, body {
 
 /* Heart Icon Hover Effect */
 .modern-favorite-link:hover i {
-    color: #131111; /* White heart icon on hover */
-    transform: scale(1.1); /* Slight enlargement for interactive feel */
+    color: #131111; 
+    transform: scale(1.1);
 }
 
-/* Adjust icon size for better visibility */
 .modern-favorite-link i {
-    font-size: 1.2rem; /* Larger heart icon */
+    font-size: 1.2rem; 
 }
 
 /* Adjust spacing on small screens (text is hidden) */
 @media (max-width: 991px) {
     .modern-favorite-link span {
-        display: none; /* Hide the text on small screens */
+        display: none; 
     }
 }
+
 /* Styling for buttons */
 .btn-outline-primary {
     border-color: transparent;
@@ -380,7 +373,7 @@ html, body {
 
 /* Adjust spacing between the elements */
 .navbar-text {
-    margin-right: 15px; /* Add space between the username and the next item */
+    margin-right: 15px;
 }
 
 
@@ -490,7 +483,6 @@ html, body {
 @media (max-width: 768px) {
     .card-img-top {
         height: 200px;
-        /* Adjust height on smaller screens */
     }
 }
 
@@ -514,7 +506,6 @@ html, body {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* add to cart */
 
 
 .btn-light {
@@ -531,32 +522,32 @@ html, body {
 
 footer {
     background-color: #343a40;
-    /* Dark background */
+ 
 }
 
 footer h5 {
     color: #ffffff;
-    /* White heading text */
+
 }
 
 footer a {
     color: #ffffff;
-    /* White link text */
+ 
 }
 
 footer a:hover {
     color: #f8f9fa;
-    /* Light gray on hover */
+   
 }
 
 footer .text-muted {
     color: #adb5bd !important;
-    /* Light gray text */
+
 }
 
 footer .border-top {
     border-color: #495057 !important;
-    /* Darker border color */
+ 
 }
 
 footer .fab {
@@ -565,12 +556,12 @@ footer .fab {
 
 footer .fab:hover {
     color: #17a2b8;
-    /* Teal color on hover */
+
 }
 
 
 
-/*file upload*/
+
 .file-upload {
     position: relative;
     width: 100%;
@@ -616,7 +607,7 @@ footer .fab:hover {
     height: auto;
     margin-top: 10px;
     display: none;
-    /* Hidden initially */
+ 
 }
 
 
@@ -637,7 +628,6 @@ footer .fab:hover {
 
 /* filter */
 .filter-sidebar {
-    /* background: linear-gradient(135deg, #f7fafd, #edf4fc); */
     border-radius: 2px;
     padding: 15px;
     color: #333;
@@ -690,7 +680,7 @@ footer .fab:hover {
     border-radius: 0.25rem;
     padding: 0.75rem 1rem;
     font-size: 14px;
-    margin-left: -150px;
+    margin-left: -238px;
 }
 
 .breadcrumb-item+.breadcrumb-item::before {

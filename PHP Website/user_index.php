@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-  
+
     $query = "SELECT * FROM users WHERE email = :email";
     $stmt = $conn->prepare($query);
     $stmt->bind_param(":email", $email);
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
 
-$sql = "SELECT product_name, price, image, product_id FROM products"; // Ensure table columns are correct
+$sql = "SELECT product_name, price, image, product_id FROM products"; 
 $result = mysqli_query($conn, $sql);
 if (!$result) {
     die("Error in query: " . mysqli_error($conn));
@@ -180,7 +180,7 @@ if (isset($_FILES['coupon_image'])) {
 
             <div class="carousel-item active position-relative">
                 <img src="images/poster333.png" class="d-block w-100" alt="Poster 3">
-                <a href="add_to_cart.php" class="btn btn-primary order-now-btn position-absolute">Order Now</a>
+                <a href="popular_product.php" class="btn btn-primary order-now-btn position-absolute">Shop Now</a>
             </div>
 
             <div class="carousel-item">
@@ -211,15 +211,16 @@ if (isset($_FILES['coupon_image'])) {
         <div class="row row-cols-1 row-cols-md-2 g-4">
 
           <?php
-$result = $conn->query("SELECT coupon_code, discount_percentage, coupon_image, valid_from, valid_to FROM coupons");
+$result = $conn->query("SELECT coupon_code, discount_percentage, coupon_image, valid_from, valid_to, minimum_purchase_amount FROM coupons");
 while ($row = $result->fetch_assoc()) {
     echo '
     <div class="col">
         <div class="card text-center shadow-sm border-0 rounded overflow-hidden">
-            <img src="' . $row['coupon_image'] . '" class="card-img-top" alt="' . $row['coupon_code'] . '">
+            <img src="' . $row['coupon_image'] . '" class="card-img-top" alt="' . $row['coupon_code'] .$row['minimum_purchase_amount'] . '">
             <div class="card-body p-4">
                 <h5 class="card-title mb-3">' . $row['coupon_code'] . ' Coupon</h5>
                 <p class="card-text text-muted">Save ' . $row['discount_percentage'] . '%! Use code: <b>' . $row['coupon_code'] . '</b></p>
+                 <p class="card-text text-muted">Spend: $' . $row['minimum_purchase_amount'] . '</p>
                 <p class="card-text text-muted">Expires: ' . $row['valid_to'] . '</p>
             </div>
         </div>

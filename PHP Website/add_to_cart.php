@@ -2,9 +2,10 @@
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    echo "You must be registered or logged in to add items to your cart.";
+    header('Location: user_login.php');
     exit;
 }
+
 if (isset($_POST['check_out'])) {
    
     $_SESSION['checkout_started'] = true;

@@ -21,7 +21,7 @@ $sql = "
     SELECT o.order_id, o.created_at, o.total_price, o.status, 
            oi.order_item_id, oi.product_id, oi.quantity, oi.price,
            p.product_name, p.image, p.size, 
-           u.address, u.phone_number
+           o.address, o.phone
     FROM orders o
     JOIN order_items oi ON o.order_id = oi.order_id
     JOIN products p ON oi.product_id = p.product_id
@@ -45,7 +45,7 @@ while ($row = $result->fetch_assoc()) {
             'total_price' => $row['total_price'],
             'status' => $row['status'],
             'address' => $row['address'],
-            'phone_number' => $row['phone_number'],
+            'phone' => $row['phone'],
             'items' => []
         ];
     }
@@ -102,7 +102,7 @@ while ($row = $result->fetch_assoc()) {
                             </p>
                             <p><strong>Total Price:</strong> <?php echo number_format($order['total_price'], 2); ?> $</p>
                             <p><strong>Address:</strong> <?php echo htmlspecialchars($order['address']); ?></p>
-                            <p><strong>Phone Number:</strong> <?php echo htmlspecialchars($order['phone_number']); ?></p>
+                            <p><strong>Phone Number:</strong> <?php echo htmlspecialchars($order['phone']); ?></p>
 
                             <ul class="list-group">
                                 <?php foreach ($order['items'] as $item): ?>

@@ -12,9 +12,9 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-
 session_start();
 
+//ChawNadi@2003!
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -24,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
+
+
 
     if ($result->num_rows > 0) {
         $admin = $result->fetch_assoc(); 

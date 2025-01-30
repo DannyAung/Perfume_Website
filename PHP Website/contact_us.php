@@ -153,7 +153,7 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="chat-box mb-2" style="height: 250px; overflow-y: scroll; padding-right: 15px;">
             <?php foreach ($chats as $chat): ?>
                 <div class="chat-bubble <?php echo $chat['sender'] === 'user' ? 'user-bubble' : 'admin-bubble'; ?> mb-3">
-                    <small class="fw-bold"><?php echo $chat['sender'] === 'user' ? 'You' : 'Chat Bot'; ?></small><br>
+                    <small class="fw-bold"><?php echo $chat['sender'] === 'user' ? 'You' : 'Admin'; ?></small><br>
                     <p class="m-0"><?php echo htmlspecialchars($chat['message']); ?></p>
                     <small class="text-muted"><?php echo $chat['sent_at']; ?></small>
                 </div>
