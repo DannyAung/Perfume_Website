@@ -54,7 +54,6 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
                 <div class="border p-5 filter-sidebar sticky-sidebar">
                     <h5 class="mb-3">Filter</h5>
 
-
                     <form method="GET" action="popular_product.php">
                         <div class="mb-3">
                             <label for="priceRange" class="form-label">Price Range</label>

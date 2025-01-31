@@ -220,7 +220,7 @@ while ($row = $result->fetch_assoc()) {
             <div class="card-body p-4">
                 <h5 class="card-title mb-3">' . $row['coupon_code'] . ' Coupon</h5>
                 <p class="card-text text-muted">Save ' . $row['discount_percentage'] . '%! Use code: <b>' . $row['coupon_code'] . '</b></p>
-                 <p class="card-text text-muted">Spend: $' . $row['minimum_purchase_amount'] . '</p>
+                 <p class="card-text text-muted">Minimum Purchase: $' . $row['minimum_purchase_amount'] . '</p>
                 <p class="card-text text-muted">Expires: ' . $row['valid_to'] . '</p>
             </div>
         </div>

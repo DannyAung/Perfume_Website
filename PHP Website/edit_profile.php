@@ -44,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_password = $_POST['new_password'];
     $confirm_password = $_POST['confirm_password'];
 
-
-    $query = "SELECT password FROM users WHERE user_id = ?";
+    // Fetch stored password and existing image
+    $query = "SELECT password, user_image FROM users WHERE user_id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($result->num_rows === 1) {
         $user_data = $result->fetch_assoc();
         $stored_password_hash = $user_data['password'];
+        $current_image = $user_data['user_image'];
 
         if (password_verify($password, $stored_password_hash)) {
             if (!empty($new_password)) {
@@ -67,13 +68,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $password = $stored_password_hash;
             }
-       
-            $update_query = "UPDATE users SET user_name = ?, email = ?, password = ?, address = ?, phone_number = ? WHERE user_id = ?";
+
+            // Handle image upload
+            if (isset($_FILES['user_image']) && $_FILES['user_image']['error'] === UPLOAD_ERR_OK) {
+                $image_name = $_FILES['user_image']['name'];
+                $image_tmp_name = $_FILES['user_image']['tmp_name'];
+                $image_folder = "uploads/profile_images/";
+                $image_new_name = uniqid() . "_" . basename($image_name);
+
+                // Move the uploaded file
+                if (move_uploaded_file($image_tmp_name, $image_folder . $image_new_name)) {
+                    $user_image = $image_new_name;
+                } else {
+                    $_SESSION['error'] = "Error uploading file.";
+                    header("Location: user_profile.php");
+                    exit;
+                }
+            } else {
+                $user_image = $current_image; 
+            }
+
+            // Update user details
+            $update_query = "UPDATE users SET user_name = ?, email = ?, password = ?, address = ?, phone_number = ?, user_image = ? WHERE user_id = ?";
             $stmt = $conn->prepare($update_query);
-            $stmt->bind_param("sssssi", $user_name, $email, $password, $address, $phone_number, $user_id);
+            $stmt->bind_param("ssssssi", $user_name, $email, $password, $address, $phone_number, $user_image, $user_id);
 
             if ($stmt->execute()) {
                 $_SESSION['user_name'] = $user_name;
+                $_SESSION['success'] = "Profile updated successfully!";
                 header("Location: user_profile.php");
                 exit;
             } else {
@@ -90,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
+
 
 
 $user_id = $_SESSION['user_id']; // Ensure this is set

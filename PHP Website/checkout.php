@@ -91,6 +91,7 @@ $discount_amount = 0;
 $final_total_price = $total_price;
 
 $final_total_price = $final_price + $shipping_fee;
+
 // Check if a coupon is applied
 if (isset($_SESSION['applied_coupon_code'])) {
     $discount_percentage = $_SESSION['discount_percentage'];

@@ -31,11 +31,8 @@ if (isset($_POST['reset_password']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($user) {
-              
-                $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-
-              
+            if ($user) {            
+                $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);      
                 $update_sql = "UPDATE users SET password = ?, updated_at = NOW() WHERE email = ?";
                 $update_stmt = $conn->prepare($update_sql);
                 $update_stmt->execute([$hashed_password, $email]);
