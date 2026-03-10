@@ -3,11 +3,18 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
-$host = 'localhost';
-$username_db = 'root';
-$password_db = '';
-$dbname = 'ecom_website';
-$port = 3306;
+#$host = 'localhost';
+#$username_db = 'root';
+#$password_db = '';
+#$dbname = 'ecom_website';
+#$port = 3306;
+$conn = mysqli_connect(
+    getenv("DB_HOST"),
+    getenv("DB_USER"),
+    getenv("DB_PASS"),
+    getenv("DB_NAME"),
+    getenv("DB_PORT")
+);
 
 $conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
 

@@ -2,11 +2,18 @@
 
 session_start();
 
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$dbname = 'ecom_website';
-$port = 3306;
+#$host = 'localhost';
+#$username = 'root';
+#$password = '';
+#$dbname = 'ecom_website';
+#$port = 3306;
+$conn = mysqli_connect(
+    getenv("DB_HOST"),
+    getenv("DB_USER"),
+    getenv("DB_PASS"),
+    getenv("DB_NAME"),
+    getenv("DB_PORT")
+);
 
 $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 
