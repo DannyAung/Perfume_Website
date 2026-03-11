@@ -1,28 +1,30 @@
 <?php
-session_start();  
+session_start();
 
 require_once "db_connection.php";
-
 
 if (isset($_POST['login']) && $_SERVER['REQUEST_METHOD'] == "POST") {
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
 
-    
     if (!empty($email) && !empty($password)) {
-        try {
-            $sql = "SELECT user_id, user_name, password FROM users WHERE email = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([$email]);
-            $info = $stmt->fetch(PDO::FETCH_ASSOC);
+        $sql = "SELECT user_id, user_name, password FROM users WHERE email = ?";
+        $stmt = $conn->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+
+            $result = $stmt->get_result();
+            $info = $result->fetch_assoc();
 
             if ($info) {
                 $password_hash = $info['password'];
+
                 if (password_verify($password, $password_hash)) {
-                   
-                    $_SESSION['user_id'] = $info['user_id'];  
+                    $_SESSION['user_id'] = $info['user_id'];
                     $_SESSION['user_name'] = $info['user_name'];
-                    $_SESSION['user_logged_in'] = true;  
+                    $_SESSION['user_logged_in'] = true;
 
                     header("Location: user_index.php");
                     exit;
@@ -32,8 +34,10 @@ if (isset($_POST['login']) && $_SERVER['REQUEST_METHOD'] == "POST") {
             } else {
                 $password_err = "No account found with this email.";
             }
-        } catch (PDOException $e) {
-            $password_err = "Error: " . $e->getMessage();
+
+            $stmt->close();
+        } else {
+            $password_err = "Database query preparation failed.";
         }
     } else {
         $password_err = "Please enter both email and password.";
