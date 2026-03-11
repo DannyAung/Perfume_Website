@@ -433,7 +433,7 @@ if (isset($_POST['remove_all'])) {
 
                
                 echo "<div class='total-price p-3 bg-white text-center text-black fw-bold rounded'>
-                    Total Price: $" . ($total_price, 2) . "
+                    Total Price: $" . number_format($total_price, 2) . "
                   </div>";
 
             

@@ -1,13 +1,19 @@
 <?php
-$host = getenv("DB_HOST");
-$user = getenv("DB_USER");
-$pass = getenv("DB_PASS");
-$db   = getenv("DB_NAME");
-$port = getenv("DB_PORT");
+$host = getenv("DB_HOST") ?: "localhost";
+$user = getenv("DB_USER") ?: "root";
+$pass = getenv("DB_PASS") ?: "";
+$db   = getenv("DB_NAME") ?: "ecom_website";
+$port = (int)(getenv("DB_PORT") ?: 3306);
 
 $conn = mysqli_connect($host, $user, $pass, $db, $port);
 
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
+$pdo = new PDO(
+    "mysql:host={$host};dbname={$db};port={$port};charset=utf8mb4",
+    $user,
+    $pass,
+    [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]
+);
 ?>
