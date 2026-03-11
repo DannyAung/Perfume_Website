@@ -4,9 +4,7 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
+
 // $host = 'localhost';
 // $username_db = 'root';
 // $password_db = '';
@@ -214,18 +212,18 @@ if ($is_logged_in) {
                                         </div>
 
                                         <?php 
-                                        $rating = (float)($women_product['avg_rating'] ?? 0);
-                                        ?>
+                                    $rating = (float)($women_product['avg_rating'] ?? 0);
+                                    ?>
 
-                                        <div class="card-body d-flex flex-column">
-                                            <div class="rating mb-2">
-                                                <span class="text-warning">
-                                                    <?php for ($i = 0; $i < floor($rating); $i++): ?>★<?php endfor; ?>
-                                                    <?php for ($i = floor($rating); $i < 5; $i++): ?>☆<?php endfor; ?>
-                                                </span>
-                                                (<?php echo number_format($rating, 1); ?>)
-                                            </div>
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="rating mb-2">
+                                            <span class="text-warning">
+                                                <?php for ($i = 0; $i < floor($rating); $i++): ?>★<?php endfor; ?>
+                                                <?php for ($i = floor($rating); $i < 5; $i++): ?>☆<?php endfor; ?>
+                                            </span>
+                                            (<?php echo number_format($rating, 1); ?>)
                                         </div>
+                                    </div>
                                             <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
                                             <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
                                         </div>
