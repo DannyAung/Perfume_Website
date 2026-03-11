@@ -1,19 +1,13 @@
 <?php
+session_start();
 require_once "db_connection.php";
-
-if (!isset($_SESSION)) {
-    session_start();
-}
 
 function ispasswordstrong($password)
 {
     if (strlen($password) < 8) {
         return false;
-    } elseif (isstrong($password)) {
-        return true;
-    } else {
-        return false;
     }
+    return isstrong($password);
 }
 
 function isstrong($password)
@@ -21,14 +15,12 @@ function isstrong($password)
     $digitcount = 0;
     $capitalcount = 0;
     $speccount = 0;
-    $lowercount = 0;
+
     foreach (str_split($password) as $char) {
         if (is_numeric($char)) {
             $digitcount++;
         } elseif (ctype_upper($char)) {
             $capitalcount++;
-        } elseif (ctype_lower($char)) {
-            $lowercount++;
         } elseif (ctype_punct($char)) {
             $speccount++;
         }
@@ -42,24 +34,30 @@ if (isset($_POST['signup']) && $_SERVER['REQUEST_METHOD'] == "POST") {
     $email = trim($_POST["email"]);
     $password = $_POST["password"];
     $cpassword = $_POST["cpassword"];
-    $terms = isset($_POST['terms']) ? true : false;
+    $terms = isset($_POST['terms']);
 
     if ($terms) {
         if ($password == $cpassword) {
             if (ispasswordstrong($password)) {
                 $password_hash = password_hash($password, PASSWORD_BCRYPT);
 
-                try {
-                    $sql = "INSERT INTO users (user_name, password, email) VALUES (?, ?, ?)";
-                    $stmt = $conn->prepare($sql);
-                    $status = $stmt->execute([$name, $password_hash, $email]);
-                    if ($status) {
+                $sql = "INSERT INTO users (user_name, password, email) VALUES (?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+
+                if ($stmt) {
+                    $stmt->bind_param("sss", $name, $password_hash, $email);
+
+                    if ($stmt->execute()) {
                         $_SESSION['signupSuccess'] = 'Signup Success';
                         header("Location: user_login.php");
                         exit();
+                    } else {
+                        $password_err = "Error: " . $stmt->error;
                     }
-                } catch (PDOException $e) {
-                    $password_err = "Error: " . $e->getMessage();
+
+                    $stmt->close();
+                } else {
+                    $password_err = "Database error: " . $conn->error;
                 }
             } else {
                 $password_err = "Password must contain at least one digit, one capital letter, and one special character.";
