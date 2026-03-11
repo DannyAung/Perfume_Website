@@ -8,6 +8,8 @@ if (!isset($_SESSION)) {
 #$password_db = '';
 #$dbname = 'ecom_website';
 #$port = 3306;
+
+#conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
 $conn = mysqli_connect(
     getenv("DB_HOST"),
     getenv("DB_USER"),
@@ -16,8 +18,9 @@ $conn = mysqli_connect(
     getenv("DB_PORT")
 );
 
-$conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
-
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
