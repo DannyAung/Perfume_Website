@@ -10,460 +10,208 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = (int)$_SESSION['user_id'];
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-$stmt = $pdo->prepare("
-    SELECT c.cart_id, c.quantity, p.product_id, p.product_name, p.price, p.image
-    FROM cart_items c
-    JOIN products p ON c.product_id = p.product_id
-    WHERE c.user_id = :user_id
-    ORDER BY c.cart_id DESC
-");
-$stmt->execute([':user_id' => $user_id]);
-$cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_POST['update_cart'])) {
+            $product_id = (int)($_POST['product_id'] ?? 0);
+            $quantity = (int)($_POST['quantity'] ?? 1);
 
-$total = 0;
-foreach ($cart_items as $item) {
-    $total += ((float)$item['price'] * (int)$item['quantity']);
-}
+            if ($product_id > 0) {
+                if ($quantity <= 0) {
+                    $delete_stmt = $pdo->prepare("
+                        DELETE FROM cart_items
+                        WHERE user_id = :user_id AND product_id = :product_id
+                    ");
+                    $delete_stmt->execute([
+                        ':user_id' => $user_id,
+                        ':product_id' => $product_id
+                    ]);
+                } else {
+                    $update_stmt = $pdo->prepare("
+                        UPDATE cart_items
+                        SET quantity = :quantity
+                        WHERE user_id = :user_id AND product_id = :product_id
+                    ");
+                    $update_stmt->execute([
+                        ':quantity' => $quantity,
+                        ':user_id' => $user_id,
+                        ':product_id' => $product_id
+                    ]);
+                }
+            }
 
-// $host = 'localhost';
-// $username_db = 'root';
-// $password_db = '';
-// $dbname = 'ecom_website';
-// $port = 3306;
-
-$conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-$is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
-
-if (isset($_POST['add_to_cart'])) {
-    $product_id = $_POST['product_id'];
-
-    $sql = "SELECT * FROM products WHERE product_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $product_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows == 0) {
-        echo "<script>alert('Error: Product does not exist.');</script>";
-        exit;
-    }
-
-    $product = $result->fetch_assoc();
-    $stock_quantity = $product['stock_quantity'];
-    $quantity = isset($_POST['quantity']) && is_numeric($_POST['quantity']) && $_POST['quantity'] > 0 ? $_POST['quantity'] : 1; // Default to 1 if invalid
-
-    $sql = "SELECT * FROM cart_items WHERE user_id = ? AND product_id = ? AND ordered_status = 'not_ordered'";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $user_id, $product_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-
-        $cart_item = $result->fetch_assoc();
-        $new_quantity = $cart_item['quantity'] + $quantity;
-
-        if ($new_quantity > $stock_quantity) {
-            echo "<script>alert('Error: Cannot add more than available stock.');</script>";
+            header("Location: add_to_cart.php");
             exit;
         }
 
-        $sql = "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?";
-        $update_stmt = $conn->prepare($sql);
-        $update_stmt->bind_param("ii", $new_quantity, $cart_item['cart_item_id']);
-        $update_stmt->execute();
-    } else {
-        if ($quantity > $stock_quantity) {
-            echo "<script>alert('Error: Cannot add more than available stock.');</script>";
+        if (isset($_POST['remove_item'])) {
+            $product_id = (int)($_POST['product_id'] ?? 0);
+
+            if ($product_id > 0) {
+                $delete_stmt = $pdo->prepare("
+                    DELETE FROM cart_items
+                    WHERE user_id = :user_id AND product_id = :product_id
+                ");
+                $delete_stmt->execute([
+                    ':user_id' => $user_id,
+                    ':product_id' => $product_id
+                ]);
+            }
+
+            header("Location: add_to_cart.php");
             exit;
         }
 
-        $sql = "INSERT INTO cart_items (user_id, product_id, quantity, ordered_status) VALUES (?, ?, ?, 'not_ordered')";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iii", $user_id, $product_id, $quantity);
-        $stmt->execute();
-    }
+        if (isset($_POST['clear_cart'])) {
+            $clear_stmt = $pdo->prepare("
+                DELETE FROM cart_items
+                WHERE user_id = :user_id
+            ");
+            $clear_stmt->execute([':user_id' => $user_id]);
 
-    $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'user_index.php';
-    echo "<script>window.location.href = '$referer';</script>";
-    exit;
-}
-
-
-if (isset($_POST['increase_quantity'])) {
-    $cart_item_id = $_POST['cart_item_id'];
-
-    // Fetch current quantity and stock quantity
-    $sql = "SELECT ci.quantity, p.stock_quantity FROM cart_items ci JOIN products p ON ci.product_id = p.product_id WHERE ci.cart_item_id = ? AND ci.user_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $cart_item_id, $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        $cart_item = $result->fetch_assoc();
-        $current_quantity = $cart_item['quantity'];
-        $stock_quantity = $cart_item['stock_quantity'];
-
-        if ($current_quantity < $stock_quantity) {
-            $new_quantity = $current_quantity + 1;
-
-        
-            $sql = "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?";
-            $update_stmt = $conn->prepare($sql);
-            $update_stmt->bind_param("ii", $new_quantity, $cart_item_id);
-            $update_stmt->execute();
-        } else {
-            echo "<script>alert('Error: Cannot increase quantity. Only $stock_quantity items in stock.');</script>";
+            header("Location: add_to_cart.php");
+            exit;
         }
     }
 
- 
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit;
-}
+    $stmt = $pdo->prepare("
+        SELECT 
+            c.product_id,
+            c.quantity,
+            p.product_name,
+            p.image,
+            p.price,
+            p.discounted_price,
+            p.stock_quantity,
+            p.subcategory
+        FROM cart_items c
+        JOIN products p ON c.product_id = p.product_id
+        WHERE c.user_id = :user_id
+        ORDER BY c.product_id DESC
+    ");
+    $stmt->execute([':user_id' => $user_id]);
+    $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    $grand_total = 0;
+    foreach ($cart_items as $item) {
+        $unit_price = (
+            isset($item['subcategory'], $item['discounted_price'], $item['price']) &&
+            $item['subcategory'] === 'discount' &&
+            (float)$item['discounted_price'] > 0 &&
+            (float)$item['discounted_price'] < (float)$item['price']
+        ) ? (float)$item['discounted_price'] : (float)$item['price'];
 
-if (isset($_POST['decrease_quantity'])) {
-    $cart_item_id = $_POST['cart_item_id'];
-
-  
-    $sql = "SELECT quantity FROM cart_items WHERE cart_item_id = ? AND user_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $cart_item_id, $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-        $cart_item = $result->fetch_assoc();
-        if ($cart_item['quantity'] > 1) {
-            $new_quantity = $cart_item['quantity'] - 1;        
-            $sql = "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?";
-            $update_stmt = $conn->prepare($sql);
-            $update_stmt->bind_param("ii", $new_quantity, $cart_item_id);
-            $update_stmt->execute();
-        } else {
-            // Remove item from cart if quantity is 1
-            $sql = "DELETE FROM cart_items WHERE cart_item_id = ?";
-            $delete_stmt = $conn->prepare($sql);
-            $delete_stmt->bind_param("i", $cart_item_id);
-            $delete_stmt->execute();
-        }
+        $grand_total += $unit_price * (int)$item['quantity'];
     }
 
-   
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit;
+} catch (PDOException $e) {
+    die("Database error: " . $e->getMessage());
 }
-
-// Remove All Items Logic
-if (isset($_POST['remove_all'])) {
-    $sql = "DELETE FROM cart_items WHERE user_id = ? AND ordered_status = 'not_ordered'";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-
-   
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit;
-}
-
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fragrance Haven</title>
-    <!-- Bootstrap CSS -->
+    <title>My Cart</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        h1 {
-            text-align: center;
-            padding: 30px;
-            background-color: #34495e;
-            color: #ecf0f1;
-            margin: 0;
-        }
-
-        .cart-container {
-            width: 100%;
-            margin: 20px auto;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #f2f2f2;
-        }
-
-        .cart-item img {
-            width: 120px;
-            height: auto;
-            border-radius: 8px;
-        }
-
-        .product-details {
-            flex-grow: 1;
-            padding-left: 20px;
-        }
-
-        .product-details h3 {
-            margin: 0;
-            font-size: 1.1em;
-            color: #2c3e50;
-        }
-
-        .quantity {
-            display: flex;
-            align-items: center;
-        }
-
-        .quantity button {
-            background-color: #3498db;
-            color: #ffffff;
-            padding: 8px 12px;
-            font-size: 1.1em;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .quantity button:hover {
-            background-color: #2980b9;
-        }
-
-        .quantity input {
-            width: 50px;
-            padding: 5px;
-            text-align: center;
-            font-size: 1em;
-            margin: 0 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .cart-item button {
-            padding: 8px 16px;
-            background-color: rgb(88, 148, 198);
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .cart-item button:hover {
-            background-color: rgb(43, 132, 192);
-        }
-
-        .total {
-            text-align: right;
-            font-size: 1.5em;
-            margin-top: 20px;
-            color: #2c3e50;
-        }
-
-        .empty-cart {
-            text-align: center;
-            padding: 30px;
-            color: rgb(129, 127, 244);
-        }
-
-        /* Styling for the cart item */
-        .cart-item {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 20px;
-        }
-
-        .product-image {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-        }
-
-        .product-details {
-            flex-grow: 1;
-        }
-
-        .price {
-            font-weight: bold;
-            color: rgb(46, 148, 237);
-        }
-
-        /* Styling for the button container */
-        .button-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        /* Button Styles */
-        .btn-danger,
-        .btn-success {
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn-danger {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #c0392b;
-           
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #218838;
-        }
-
-
-        .original-price {
-            text-decoration: line-through;
-            color: blue;
-         
-        }
-
-        .discounted-price {
-            font-weight: bold;
-            color: rgb(222, 31, 24);
-           
-        }
-    </style>
 </head>
-
 <body>
     <?php include 'navbar.php'; ?>
-
 
     <nav aria-label="breadcrumb" class="py-3 bg-light">
         <div class="container">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Add To Cart</li>
+                <li class="breadcrumb-item active" aria-current="page">Cart</li>
             </ol>
         </div>
-
     </nav>
 
-    <div class="cart-page container my-2">
-      
-        <div class="cart-header text-center mb-2">
-            <h1>Your Shopping Cart</h1>
-        </div>
+    <div class="container my-5">
+        <h2 class="mb-4">My Cart</h2>
 
-        <div class="cart-container">
-            <?php
-            $sql = "SELECT ci.cart_item_id, ci.quantity, p.product_name, p.price, p.discounted_price, p.image, p.size
-                FROM cart_items ci
-                JOIN products p ON ci.product_id = p.product_id
-                WHERE ci.user_id = ? AND ci.ordered_status = 'not_ordered'";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("i", $user_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
+        <?php if (!empty($cart_items)): ?>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th width="170">Quantity</th>
+                            <th>Total</th>
+                            <th width="120">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($cart_items as $item): ?>
+                            <?php
+                            $unit_price = (
+                                isset($item['subcategory'], $item['discounted_price'], $item['price']) &&
+                                $item['subcategory'] === 'discount' &&
+                                (float)$item['discounted_price'] > 0 &&
+                                (float)$item['discounted_price'] < (float)$item['price']
+                            ) ? (float)$item['discounted_price'] : (float)$item['price'];
 
-            if ($result->num_rows > 0) {
-                $total_price = 0;
-                while ($item = $result->fetch_assoc()) {
-                    $regular_price = $item['price'];
-                    $discounted_price = $item['discounted_price'] > 0 ? $item['discounted_price'] : 0;
-                    $item_price = $discounted_price > 0 ? $discounted_price : $regular_price;
-                    $item_total = $item_price * $item['quantity'];
-                    $total_price += $item_total;
+                            $line_total = $unit_price * (int)$item['quantity'];
+                            ?>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="products/<?php echo htmlspecialchars($item['image']); ?>"
+                                             alt="<?php echo htmlspecialchars($item['product_name']); ?>"
+                                             style="width: 70px; height: 70px; object-fit: cover;"
+                                             class="me-3 rounded">
+                                        <div>
+                                            <strong><?php echo htmlspecialchars($item['product_name']); ?></strong>
+                                        </div>
+                                    </div>
+                                </td>
 
-                    $product_name = htmlspecialchars($item['product_name']);
-                    $product_image = htmlspecialchars($item['image']);
-                    $product_size = htmlspecialchars($item['size']); // Fetch the size
-                    $image_path = "products/" . $product_image;
+                                <td>$<?php echo number_format($unit_price, 2); ?></td>
 
-                   
-                    echo "<div class='cart-item d-flex align-items-center p-3 mb-4 bg-light rounded shadow-sm'>
-                    <img src='" . $image_path . "' alt='" . $product_name . "' class='product-image img-thumbnail me-4' style='width: 100px; height: 100px; object-fit: cover;'>
-                    <div class='product-details flex-grow-1'>
-                        <h4>" . $product_name . "</h4>
-                        <p class='text-muted'>Size: " . $product_size . "</p>";
+                                <td>
+                                    <form method="POST" action="add_to_cart.php" class="d-flex gap-2">
+                                        <input type="hidden" name="product_id" value="<?php echo (int)$item['product_id']; ?>">
+                                        <input type="number" name="quantity" value="<?php echo (int)$item['quantity']; ?>" min="0" class="form-control">
+                                        <button type="submit" name="update_cart" class="btn btn-sm btn-primary">Update</button>
+                                    </form>
+                                </td>
 
-                  
-                    if ($discounted_price > 0) {
-                        echo "<p class='regular-price text-muted'><del>$" . number_format($regular_price, 2) . "</del></p>";
-                        echo "<p class='discounted-price text-success fw-bold'>$" . number_format($discounted_price, 2) . "</p>";
-                    } else {
-                        echo "<p class='price fw-bold'>$" . number_format($regular_price, 2) . "</p>";
-                    }
+                                <td>$<?php echo number_format($line_total, 2); ?></td>
 
-                    echo "<p>Quantity: " . $item['quantity'] . "</p>
-                    </div>
-                    <div class='quantity-controls ms-3'>
-                        <form method='post'>
-                            <input type='hidden' name='cart_item_id' value='" . $item['cart_item_id'] . "'>
-                            <button type='submit' name='decrease_quantity' class='btn btn-sm btn-outline-secondary' >&ndash;</button>
-                            <button type='submit' name='increase_quantity' class='btn btn-sm btn-outline-primary'>+</button>
-                        </form>
-                    </div>
-                </div>";
-                }
+                                <td>
+                                    <form method="POST" action="add_to_cart.php">
+                                        <input type="hidden" name="product_id" value="<?php echo (int)$item['product_id']; ?>">
+                                        <button type="submit" name="remove_item" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
 
-               
-                echo "<div class='total-price p-3 bg-white text-center text-black fw-bold rounded'>
-                    Total Price: $" . number_format($total_price, 2) . "
-                  </div>";
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <form method="POST" action="add_to_cart.php">
+                    <button type="submit" name="clear_cart" class="btn btn-outline-danger">Clear Cart</button>
+                </form>
 
-            
-                echo "<div class='button-container d-flex justify-content-center mt-4'>
-                    <form method='post' class='w-20'>
-                        <button type='submit' name='remove_all' class='btn btn-danger w-100'>Remove All Items</button>
-                    </form>
-                    <form method='post' action='$_SERVER[PHP_SELF]' class='w-20'>
-                        <button type='submit' name='check_out' class='btn btn-success w-100'>Proceed to Checkout</button>
-                    </form>
-                  </div>";
-            } else {
-                echo "<div class='empty-cart text-center py-5'>
-                    <p class='text-muted'>Your cart is empty.</p>
-                    <a href='user_index.php' class='btn btn-primary mt-3'>Continue Shopping</a>
-                  </div>";
-            }
-            ?>
-        </div>
+                <div class="text-end">
+                    <h4>Grand Total: $<?php echo number_format($grand_total, 2); ?></h4>
+                    <a href="checkout.php" class="btn btn-success mt-2">Proceed to Checkout</a>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="alert alert-info">Your cart is empty.</div>
+        <?php endif; ?>
     </div>
+
     <?php include 'footer.php'; ?>
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
-
-<?php
-$conn->close();
-?>
