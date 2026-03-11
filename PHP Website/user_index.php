@@ -385,16 +385,18 @@ while ($row = $result->fetch_assoc()) {
                                             </div>
                                         </div>
                                         <?php 
-                                            $rating = (float)($discounted_product['avg_rating'] ?? 0);
-                                            ?>
+$rating = isset($discounted_product['avg_rating']) 
+          ? (float)$discounted_product['avg_rating'] 
+          : 0;
+?>
 
-                                            <div class="rating">
-                                                <span class="text-warning">
-                                                    <?php for ($i = 0; $i < floor($rating); $i++): ?>★<?php endfor; ?>
-                                                    <?php for ($i = floor($rating); $i < 5; $i++): ?>☆<?php endfor; ?>
-                                                </span>
-                                                (<?php echo number_format($rating, 1); ?>)
-                                            </div>
+<div class="rating">
+    <span class="text-warning">
+        <?php for ($i = 0; $i < floor($rating); $i++): ?>★<?php endfor; ?>
+        <?php for ($i = floor($rating); $i < 5; $i++): ?>☆<?php endfor; ?>
+    </span>
+    (<?php echo number_format($rating, 1); ?>)
+</div>
                                         <div class="card-body d-flex flex-column justify-content-between">
                                             <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
                                             <div class="pricing mb-3">
