@@ -384,12 +384,16 @@ while ($row = $result->fetch_assoc()) {
                                                 <?php endif; ?>
                                             </div>
                                         </div>
-                                        <div class="rating">
+                                        <?php 
+                                            $rating = (float)($discounted_product['avg_rating'] ?? 0);
+                                            ?>
+
+                                            <div class="rating">
                                                 <span class="text-warning">
-                                                    <?php for ($i = 0; $i < floor($discounted_product['avg_rating']); $i++): ?>★<?php endfor; ?>
-                                                    <?php for ($i = floor($discounted_product['avg_rating']); $i < 5; $i++): ?>☆<?php endfor; ?>
+                                                    <?php for ($i = 0; $i < floor($rating); $i++): ?>★<?php endfor; ?>
+                                                    <?php for ($i = floor($rating); $i < 5; $i++): ?>☆<?php endfor; ?>
                                                 </span>
-                                                (<?php echo number_format($discounted_product['avg_rating'], 1); ?>)
+                                                (<?php echo number_format($rating, 1); ?>)
                                             </div>
                                         <div class="card-body d-flex flex-column justify-content-between">
                                             <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
