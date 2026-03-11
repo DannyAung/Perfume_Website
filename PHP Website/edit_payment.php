@@ -5,17 +5,29 @@ if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     header('Location: admin_login.php');
     exit;
 }
+$conn = mysqli_connect(
+    getenv("DB_HOST"),
+    getenv("DB_USER"),
+    getenv("DB_PASS"),
+    getenv("DB_NAME"),
+    getenv("DB_PORT")
+);
 
-$host = 'localhost';
-$username_db = 'root';
-$password_db = '';
-$dbname = 'ecom_website';
-$port = 3306;
 
-$conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
+
+// $host = 'localhost';
+// $username_db = 'root';
+// $password_db = '';
+// $dbname = 'ecom_website';
+// $port = 3306;
+
+// $conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
+// if (!$conn) {
+//     die("Connection failed: " . mysqli_connect_error());
+// }
 
 // Check if edit_id is provided
 if (!isset($_GET['edit_id']) || !is_numeric($_GET['edit_id'])) {

@@ -11,17 +11,29 @@ if (!isset($_GET['order_id'])) {
 
 $order_id = $_GET['order_id'];
 
-$host = 'localhost';
-$username_db = 'root';
-$password_db = '';
-$dbname = 'ecom_website';
-$port = 3306;
+// $host = 'localhost';
+// $username_db = 'root';
+// $password_db = '';
+// $dbname = 'ecom_website';
+// $port = 3306;
 
-$conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
+// $conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
+// if (!$conn) {
+//     die("Connection failed: " . mysqli_connect_error());
+// }
+
+$conn = mysqli_connect(
+    getenv("DB_HOST"),
+    getenv("DB_USER"),
+    getenv("DB_PASS"),
+    getenv("DB_NAME"),
+    getenv("DB_PORT")
+);
+
+
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
-
 
 $sql = "SELECT o.order_id, o.total_price, o.created_at, o.shipping_method, o.shipping_fee, 
                o.coupon_code, o.discount_percentage, o.coupon_id, u.user_name, u.email, u.phone_number, 
