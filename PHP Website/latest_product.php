@@ -23,7 +23,7 @@ if (!$conn) {
 // $dbname = 'ecom_website';
 // $port = 3306;
 
-$conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
+//$conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
 
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
