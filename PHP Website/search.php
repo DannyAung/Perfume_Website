@@ -254,8 +254,8 @@ if ($is_logged_in) {
                                     <div class="card-body d-flex flex-column">
                                         <div class="rating mb-2">
                                             <span class="text-warning">
-                                                <?php for ($i = 0; $i < floor($product['avg_rating']); $i++): ?>★<?php endfor; ?>
-                                                <?php for ($i = floor($product['avg_rating']); $i < 5; $i++): ?>☆<?php endfor; ?>
+                                                <?php for ($i = 0; $i < floor($product['avg_rating'] ?? 0); $i++): ?>★<?php endfor; ?>
+                                                <?php for ($i = floor($product['avg_rating'] ?? 0); $i < 5; $i++): ?>☆<?php endfor; ?>
                                             </span>
                                             (<?php echo number_format($product['avg_rating'], 1); ?>)
                                         </div>

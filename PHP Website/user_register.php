@@ -44,16 +44,20 @@ if (isset($_POST['signup']) && $_SERVER['REQUEST_METHOD'] == "POST") {
                 $sql = "INSERT INTO users (user_name, password, email) VALUES (?, ?, ?)";
                 $stmt = $conn->prepare($sql);
 
-                if ($stmt) {
-                    $stmt->bind_param("sss", $name, $password_hash, $email);
+                $stmt->bind_param("sss", $name, $password_hash, $email);
 
-                    if ($stmt->execute()) {
-                        $_SESSION['signupSuccess'] = 'Signup Success';
-                        header("Location: user_login.php");
-                        exit();
-                    } else {
-                        $password_err = "Error: " . $stmt->error;
-                    }
+                if ($stmt->execute()) {
+
+                    $_SESSION['signupSuccess'] = 'Signup Success';
+
+                    header("Location: user_login.php");
+                    exit();
+
+                } else {
+
+                    $password_err = "Error: " . $stmt->error;
+
+                }
 
                     $stmt->close();
                 } else {
@@ -68,7 +72,7 @@ if (isset($_POST['signup']) && $_SERVER['REQUEST_METHOD'] == "POST") {
     } else {
         $password_err = "You must agree to the terms and conditions.";
     }
-}
+
 
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 ?>
