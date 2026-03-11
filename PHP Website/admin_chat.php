@@ -6,12 +6,24 @@ if (!isset($_SESSION['admin_logged_in'])) {
     exit;
 }
 
+$conn = mysqli_connect(
+    getenv("DB_HOST"),
+    getenv("DB_USER"),
+    getenv("DB_PASS"),
+    getenv("DB_NAME"),
+    getenv("DB_PORT")
+);
 
-$host = 'localhost';
-$username_db = 'root';
-$password_db = '';
-$db_name = 'ecom_website';
-$port = 3306;
+
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+// $host = 'localhost';
+// $username_db = 'root';
+// $password_db = '';
+// $db_name = 'ecom_website';
+// $port = 3306;
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8mb4;port=$port", $username_db, $password_db);

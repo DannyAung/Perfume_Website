@@ -6,15 +6,27 @@ if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     header('Location: admin_login.php');
     exit;
 }
+$conn = mysqli_connect(
+    getenv("DB_HOST"),
+    getenv("DB_USER"),
+    getenv("DB_PASS"),
+    getenv("DB_NAME"),
+    getenv("DB_PORT")
+);
 
 
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$dbname = 'ecom_website';
-$port = 3306;
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
 
-$conn = mysqli_connect($host, $username, $password, $dbname, $port);
+
+// $host = 'localhost';
+// $username = 'root';
+// $password = '';
+// $dbname = 'ecom_website';
+// $port = 3306;
+
+// $conn = mysqli_connect($host, $username, $password, $dbname, $port);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $product_name = htmlspecialchars($_POST['product_name']);
