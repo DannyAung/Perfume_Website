@@ -7,35 +7,64 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$user_id = (int)$_SESSION['user_id'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id = (int)$_SESSION['user_id'];
+    $product_id = (int)($_POST['product_id'] ?? 0);
+    $quantity = (int)($_POST['quantity'] ?? 1);
 
-$fav_stmt = $pdo->prepare("SELECT product_id FROM favorites WHERE user_id = :user_id");
-$fav_stmt->execute([':user_id' => $user_id]);
-$favorite_products = $fav_stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($product_id <= 0) {
+        die("Invalid product.");
+    }
 
-foreach ($favorite_products as $fav) {
-    $product_id = (int)$fav['product_id'];
+    if ($quantity <= 0) {
+        $quantity = 1;
+    }
 
-    $check = $pdo->prepare("SELECT cart_id, quantity FROM cart_items WHERE user_id = :user_id AND product_id = :product_id");
-    $check->execute([
-        ':user_id' => $user_id,
-        ':product_id' => $product_id
-    ]);
-    $existing = $check->fetch(PDO::FETCH_ASSOC);
-
-    if ($existing) {
-        $update = $pdo->prepare("UPDATE cart_items SET quantity = quantity + 1 WHERE cart_id = :cart_id");
-        $update->execute([':cart_id' => $existing['cart_id']]);
-    } else {
-        $insert = $pdo->prepare("INSERT INTO cart_items (user_id, product_id, quantity) VALUES (:user_id, :product_id, 1)");
-        $insert->execute([
+    try {
+        $check = $pdo->prepare("
+            SELECT quantity 
+            FROM cart_items 
+            WHERE user_id = :user_id AND product_id = :product_id
+        ");
+        $check->execute([
             ':user_id' => $user_id,
             ':product_id' => $product_id
         ]);
+        $existing = $check->fetch(PDO::FETCH_ASSOC);
+
+        if ($existing) {
+            $new_quantity = (int)$existing['quantity'] + $quantity;
+
+            $update = $pdo->prepare("
+                UPDATE cart_items 
+                SET quantity = :quantity
+                WHERE user_id = :user_id AND product_id = :product_id
+            ");
+            $update->execute([
+                ':quantity' => $new_quantity,
+                ':user_id' => $user_id,
+                ':product_id' => $product_id
+            ]);
+        } else {
+            $insert = $pdo->prepare("
+                INSERT INTO cart_items (user_id, product_id, quantity) 
+                VALUES (:user_id, :product_id, :quantity)
+            ");
+            $insert->execute([
+                ':user_id' => $user_id,
+                ':product_id' => $product_id,
+                ':quantity' => $quantity
+            ]);
+        }
+
+        header("Location: add_to_cart.php");
+        exit;
+
+    } catch (PDOException $e) {
+        die("Database error: " . $e->getMessage());
     }
 }
 
-header("Location: add_to_cart.php");
 exit;
 
 if (!empty($wishlist_items)) {

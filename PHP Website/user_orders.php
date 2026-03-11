@@ -10,14 +10,19 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = (int)$_SESSION['user_id'];
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-$stmt = $pdo->prepare("
-    SELECT *
-    FROM orders
-    WHERE user_id = :user_id
-    ORDER BY order_id DESC
-");
-$stmt->execute([':user_id' => $user_id]);
-$orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $stmt = $pdo->prepare("
+        SELECT *
+        FROM orders
+        WHERE user_id = :user_id
+        ORDER BY order_id DESC
+    ");
+    $stmt->execute([':user_id' => $user_id]);
+    $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    die("Database error: " . $e->getMessage());
+}
 
 $orders = [];
 while ($row = $result->fetch_assoc()) {
