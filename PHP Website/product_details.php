@@ -172,6 +172,25 @@ try {
             flex-direction: column;
             justify-content: space-between;
         }
+        @media (max-width: 768px) {
+    .thumbnail-gallery {
+        flex-direction: row !important;
+        justify-content: center;
+        margin-left: 0 !important;
+    }
+
+    .main-image-container {
+        margin-left: 0 !important;
+        width: 100%;
+        text-align: center;
+    }
+
+    .main-image-container img {
+        width: 100%;
+        height: auto !important;
+        max-height: 300px;
+    }
+}
     </style>
 </head>
 
