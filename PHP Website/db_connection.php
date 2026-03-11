@@ -17,15 +17,15 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-try{
-    $conn = new PDO("mysql:host=$server; port=$port; dbname=ecom_website",$user,$password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-}
+// try{
+//     $conn = new PDO("mysql:host=$server; port=$port; dbname=ecom_website",$user,$password);
+//     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// }
 
-catch(PDOException $e){
-    echo $e->getMessage();
-}
-?>
+// catch(PDOException $e){
+//     echo $e->getMessage();
+// }
+// ?>
 
 
 
