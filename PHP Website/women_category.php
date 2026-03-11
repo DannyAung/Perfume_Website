@@ -4,8 +4,9 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
-ini_set('display_errors', 0);
 error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 // $host = 'localhost';
 // $username_db = 'root';
 // $password_db = '';
