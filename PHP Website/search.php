@@ -252,13 +252,15 @@ if ($is_logged_in) {
                                         </div>
                                     </div>
                                     <div class="card-body d-flex flex-column">
-                                        <div class="rating mb-2">
-                                            <span class="text-warning">
-                                                <?php for ($i = 0; $i < floor($product['avg_rating'] ?? 0); $i++): ?>★<?php endfor; ?>
-                                                <?php for ($i = floor($product['avg_rating'] ?? 0); $i < 5; $i++): ?>☆<?php endfor; ?>
-                                            </span>
-                                            (<?php echo number_format($product['avg_rating'], 1); ?>)
-                                        </div>
+                                        <?php $rating = (float)($men_product['avg_rating'] ?? 0); ?>
+
+                                            <div class="rating mb-2">
+                                                <span class="text-warning">
+                                                    <?php for ($i = 0; $i < floor($rating); $i++): ?>★<?php endfor; ?>
+                                                    <?php for ($i = floor($rating); $i < 5; $i++): ?>☆<?php endfor; ?>
+                                                </span>
+                                                (<?php echo number_format($rating, 1); ?>)
+                                            </div>
                                         <h5 class="card-title text-truncate"><?php echo $product_name; ?></h5>
                                         <p class="card-text text-muted">$<?php echo number_format($product_price, 2); ?></p>
                                     </div>

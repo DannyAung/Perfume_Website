@@ -1,32 +1,28 @@
 <?php
 session_start();
+require_once "db_connection.php";
 
 if (!isset($_SESSION['user_id'])) {
-    header('Location: user_login.php');
+    header("Location: user_login.php");
     exit;
 }
 
-if (isset($_POST['check_out'])) {
-   
-    $_SESSION['checkout_started'] = true;
+$user_id = (int)$_SESSION['user_id'];
+$is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-   
-    header("Location: checkout.php"); 
-    exit;
-}
+$stmt = $pdo->prepare("
+    SELECT c.cart_id, c.quantity, p.product_id, p.product_name, p.price, p.image
+    FROM cart_items c
+    JOIN products p ON c.product_id = p.product_id
+    WHERE c.user_id = :user_id
+    ORDER BY c.cart_id DESC
+");
+$stmt->execute([':user_id' => $user_id]);
+$cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$user_id = $_SESSION['user_id'];
-$conn = mysqli_connect(
-    getenv("DB_HOST"),
-    getenv("DB_USER"),
-    getenv("DB_PASS"),
-    getenv("DB_NAME"),
-    getenv("DB_PORT")
-);
-
-
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+$total = 0;
+foreach ($cart_items as $item) {
+    $total += ((float)$item['price'] * (int)$item['quantity']);
 }
 
 // $host = 'localhost';

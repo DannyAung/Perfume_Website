@@ -1,26 +1,42 @@
 <?php
 session_start();
-require_once 'db_connection.php';
-
+require_once "db_connection.php";
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: user_login.php");
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = (int)$_SESSION['user_id'];
 
-$query = "
-    SELECT w.product_id, p.stock_quantity
-    FROM wishlist w
-    JOIN products p ON w.product_id = p.product_id
-    WHERE w.user_id = :user_id
-";
-$stmt = $conn->prepare($query);
-$stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-$stmt->execute();
+$fav_stmt = $pdo->prepare("SELECT product_id FROM favorites WHERE user_id = :user_id");
+$fav_stmt->execute([':user_id' => $user_id]);
+$favorite_products = $fav_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$wishlist_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+foreach ($favorite_products as $fav) {
+    $product_id = (int)$fav['product_id'];
+
+    $check = $pdo->prepare("SELECT cart_id, quantity FROM cart_items WHERE user_id = :user_id AND product_id = :product_id");
+    $check->execute([
+        ':user_id' => $user_id,
+        ':product_id' => $product_id
+    ]);
+    $existing = $check->fetch(PDO::FETCH_ASSOC);
+
+    if ($existing) {
+        $update = $pdo->prepare("UPDATE cart_items SET quantity = quantity + 1 WHERE cart_id = :cart_id");
+        $update->execute([':cart_id' => $existing['cart_id']]);
+    } else {
+        $insert = $pdo->prepare("INSERT INTO cart_items (user_id, product_id, quantity) VALUES (:user_id, :product_id, 1)");
+        $insert->execute([
+            ':user_id' => $user_id,
+            ':product_id' => $product_id
+        ]);
+    }
+}
+
+header("Location: add_to_cart.php");
+exit;
 
 if (!empty($wishlist_items)) {
     foreach ($wishlist_items as $item) {

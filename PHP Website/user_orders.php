@@ -1,40 +1,23 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "ecom_website";
+session_start();
+require_once "db_connection.php";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if (!isset($_SESSION['user_id'])) {
+    header("Location: user_login.php");
+    exit;
 }
 
-
-session_start();
-$user_id = $_SESSION['user_id'];
-
+$user_id = (int)$_SESSION['user_id'];
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-
-$sql = "
-    SELECT o.order_id, o.created_at, o.total_price, o.status, 
-           oi.order_item_id, oi.product_id, oi.quantity, oi.price,
-           p.product_name, p.image, p.size, 
-           o.address, o.phone
-    FROM orders o
-    JOIN order_items oi ON o.order_id = oi.order_id
-    JOIN products p ON oi.product_id = p.product_id
-    JOIN users u ON o.user_id = u.user_id
-    WHERE o.user_id = ? 
-    ORDER BY o.created_at DESC, oi.order_item_id ASC
-";
-
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-
+$stmt = $pdo->prepare("
+    SELECT *
+    FROM orders
+    WHERE user_id = :user_id
+    ORDER BY order_id DESC
+");
+$stmt->execute([':user_id' => $user_id]);
+$orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $orders = [];
 while ($row = $result->fetch_assoc()) {

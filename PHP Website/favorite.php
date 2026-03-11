@@ -1,39 +1,34 @@
 <?php
 session_start();
-require_once 'db_connection.php';
-
+require_once "db_connection.php";
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: user_login.php");
     exit;
 }
 
+$user_id = (int)$_SESSION['user_id'];
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 
-$user_id = $_SESSION['user_id'];
+$stmt = $pdo->prepare("
+    SELECT f.favorite_id, p.*, COALESCE(AVG(r.rating), 0) AS avg_rating
+    FROM favorites f
+    JOIN products p ON f.product_id = p.product_id
+    LEFT JOIN reviews r ON p.product_id = r.product_id
+    WHERE f.user_id = :user_id
+    GROUP BY f.favorite_id, p.product_id
+    ORDER BY f.favorite_id DESC
+");
+$stmt->execute([':user_id' => $user_id]);
+$favorites = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//Fetch and retrieves wishlist items
-$query = "
-    SELECT 
-        w.wishlist_id, 
-        w.date_added, 
-        p.product_id, 
-        p.product_name, 
-        p.image, 
-        p.price, 
-        p.discounted_price, 
-        p.stock_quantity
-    FROM wishlist w
-    JOIN products p ON w.product_id = p.product_id
-    WHERE w.user_id = :user_id
-";
 
-$stmt = $conn->prepare($query);
-$stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-$stmt->execute();
+// $stmt = $conn->prepare($query);
+// $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+// $stmt->execute();
 
-//store in wishlist_items
-$wishlist_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// //store in wishlist_items
+// $wishlist_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
