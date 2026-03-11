@@ -1,36 +1,13 @@
 <?php
 session_start();
 
-
 if (!isset($_SESSION['user_id'])) {
     header('Location: user_login.php');
     exit;
 }
-$conn = mysqli_connect(
-    getenv("DB_HOST"),
-    getenv("DB_USER"),
-    getenv("DB_PASS"),
-    getenv("DB_NAME"),
-    getenv("DB_PORT")
-);
 
+require_once "db_connection.php";
 
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-
-// $host = 'localhost';
-// $username_db = 'root';
-// $password_db = '';
-// $db_name = 'ecom_website';
-// $port = 3306;
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8mb4;port=$port", $username_db, $password_db);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
-}
 if (isset($_SESSION['success'])) {
     echo '<div class="alert alert-success">' . htmlspecialchars($_SESSION['success']) . '</div>';
     unset($_SESSION['success']);
@@ -41,17 +18,13 @@ if (isset($_SESSION['error'])) {
 }
 
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
-
-// Get user ID
 $user_id = $_SESSION['user_id'];
 
-// Fetch chat messages for the user
 $stmt = $pdo->prepare("SELECT * FROM chats WHERE user_id = :user_id ORDER BY sent_at ASC");
 $stmt->execute([':user_id' => $user_id]);
 $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
 ?>
+
 
 
 <!DOCTYPE html>

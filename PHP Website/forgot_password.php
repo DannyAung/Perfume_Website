@@ -1,48 +1,35 @@
 <?php
-require_once "db_connection.php"; 
+require_once "db_connection.php";
 
+if (isset($_POST['reset_password']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $new_password = $_POST['new_password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
 
-if (isset($_POST['reset_password']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = trim($_POST['email']);
-    $new_password = $_POST['new_password'];
-    $confirm_password = $_POST['confirm_password'];
-
-    
     $errors = [];
 
-    // Validate input fields
-    if (empty($email)) {
-        $errors[] = "Email is required.";
-    }
-    if (empty($new_password)) {
-        $errors[] = "New password is required.";
-    }
-    if (empty($confirm_password)) {
-        $errors[] = "Please confirm your password.";
-    }
-    if ($new_password !== $confirm_password) {
-        $errors[] = "Passwords do not match.";
-    }
+    if ($email === '') $errors[] = "Email is required.";
+    if ($new_password === '') $errors[] = "New password is required.";
+    if ($confirm_password === '') $errors[] = "Please confirm your password.";
+    if ($new_password !== $confirm_password) $errors[] = "Passwords do not match.";
 
     if (empty($errors)) {
-        try {
-            $sql = "SELECT user_id FROM users WHERE email = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([$email]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $sql = "SELECT user_id FROM users WHERE email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $user = $result->fetch_assoc();
 
-            if ($user) {            
-                $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);      
-                $update_sql = "UPDATE users SET password = ?, updated_at = NOW() WHERE email = ?";
-                $update_stmt = $conn->prepare($update_sql);
-                $update_stmt->execute([$hashed_password, $email]);
-
-                $success_message = "Password updated successfully. You can now log in.";
-            } else {
-                $errors[] = "No account found with this email.";
-            }
-        } catch (PDOException $e) {
-            $errors[] = "Error: " . $e->getMessage();
+        if ($user) {
+            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+            $update_sql = "UPDATE users SET password = ?, updated_at = NOW() WHERE email = ?";
+            $update_stmt = $conn->prepare($update_sql);
+            $update_stmt->bind_param("ss", $hashed_password, $email);
+            $update_stmt->execute();
+            $success_message = "Password updated successfully. You can now log in.";
+        } else {
+            $errors[] = "No account found with this email.";
         }
     }
 }
