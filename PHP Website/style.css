@@ -136,6 +136,47 @@ html, body {
         width: 16%;
     }
 }
+.product-feature {
+    margin-bottom: 40px;
+}
+
+.feature-img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    object-fit: cover;
+    display: block;
+}
+
+.text-content h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.text-content p {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .product-feature {
+        text-align: center;
+    }
+
+    .text-content h2 {
+        font-size: 1.7rem;
+    }
+
+    .text-content p {
+        font-size: 0.95rem;
+    }
+
+    .text-content .btn {
+        width: auto;
+        padding: 10px 20px;
+    }
+}
 * {
     box-sizing: border-box;  
 }
