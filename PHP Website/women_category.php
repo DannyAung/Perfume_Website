@@ -57,22 +57,10 @@ if ($is_logged_in) {
 
 <body>
     <?php include 'navbar.php'; ?>
-    <div>
-
-        <nav aria-label="breadcrumb" class="py-3 bg-light">
-            <div class="container">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
-                    <li class="breadcrumb-item"><a href="women_category.php">Category</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Women</li>
-                </ol>
-            </div>
             <h2 class="fw-bold" style="margin-left: 35px;">Women's Fragrance Collection</h2>
             <p class="text-muted" style="margin-left: 35px;">
                 Discover our exclusive Women's Fragrance Collection, where elegance meets femininity. Each scent is crafted to leave a lasting impression, perfect for any occasion.
             </p>
-        </nav>
-
         <div class="container-fluid">
             <div class="row">
 

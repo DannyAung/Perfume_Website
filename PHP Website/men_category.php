@@ -62,13 +62,6 @@ if ($is_logged_in) {
     <div>
 
         <nav aria-label="breadcrumb" class="py-3 bg-light">
-            <div class="container">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
-                    <li class="breadcrumb-item"><a href="men_category.php">Category</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Men</li>
-                </ol>
-            </div>
             <h2 class="fw-bold" style="margin-left: 35px;">Men's Fragrance Collection</h2>
             <p class="text-muted" style="margin-left: 35px;">
                 Elevate your style with our exclusive Men's Fragrance Collection, blending timeless sophistication with modern charm.

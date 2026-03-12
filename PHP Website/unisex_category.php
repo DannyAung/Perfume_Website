@@ -59,17 +59,6 @@ if ($is_logged_in) {
 <body>
     <?php include 'navbar.php'; ?>
 
-    <!-- Breadcrumb -->
-<nav aria-label="breadcrumb" class="py-3 bg-light">
-    <div class="container">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
-            <li class="breadcrumb-item"><a href="unisex_category.php">Category</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Unisex</li>
-        </ol>
-    </div>
-</nav>
-
 <!-- Page Title Section -->
 <div class="container my-3">
     <h2 class="fw-bold">Unisex Fragrance Collection</h2>
