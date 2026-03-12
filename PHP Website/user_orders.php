@@ -187,7 +187,6 @@ try {
 </head>
 <body>
 
-div class="container mt-4">
     <h2>Your Orders</h2>
 
     <?php if (!empty($orders)): ?>
