@@ -59,19 +59,26 @@ if ($is_logged_in) {
 <body>
     <?php include 'navbar.php'; ?>
 
-    <nav aria-label="breadcrumb" class="py-3 bg-light">
-        <div class="container">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
-                <li class="breadcrumb-item"><a href="unisex_category.php">Category</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Unisex</li>
-            </ol>
-        </div>
-        <h2 class="fw-bold" style="margin-left: 35px;">Unisex Fragrance Collection</h2>
-        <p class="text-muted" style="margin-left: 35px;">
-            Explore our Unisex Fragrance Collection, where versatility meets sophistication. Perfectly balanced for any gender, each scent is designed to make a statement and fit every occasion.
-        </p>
-    </nav>
+    <!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="py-3 bg-light">
+    <div class="container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
+            <li class="breadcrumb-item"><a href="unisex_category.php">Category</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Unisex</li>
+        </ol>
+    </div>
+</nav>
+
+<!-- Page Title Section -->
+<div class="container my-3">
+    <h2 class="fw-bold">Unisex Fragrance Collection</h2>
+    <p class="text-muted">
+        Explore our Unisex Fragrance Collection, where versatility meets sophistication.
+        Perfectly balanced for any gender, each scent is designed to make a statement
+        and fit every occasion.
+    </p>
+</div>
 
     <div class="container-fluid">
         <div class="row">

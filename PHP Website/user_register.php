@@ -87,113 +87,79 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        .container {
-            display: flex;
-            height: 85vh;
-            margin-top: 47px;
-            margin-left: 335px;
-            border-radius: 20px;
-            max-width: 900px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: background 0.3s, transform 0.2s;
-        }
+body{
+    background:#f4f7fc;
+}
 
-        .row {
-            align-items: center;
-        }
+/* Main container */
+.signup-container{
+    max-width:900px;
+    margin:40px auto;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+    background:white;
+    overflow:hidden;
+}
 
+/* form section */
+.form-container{
+    padding:40px;
+}
 
-        .form-container {
-            padding: 30px;
-        }
+.form-container h4{
+    font-weight:bold;
+    color:#007bff;
+}
 
-        .form-container h4 {
-            font-weight: bold;
-            color: #007bff;
-            margin-bottom: 20px;
-        }
+/* inputs */
+.form-control{
+    margin-bottom:15px;
+    border-radius:10px;
+}
 
+/* buttons */
+.btn-signup{
+    background:linear-gradient(45deg,#007bff,#0056b3);
+    border:none;
+    border-radius:10px;
+    padding:12px;
+}
 
-        .form-control {
-            margin-bottom: 15px;
-            border-radius: 10px;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
-        }
+/* image section */
+.img-container{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100%;
+}
 
+.img-container img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
 
-        .terms-label {
-            font-size: 0.9rem;
-            color: #007bff;
-        }
+/* tablet */
+@media (max-width: 992px){
 
-        .terms-check {
-            font-size: 0.8rem;
-            color: #777;
-        }
+    .signup-container{
+        margin:30px 15px;
+    }
 
+}
 
-        .btn {
-            font-size: 1.1rem;
-            padding: 6px 0;
-            border-radius: 10px;
-            background: linear-gradient(45deg, #007bff, #0056b3);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            transition: background 0.3s, transform 0.2s;
-        }
+/* mobile */
+@media (max-width:768px){
 
-        .btn-signup {
-            background: linear-gradient(45deg, #007bff, #0056b3);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            transition: background 0.3s ease;
-        }
+    .form-container{
+        padding:25px;
+    }
 
-        .btn:hover {
-            background-color: #0056b3;
-        }
+    .img-container{
+        display:none;
+    }
+}
 
-
-        .alert {
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-
-
-        .img-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-            height: 100%;
-
-        }
-
-        .img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 15px;
-        }
-
-        @media (max-width: 768px) {
-            .form-container {
-                padding: 20px;
-            }
-
-            .img-container {
-                display: none;
-            }
-
-            .btn {
-                font-size: 1rem;
-            }
-        }
-    </style>
 </head>
 
 <body>
