@@ -87,7 +87,8 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-body{
+    <style>
+        body{
     background:#f4f7fc;
 }
 
@@ -159,7 +160,7 @@ body{
         display:none;
     }
 }
-
+    </style>
 </head>
 
 <body>
