@@ -44,20 +44,16 @@ if (isset($_POST['signup']) && $_SERVER['REQUEST_METHOD'] == "POST") {
                 $sql = "INSERT INTO users (user_name, password, email) VALUES (?, ?, ?)";
                 $stmt = $conn->prepare($sql);
 
-                $stmt->bind_param("sss", $name, $password_hash, $email);
+                if ($stmt) {
+                    $stmt->bind_param("sss", $name, $password_hash, $email);
 
-                if ($stmt->execute()) {
-
-                    $_SESSION['signupSuccess'] = 'Signup Success';
-
-                    header("Location: user_login.php");
-                    exit();
-
-                } else {
-
-                    $password_err = "Error: " . $stmt->error;
-
-                }
+                    if ($stmt->execute()) {
+                        $_SESSION['signupSuccess'] = 'Signup Success';
+                        header("Location: user_login.php");
+                        exit();
+                    } else {
+                        $password_err = "Error: " . $stmt->error;
+                    }
 
                     $stmt->close();
                 } else {
@@ -72,151 +68,193 @@ if (isset($_POST['signup']) && $_SERVER['REQUEST_METHOD'] == "POST") {
     } else {
         $password_err = "You must agree to the terms and conditions.";
     }
-
+}
 
 $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'];
 ?>
 <!doctype html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sign Up</title>
-    <!-- Bootstrap CSS -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
-        body{
-    background:#f4f7fc;
-}
+        body {
+            background: #f4f7fc;
+            overflow-x: hidden;
+        }
 
-/* Main container */
-.signup-container{
-    max-width:900px;
-    margin:40px auto;
-    border-radius:20px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.1);
-    background:white;
-    overflow:hidden;
-}
+        .signup-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 15px;
+        }
 
-/* form section */
-.form-container{
-    padding:40px;
-}
+        .signup-container {
+            max-width: 1000px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
 
-.form-container h4{
-    font-weight:bold;
-    color:#007bff;
-}
+        .form-container {
+            padding: 40px 35px;
+        }
 
-/* inputs */
-.form-control{
-    margin-bottom:15px;
-    border-radius:10px;
-}
+        .form-container h4 {
+            font-weight: bold;
+            color: #0d6efd;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
 
-/* buttons */
-.btn-signup{
-    background:linear-gradient(45deg,#007bff,#0056b3);
-    border:none;
-    border-radius:10px;
-    padding:12px;
-}
+        .form-control {
+            margin-bottom: 15px;
+            border-radius: 10px;
+            min-height: 46px;
+        }
 
-/* image section */
-.img-container{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100%;
-}
+        .btn-signup {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.05rem;
+        }
 
-.img-container img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-}
+        .btn-signup:hover {
+            background: #0056b3;
+            color: white;
+        }
 
-/* tablet */
-@media (max-width: 992px){
+        .img-container {
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            min-height: 100%;
+        }
 
-    .signup-container{
-        margin:30px 15px;
-    }
+        .img-container img {
+            width: 100%;
+            max-width: 420px;
+            height: auto;
+            object-fit: contain;
+        }
 
-}
+        .form-check-label {
+            font-size: 0.95rem;
+        }
 
-/* mobile */
-@media (max-width:768px){
+        .alert {
+            font-size: 0.95rem;
+            border-radius: 10px;
+        }
 
-    .form-container{
-        padding:25px;
-    }
+        @media (max-width: 991.98px) {
+            .signup-container {
+                max-width: 700px;
+            }
 
-    .img-container{
-        display:none;
-    }
-}
+            .img-container {
+                display: none !important;
+            }
+
+            .form-container {
+                padding: 30px 22px;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .signup-wrapper {
+                padding: 15px 10px;
+            }
+
+            .signup-container {
+                border-radius: 14px;
+            }
+
+            .form-container {
+                padding: 24px 16px;
+            }
+
+            .form-container h4 {
+                font-size: 1.8rem;
+            }
+
+            .btn-signup {
+                font-size: 1rem;
+                padding: 11px;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <div class="container d-flex justify-content-center align-items-center ">
-        <div class="row w-100">
+    <div class="signup-wrapper">
+        <div class="signup-container">
+            <div class="row g-0">
+                <div class="col-lg-6 col-12 form-container">
+                    <h4 class="text-center">Sign Up</h4>
 
-            <div class="col-md-6 col-sm-10 form-container">
-                <h4 class="text-center mb-1">Sign Up</h4>
-                <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" enctype="multipart/form-data">
-                    <?php if (isset($password_err)) {
-                        echo "<p class='alert alert-danger'>$password_err</p>";
-                    } ?>
+                    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+                        <?php if (isset($password_err)) : ?>
+                            <p class="alert alert-danger"><?php echo htmlspecialchars($password_err); ?></p>
+                        <?php endif; ?>
 
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name" id="name" required>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" name="name" required>
-                    </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" id="email" required>
+                        </div>
 
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" id="password" required>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email" required>
-                    </div>
+                        <div class="mb-3">
+                            <label for="cpassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" name="cpassword" id="cpassword" required>
+                        </div>
 
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" name="terms" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="terms.html" target="_blank">Terms and Conditions</a>
+                            </label>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" name="password" required>
-                    </div>
+                        <button type="submit" class="btn btn-signup w-100" name="signup">Sign Up</button>
+                    </form>
 
+                    <p class="mt-4 text-center">
+                        Already a member? <a href="user_login.php">Login here</a>.
+                    </p>
+                </div>
 
-                    <div class="mb-3">
-                        <label for="cpassword" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" name="cpassword" required>
-                    </div>
-
-
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" name="terms" id="terms" required>
-                        <label class="form-check-label terms-label" for="terms">I agree to the <a href="terms.html" target="_blank">Terms and Conditions</a></label>
-                    </div>
-
-
-                    <button type="submit" class="btn btn-signup w-100" name="signup">Sign Up</button>
-                </form>
-                <p class="mt-3 text-center">Already a member? <a href="user_login.php">Login here</a>.</p>
-            </div>
-
-            <div class="col-md-6 d-none d-md-flex img-container">
-                <img src="./images/register.jpg" alt="Register GIF">
+                <div class="col-lg-6 img-container">
+                    <img src="./images/register.jpg" alt="Register Image">
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
