@@ -459,7 +459,7 @@ $rating = isset($discounted_product['avg_rating'])
                 </div>
 
                 <div class="latest mb-1 d-flex align-items-center">
-                    <div class="text-right" style="width: 50%; margin-left:120px;">
+                    <div class="text-right" style="width: 50%; margin-left:60px;">
                         <h3><b>New Arrival</b></h3>
                         <p class="text-muted mt-2">Experience the essence of our new arrival scent</p>
 
