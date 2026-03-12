@@ -12,39 +12,54 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 
 try {
     $stmt = $pdo->prepare("
-        SELECT *
-        FROM orders
-        WHERE user_id = :user_id
-        ORDER BY order_id DESC
+        SELECT 
+            o.order_id,
+            o.created_at,
+            o.total_price,
+            o.status,
+            o.address,
+            o.phone,
+            oi.product_name,
+            oi.quantity,
+            oi.price,
+            oi.size,
+            oi.product_id
+        FROM orders o
+        LEFT JOIN order_items oi ON o.order_id = oi.order_id
+        WHERE o.user_id = :user_id
+        ORDER BY o.order_id DESC
     ");
     $stmt->execute([':user_id' => $user_id]);
-    $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $orders = [];
+    foreach ($rows as $row) {
+        $order_id = $row['order_id'];
+
+        if (!isset($orders[$order_id])) {
+            $orders[$order_id] = [
+                'created_at' => $row['created_at'],
+                'total_price' => $row['total_price'],
+                'status' => $row['status'],
+                'address' => $row['address'],
+                'phone' => $row['phone'],
+                'items' => []
+            ];
+        }
+
+        if (!empty($row['product_name'])) {
+            $orders[$order_id]['items'][] = [
+                'product_name' => $row['product_name'],
+                'quantity' => $row['quantity'],
+                'price' => $row['price'],
+                'size' => $row['size'],
+                'product_id' => $row['product_id']
+            ];
+        }
+    }
 
 } catch (PDOException $e) {
     die("Database error: " . $e->getMessage());
-}
-
-$orders = [];
-while ($row = $result->fetch_assoc()) {
-    $order_id = $row['order_id'];
-    if (!isset($orders[$order_id])) {
-        $orders[$order_id] = [
-            'created_at' => $row['created_at'],
-            'total_price' => $row['total_price'],
-            'status' => $row['status'],
-            'address' => $row['address'],
-            'phone' => $row['phone'],
-            'items' => []
-        ];
-    }
-    $orders[$order_id]['items'][] = [
-        'product_name' => $row['product_name'],
-        'image' => $row['image'],
-        'quantity' => $row['quantity'],
-        'price' => $row['price'],
-        'size' => $row['size'],
-        'product_id' => $row['product_id']
-    ];
 }
 ?>
 
