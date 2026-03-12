@@ -187,8 +187,6 @@ try {
 </head>
 <body>
 
-<?php include 'navbar.php'; ?>
-
 <nav aria-label="breadcrumb" class="py-3 bg-light">
     <div class="container">
         <ol class="breadcrumb mb-0">
