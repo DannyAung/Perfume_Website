@@ -451,7 +451,7 @@ $rating = isset($discounted_product['avg_rating'])
                             <source src="./videos/video5.mp4" type="video/mp4">
                         </video>
                     </div>
-                    <div class="text-left" style="width: 50%; margin-left:80px;">
+                    <div class="text-left" style="width: 50%; margin-left:50px;">
                         <h3><b>Popular</b></h3>
                         <p class="text-muted mt-1">Experience the essence of our popular scent</p>
                         <a href="popular_product.php" class="btn btn-primary mt-1">See More</a>
@@ -459,7 +459,7 @@ $rating = isset($discounted_product['avg_rating'])
                 </div>
 
                 <div class="latest mb-1 d-flex align-items-center">
-                    <div class="text-right" style="width: 50%; margin-left:60px;">
+                    <div class="text-right" style="width: 50%; margin-left:40px;">
                         <h3><b>New Arrival</b></h3>
                         <p class="text-muted mt-2">Experience the essence of our new arrival scent</p>
 

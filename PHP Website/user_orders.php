@@ -187,16 +187,7 @@ try {
 </head>
 <body>
 
-<nav aria-label="breadcrumb" class="py-3 bg-light">
-    <div class="container">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Orders</li>
-        </ol>
-    </div>
-</nav>
-
-<div class="container mt-4">
+div class="container mt-4">
     <h2>Your Orders</h2>
 
     <?php if (!empty($orders)): ?>
@@ -278,6 +269,7 @@ try {
         <p>You have no orders yet.</p>
     <?php endif; ?>
 </div>
+
 
 <br><br><br><br><br>
 
