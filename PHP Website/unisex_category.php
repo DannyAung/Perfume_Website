@@ -59,6 +59,10 @@ if ($is_logged_in) {
 <body>
     <?php include 'navbar.php'; ?>
 
+    <!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="py-3 bg-light">
+</nav>
+
 <!-- Page Title Section -->
 <div class="container my-3">
     <h2 class="fw-bold">Unisex Fragrance Collection</h2>

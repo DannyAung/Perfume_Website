@@ -49,20 +49,12 @@ $is_logged_in = isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'
 <body>
     <?php include 'navbar.php'; ?>
     <div>
-       
-        <nav aria-label="breadcrumb" class="py-3 bg-light">
-            <div class="container">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Latest items</li>
-                </ol>
-            </div>
             <h2 class="fw-bold" style="margin-left: 35px;">Latest Fragrance Collection</h2>
             <p class="text-muted" style="margin-left: 35px;">
                 Elevate your style with our exclusive Latest Fragrance Collection, blending timeless sophistication with modern charm.
                 Each scent is carefully crafted to leave a lasting impression, perfect for every occasion.
             </p>
-        </nav>
+        
 
         <div class="container-fluid">
             <div class="row">

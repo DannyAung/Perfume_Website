@@ -122,12 +122,7 @@ try {
     <?php include 'navbar.php'; ?>
 
     <nav aria-label="breadcrumb" class="py-3 bg-light">
-        <div class="container">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="user_index.php">Home</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Cart</li>
-            </ol>
-        </div>
+
     </nav>
 
     <div class="container my-5">
