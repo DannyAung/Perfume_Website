@@ -1,11 +1,23 @@
 <?php
 mysqli_report(MYSQLI_REPORT_OFF);
 
-$host = getenv("DB_HOST") ?: "localhost";
-$user = getenv("DB_USER") ?: "root";
-$pass = getenv("DB_PASS") ?: "";
-$db   = getenv("DB_NAME") ?: "ecom_website";
-$port = (int)(getenv("DB_PORT") ?: 3306);
+function env_first(array $names, string $default = ''): string
+{
+    foreach ($names as $name) {
+        $value = getenv($name);
+        if ($value !== false && $value !== '') {
+            return trim($value);
+        }
+    }
+
+    return $default;
+}
+
+$host = env_first(["DB_HOST", "MYSQLHOST"], "localhost");
+$user = env_first(["DB_USER", "MYSQLUSER"], "root");
+$pass = env_first(["DB_PASS", "DB_PASSWORD", "MYSQLPASSWORD"]);
+$db   = env_first(["DB_NAME", "DB_DATABASE", "MYSQLDATABASE"], "ecom_website");
+$port = (int)env_first(["DB_PORT", "MYSQLPORT"], "3306");
 
 $conn = mysqli_connect($host, $user, $pass, $db, $port);
 

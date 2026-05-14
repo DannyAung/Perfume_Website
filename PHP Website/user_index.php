@@ -7,11 +7,23 @@ ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 mysqli_report(MYSQLI_REPORT_OFF);
 
-$dbHost = getenv("DB_HOST") ?: "localhost";
-$dbUser = getenv("DB_USER") ?: "root";
-$dbPass = getenv("DB_PASS") ?: "";
-$dbName = getenv("DB_NAME") ?: "ecom_website";
-$dbPort = (int)(getenv("DB_PORT") ?: 3306);
+function env_first(array $names, string $default = ''): string
+{
+    foreach ($names as $name) {
+        $value = getenv($name);
+        if ($value !== false && $value !== '') {
+            return trim($value);
+        }
+    }
+
+    return $default;
+}
+
+$dbHost = env_first(["DB_HOST", "MYSQLHOST"], "localhost");
+$dbUser = env_first(["DB_USER", "MYSQLUSER"], "root");
+$dbPass = env_first(["DB_PASS", "DB_PASSWORD", "MYSQLPASSWORD"]);
+$dbName = env_first(["DB_NAME", "DB_DATABASE", "MYSQLDATABASE"], "ecom_website");
+$dbPort = (int)env_first(["DB_PORT", "MYSQLPORT"], "3306");
 
 $conn = mysqli_connect($dbHost, $dbUser, $dbPass, $dbName, $dbPort);
 
