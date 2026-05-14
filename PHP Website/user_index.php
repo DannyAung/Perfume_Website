@@ -5,26 +5,23 @@ if (!isset($_SESSION)) {
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
-#$host = 'localhost';
-#$username_db = 'root';
-#$password_db = '';
-#$dbname = 'ecom_website';
-#$port = 3306;
+mysqli_report(MYSQLI_REPORT_OFF);
 
-#conn = mysqli_connect($host, $username_db, $password_db, $dbname, $port);
-$conn = mysqli_connect(
-    getenv("DB_HOST"),
-    getenv("DB_USER"),
-    getenv("DB_PASS"),
-    getenv("DB_NAME"),
-    getenv("DB_PORT")
-);
+$dbHost = getenv("DB_HOST") ?: "localhost";
+$dbUser = getenv("DB_USER") ?: "root";
+$dbPass = getenv("DB_PASS") ?: "";
+$dbName = getenv("DB_NAME") ?: "ecom_website";
+$dbPort = (int)(getenv("DB_PORT") ?: 3306);
+
+$conn = mysqli_connect($dbHost, $dbUser, $dbPass, $dbName, $dbPort);
 
 if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+    error_log(
+        "Database connection failed. host={$dbHost}, user={$dbUser}, db={$dbName}, port={$dbPort}, error=" .
+        mysqli_connect_error()
+    );
+    http_response_code(503);
+    exit("Database connection failed. Please check the Render logs.");
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['password'])) {
@@ -32,9 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'], $_POST['pass
     $password = $_POST['password'];
 
 
-    $query = "SELECT * FROM users WHERE email = :email";
+    $query = "SELECT * FROM users WHERE email = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param(":email", $email);
+    $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
 
